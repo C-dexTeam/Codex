@@ -2,9 +2,9 @@
 
 dev:
 	@echo "[i] Project is starting in development mode...\n"
-	@if command -v docker-compose > /dev/null; then \
-		echo "[i] Using docker-compose..."; \
-		docker-compose -f deployment/dev.docker-compose.yaml -p codex up -d; \
+	@if command -v docker compose > /dev/null; then \
+		echo "[i] Using docker compose..."; \
+		docker compose -f deployment/dev.docker-compose.yaml -p codex up -d; \
 	else \
 		echo "[i] Using docker compose..."; \
 		docker compose -f deployment/dev.docker-compose.yaml -p codex up -d; \
@@ -13,9 +13,9 @@ dev:
 	
 down:
 	@echo "[i] Stopping and removing containers...\n"
-	@if command -v docker-compose > /dev/null; then \
-		echo "[i] Using docker-compose..."; \
-		docker-compose -f deployment/dev.docker-compose.yaml -p codex down; \
+	@if command -v docker compose > /dev/null; then \
+		echo "[i] Using docker compose..."; \
+		docker compose -f deployment/dev.docker-compose.yaml -p codex down; \
 	else \
 		echo "[i] Using docker compose..."; \
 		docker compose -f deployment/dev.docker-compose.yaml -p codex down; \
@@ -24,9 +24,9 @@ down:
 
 build:
 	@echo "[i] Production mode is not active for now.\n"
-	@if command -v docker-compose > /dev/null; then \
-		echo "[i] Using docker-compose..."; \
-		docker-compose -f deployment/prod.docker-compose.yaml -p codex build; \
+	@if command -v docker compose > /dev/null; then \
+		echo "[i] Using docker compose..."; \
+		docker compose -f deployment/prod.docker-compose.yaml -p codex build; \
 	else \
 		echo "[i] Using docker compose..."; \
 		docker compose -f deployment/prod.docker-compose.yaml -p codex build; \
@@ -34,9 +34,9 @@ build:
 
 dev-build:
 	@echo "[i] Production mode is not active for now.\n"
-	@if command -v docker-compose > /dev/null; then \
-		echo "[i] Using docker-compose..."; \
-		docker-compose -f deployment/dev.docker-compose.yaml -p codex build; \
+	@if command -v docker compose > /dev/null; then \
+		echo "[i] Using docker compose..."; \
+		docker compose -f deployment/dev.docker-compose.yaml -p codex build; \
 	else \
 		echo "[i] Using docker compose..."; \
 		docker compose -f deployment/dev.docker-compose.yaml -p codex build; \
