@@ -1,0 +1,43 @@
+version: '3.3'
+
+services:
+  api:
+    container_name: codex-api
+    build:
+      context: ../backend/.
+      dockerfile: ../deployment/backend/dev.Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ../backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker.sock ekleniyor
+    networks:
+      - codex
+
+  frontend:
+    container_name: codex-frontend
+    build:
+      context: ../frontend/.
+      dockerfile: ../deployment/frontend/dev.Dockerfile
+    ports:
+      - 9000:3000
+    volumes:
+      - ../frontend:/app
+    networks:
+      - codex
+
+  nginx:
+    image: nginx:latest
+    container_name: codex-nginx
+    restart: always
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - codex
+
+networks:
+  codex:
+    driver: bridge
