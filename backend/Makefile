@@ -9,5 +9,4 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  dev.swagger.init    Generate Swagger"
-	@echo "  dev.docker.start    Start & Build Containers"
 	@echo "  help                Show this help"

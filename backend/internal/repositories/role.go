@@ -29,20 +29,6 @@ func (r *RoleRepository) dbModelToAppModel(dbModel dbModelRoles) (role domains.R
 	return
 }
 
-// dbModelFromAppModel converts domains.role to dbModelRoles for database operations (e.g. insert, update)
-func (r *RoleRepository) dbModelFromAppModel(domModel domains.Role) (dbModel dbModelRoles) {
-	if domModel.GetID() != uuid.Nil {
-		dbModel.ID.String = domModel.GetID().String()
-		dbModel.ID.Valid = true
-	}
-	if domModel.GetName() != "" {
-		dbModel.Name.String = domModel.GetName()
-		dbModel.Name.Valid = true
-	}
-
-	return
-}
-
 // dbModelFromAppFilter converts domains.RoleFilter to dbModelRole for database operations (e.g. select)
 func (r *RoleRepository) dbModelFromAppFilter(filter domains.RoleFilter) (dbFilter dbModelRoles) {
 	if filter.ID != uuid.Nil {

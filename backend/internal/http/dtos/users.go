@@ -23,6 +23,12 @@ type UserLoginDTO struct {
 	Password string `json:"password" validate:"required,min=8"`
 }
 
+type UserAuthWallet struct {
+	PublicKeyBase58 string `json:"publicKeyBase58"`
+	Message         string `json:"message"`
+	Signature       string `json:"signatureBase58"`
+}
+
 type UserProfileDTO struct {
 	UserID   string `json:"userID"`
 	RoleID   string `json:"roleID"`

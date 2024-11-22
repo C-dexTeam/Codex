@@ -183,9 +183,57 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/public/wallet": {
+            "post": {
+                "description": "Auth Wallet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Auth Wallet",
+                "parameters": [
+                    {
+                        "description": "Wallet",
+                        "name": "wallet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserAuthWallet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "dto.UserAuthWallet": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "publicKeyBase58": {
+                    "type": "string"
+                },
+                "signatureBase58": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UserLoginDTO": {
             "type": "object",
             "required": [

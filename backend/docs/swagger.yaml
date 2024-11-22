@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  dto.UserAuthWallet:
+    properties:
+      message:
+        type: string
+      publicKeyBase58:
+        type: string
+      signatureBase58:
+        type: string
+    type: object
   dto.UserLoginDTO:
     properties:
       password:
@@ -158,6 +167,28 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Register
+      tags:
+      - Auth
+  /public/wallet:
+    post:
+      consumes:
+      - application/json
+      description: Auth Wallet
+      parameters:
+      - description: Wallet
+        in: body
+        name: wallet
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserAuthWallet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Auth Wallet
       tags:
       - Auth
 securityDefinitions:

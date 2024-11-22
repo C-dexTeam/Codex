@@ -16,16 +16,18 @@ type UserRepository struct {
 
 // dbModelUsers is the struct that represents the user in the database.
 type dbModelUsers struct {
-	ID       sql.NullString `db:"id"`
-	Username sql.NullString `db:"username"`
-	Email    sql.NullString `db:"email"`
-	Password sql.NullString `db:"password"`
+	ID        sql.NullString `db:"id"`
+	PublicKey sql.NullString `db:"public_key"`
+	Username  sql.NullString `db:"username"`
+	Email     sql.NullString `db:"email"`
+	Password  sql.NullString `db:"password"`
 }
 
 // dbModelToAppModel converts dbModelUsers to domains.User for application operations (e.g. return to client)
 func (r *UserRepository) dbModelToAppModel(dbModel dbModelUsers) (user domains.User) {
 	user.Unmarshal(
 		uuid.MustParse(dbModel.ID.String),
+		dbModel.PublicKey.String,
 		dbModel.Username.String,
 		dbModel.Email.String,
 		dbModel.Password.String,
@@ -38,6 +40,10 @@ func (r *UserRepository) dbModelFromAppModel(domModel domains.User) (dbModel dbM
 	if domModel.GetID() != uuid.Nil {
 		dbModel.ID.String = domModel.GetID().String()
 		dbModel.ID.Valid = true
+	}
+	if domModel.GetPublicKey() != "" {
+		dbModel.PublicKey.String = domModel.GetPublicKey()
+		dbModel.PublicKey.Valid = true
 	}
 	if domModel.GetEmail() != "" {
 		dbModel.Email.String = domModel.GetEmail()
@@ -60,6 +66,10 @@ func (r *UserRepository) dbModelFromAppFilter(filter domains.UserFilter) (dbFilt
 	if filter.ID != uuid.Nil {
 		dbFilter.ID.String = filter.ID.String()
 		dbFilter.ID.Valid = true
+	}
+	if filter.PublicKey != "" {
+		dbFilter.PublicKey.String = filter.PublicKey
+		dbFilter.PublicKey.Valid = true
 	}
 	if filter.Username != "" {
 		dbFilter.Username.String = filter.Username
@@ -87,13 +97,14 @@ func (r *UserRepository) Filter(ctx context.Context, filter domains.UserFilter, 
 	FROM t_users
 	WHERE
 		($1::uuid IS NULL OR id = $1::uuid) AND
-		($2::text IS NULL OR username LIKE '%' || $2::text || '%') AND
-		($3::text IS NULL OR email LIKE '%' || $3::text || '%')
-	LIMIT $4 OFFSET $5
+		($2::text IS NULL OR public_key = $2::text) AND
+		($3::text IS NULL OR username LIKE '%' || $3::text || '%') AND
+		($4::text IS NULL OR email LIKE '%' || $4::text || '%')
+	LIMIT $5 OFFSET $6
 	`
 
 	// Execute the query with the extracted fields
-	if err = r.db.SelectContext(ctx, &dbResult, query, dbFilter.ID, dbFilter.Username, dbFilter.Email, limit, (page-1)*limit); err != nil {
+	if err = r.db.SelectContext(ctx, &dbResult, query, dbFilter.ID, dbFilter.PublicKey, dbFilter.Username, dbFilter.Email, limit, (page-1)*limit); err != nil {
 		return
 	}
 	for _, dbModel := range dbResult {
@@ -106,14 +117,14 @@ func (r *UserRepository) AddTx(ctx context.Context, tx *sqlx.Tx, user *domains.U
 	dbModel := r.dbModelFromAppModel(*user)
 	query := `
 		INSERT INTO
-			t_users (username, email, password)
+			t_users (public_key, username, email, password)
 		VALUES
-			($1, $2, $3)
+			($1, $2, $3, $4)
 		RETURNING id
 	`
 
 	var id uuid.UUID
-	err := tx.QueryRowxContext(ctx, query, dbModel.Username, dbModel.Email, dbModel.Password).Scan(&id)
+	err := tx.QueryRowxContext(ctx, query, dbModel.PublicKey, dbModel.Username, dbModel.Email, dbModel.Password).Scan(&id)
 	if err != nil {
 		tx.Rollback()
 		return uuid.Nil, err

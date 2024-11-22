@@ -20,25 +20,28 @@ type IUserRepository interface {
 type IUserService interface {
 	Login(ctx context.Context, username, password string) (user *User, err error)
 	Register(ctx context.Context, username, email, password, confirmPassword string, defaultRoleID uuid.UUID) (err error)
+	AuthWallet(ctx context.Context, publicKey, message, signature string, defaultRoleID uuid.UUID) (user *User, err error)
 }
 
 // User represents a user entity.
 type User struct {
-	id       uuid.UUID
-	username string
-	email    string
-	password string
+	id        uuid.UUID
+	publicKey string
+	username  string
+	email     string
+	password  string
 }
 
 // UserFilter is the struct that represents user's uniques.
 type UserFilter struct {
-	ID       uuid.UUID
-	Username string
-	Email    string
+	ID        uuid.UUID
+	PublicKey string
+	Username  string
+	Email     string
 }
 
 // NewUser creates a new user.
-func NewUser(username, email, password string) (*User, error) {
+func NewUser(publicKey, username, email, password string) (*User, error) {
 	user := &User{}
 	if err := user.SetUsername(username); err != nil {
 		return nil, err
@@ -49,13 +52,15 @@ func NewUser(username, email, password string) (*User, error) {
 	if err := user.SetPassword(password); err != nil {
 		return nil, err
 	}
+	user.SetPublicKey(publicKey)
 
 	return user, nil
 }
 
 // Unmarshal unmarshals the user for database operations.
-func (d *User) Unmarshal(id uuid.UUID, username, email, password string) {
+func (d *User) Unmarshal(id uuid.UUID, publicKey, username, email, password string) {
 	d.id = id
+	d.publicKey = publicKey
 	d.username = username
 	d.email = email
 	d.password = password
@@ -64,6 +69,10 @@ func (d *User) Unmarshal(id uuid.UUID, username, email, password string) {
 // Getter Functions
 func (d *User) GetID() uuid.UUID {
 	return d.id
+}
+
+func (d *User) GetPublicKey() string {
+	return d.publicKey
 }
 
 func (d *User) GetUsername() string {
@@ -79,11 +88,12 @@ func (d *User) GetPassword() string {
 }
 
 // Setter Functions
+func (d *User) SetPublicKey(publicKey string) {
+	d.publicKey = publicKey
+}
+
 func (d *User) SetUsername(username string) error {
-	if username == "" {
-		return serviceErrors.NewServiceErrorWithMessage(400, "username is required")
-	}
-	if len(username) < 3 {
+	if len(username) < 3 && len(username) != 0 {
 		return serviceErrors.NewServiceErrorWithMessage(400, "username must be at least 3 characters")
 	} else if len(username) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(400, "username must be at most 30 characters")
@@ -93,9 +103,6 @@ func (d *User) SetUsername(username string) error {
 }
 
 func (d *User) SetEmail(email string) error {
-	if email == "" {
-		return serviceErrors.NewServiceErrorWithMessage(400, "email is required")
-	}
 	if len(email) > 40 {
 		return serviceErrors.NewServiceErrorWithMessage(400, "email must be at most 40 characters")
 	}
