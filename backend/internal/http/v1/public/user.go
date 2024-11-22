@@ -12,6 +12,7 @@ import (
 func (h *PublicHandler) initUserRoutes(root fiber.Router) {
 	root.Post("/login", h.Login)
 	root.Post("/register", h.Register)
+	root.Post("/wallet", h.AuthWallet)
 	root.Post("/logout", h.Logout)
 
 }
@@ -33,6 +34,59 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 		return err
 	}
 	userAuthData, err := h.services.UserService().Login(c.Context(), login.Username, login.Password)
+	if err != nil {
+		return err
+	}
+
+	var userProfileData *domains.UserProfile
+	userProfiles, err := h.services.UserProfileService().GetAllUsersProfile(c.Context(), "", userAuthData.GetID().String(), "", "", "", "1", "1")
+	if err != nil {
+		return err
+	}
+	userProfileData = &userProfiles[0]
+
+	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfileData.GetRoleID())
+	if err != nil {
+		return err
+	}
+
+	sess, err := h.sessionStore.Get(c)
+	if err != nil {
+		return err
+	}
+	sessionData := sessionStore.SessionData{}
+	sessionData.ParseFromUser(userAuthData, userProfileData, userRole)
+	sess.Set("user", sessionData)
+	if err := sess.Save(); err != nil {
+		return err
+	}
+
+	return response.Response(200, "Login successful", nil)
+}
+
+// @Tags Auth
+// @Summary Auth Wallet
+// @Description Auth Wallet
+// @Accept json
+// @Produce json
+// @Param wallet body dto.UserAuthWallet true "Wallet"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /public/wallet [post]
+func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
+	var wallet dto.UserAuthWallet
+	if err := c.BodyParser(&wallet); err != nil {
+		return err
+	}
+	if err := h.services.UtilService().Validator().ValidateStruct(wallet); err != nil {
+		return err
+	}
+
+	defaultRole, err := h.services.RoleService().GetDefault(c.Context())
+	if err != nil {
+		return err
+	}
+
+	userAuthData, err := h.services.UserService().AuthWallet(c.Context(), wallet.PublicKeyBase58, wallet.Message, wallet.Signature, defaultRole.GetID())
 	if err != nil {
 		return err
 	}

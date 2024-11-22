@@ -91,7 +91,7 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	}()
 
 	// Creating a new user model
-	newUser, err := domains.NewUser(username, email, password)
+	newUser, err := domains.NewUser("", username, email, password)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating user", err)
 	}
@@ -105,7 +105,6 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	// Creating a new user profile
 	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "")
 	if err != nil {
-		fmt.Println(1, err)
 		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
 	}
 
@@ -122,4 +121,70 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	}
 
 	return nil
+}
+
+func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signature string, defaultRoleID uuid.UUID) (user *domains.User, err error) {
+	ok, err := hasherService.VerifySignature(publicKey, message, signature)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(400, "error while verifing signature", err)
+	}
+	if !ok {
+		return nil, serviceErrors.NewServiceErrorWithMessage(400, "unable to verify the signature with the provided public key")
+	}
+
+	// Checking if the user already has an account
+	users, _, err := s.userRepository.Filter(ctx, domains.UserFilter{PublicKey: publicKey}, 1, 1)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while filtering users", err)
+	}
+	if len(users) != 0 {
+		// If the user exist return the user.
+		user = &users[0]
+
+		return user, nil
+	}
+
+	// Begin a new transaction
+	tx, err := s.transactionRepository.Begin()
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while beginning transaction", err)
+	}
+
+	// Rollback the transaction in case of any error
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Creating a new user model
+	newUser, err := domains.NewUser(publicKey, "", "", "")
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating user", err)
+	}
+
+	// Save the new user to the database within the transaction
+	authUserID, err := s.userRepository.AddTx(ctx, tx, newUser)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while adding the user", err)
+	}
+
+	// Creating a new user profile
+	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "")
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
+	}
+
+	// Save the new user profile to the database within the transaction
+	if err := s.userProfileRepository.AddTx(ctx, tx, newUserProfile); err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
+	}
+
+	// Commit the transaction
+	if err = s.transactionRepository.Commit(tx); err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while committing transaction", err)
+	}
+	user = newUser
+
+	return
 }
