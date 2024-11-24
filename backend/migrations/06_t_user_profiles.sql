@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS t_user_profiles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 
-    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES t_users(id),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES t_users(id) ON DELETE CASCADE,
     CONSTRAINT fk_role_id FOREIGN KEY (role_id) REFERENCES t_roles(id)
 );
 
