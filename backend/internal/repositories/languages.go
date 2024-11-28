@@ -25,6 +25,18 @@ func (r *LanguagesRepository) dbModelToAppModel(dbModel dbModelLanguages) (langu
 	)
 	return
 }
+func (r *LanguagesRepository) filterModelToDBModel(filter domains.LanguagesFilter) (dbModel dbModelLanguages) {
+	if filter.ID != uuid.Nil {
+		dbModel.ID.String = filter.ID.String()
+		dbModel.ID.Valid = true
+	}
+	if filter.Value != "" {
+		dbModel.Value.String = filter.Value
+		dbModel.Value.Valid = true
+	}
+
+	return
+}
 
 func (r *LanguagesRepository) appModelToDBModel(appModel domains.Languages) (dbModel dbModelLanguages) {
 	if appModel.GetID() != uuid.Nil {
@@ -42,8 +54,8 @@ func NewLanguageRepository(db *sqlx.DB) domains.ILanguagesRepository {
 	return &LanguagesRepository{db: db}
 }
 
-func (r *LanguagesRepository) Filter(ctx context.Context, appModel domains.Languages, limit, page int64) (languages []domains.Languages, dataCount int64, err error) {
-	dbModel := r.appModelToDBModel(appModel)
+func (r *LanguagesRepository) Filter(ctx context.Context, filterModel domains.LanguagesFilter, limit, page int64) (languages []domains.Languages, dataCount int64, err error) {
+	dbModel := r.filterModelToDBModel(filterModel)
 	dbResult := []dbModelLanguages{}
 
 	query := `
