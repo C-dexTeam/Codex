@@ -16,6 +16,7 @@ type Services struct {
 	adminService       domains.IAdminService
 	userProfileService domains.IUserProfileService
 	roleService        domains.IRoleService
+	languageService    domains.ILanguagesService
 }
 
 func CreateNewServices(
@@ -24,6 +25,7 @@ func CreateNewServices(
 	userProfileRepository domains.IUserProfileRepository,
 	transactionRepository domains.ITransactionRepository,
 	roleRepository domains.IRoleRepository,
+	languageRepository domains.ILanguagesRepository,
 
 ) *Services {
 	utilsService := newUtilService(validatorService)
@@ -31,6 +33,7 @@ func CreateNewServices(
 	userService := newUserService(userRepository, userProfileRepository, transactionRepository, utilsService)
 	adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
 	roleService := newRoleService(roleRepository)
+	languageService := newLanguageService(languageRepository)
 
 	return &Services{
 		utilService:        utilsService,
@@ -38,6 +41,7 @@ func CreateNewServices(
 		adminService:       adminService,
 		userProfileService: userProfileService,
 		roleService:        roleService,
+		languageService:    languageService,
 	}
 }
 
@@ -59,6 +63,10 @@ func (s *Services) UserProfileService() domains.IUserProfileService {
 
 func (s *Services) RoleService() domains.IRoleService {
 	return s.roleService
+}
+
+func (s *Services) LanguageService() domains.ILanguagesService {
+	return s.languageService
 }
 
 // ------------------------------------------------------

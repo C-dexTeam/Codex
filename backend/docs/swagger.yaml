@@ -95,6 +95,30 @@ paths:
       summary: Get All Users
       tags:
       - Admin
+  /private/language/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all languages based on the provided query parameters.
+      parameters:
+      - description: Language ID
+        in: query
+        name: id
+        type: string
+      - description: Value
+        in: query
+        name: value
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All Languages
+      tags:
+      - Language
   /private/user/profile:
     get:
       consumes:

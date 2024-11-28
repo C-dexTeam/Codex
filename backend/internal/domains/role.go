@@ -20,6 +20,11 @@ type IRoleService interface {
 	GetRoleByID(ctx context.Context, roleID uuid.UUID) (role *Role, err error)
 }
 
+const (
+	DefaultRole = "Member"
+	AdminRole   = "Admin"
+)
+
 // Role represents a role entity.
 type Role struct {
 	id   uuid.UUID
@@ -70,10 +75,3 @@ func (d *Role) GetID() uuid.UUID {
 func (d *Role) GetName() string {
 	return d.name
 }
-
-// Variables
-
-var (
-	DefaultRole = "Member"
-	AdminRole   = "Admin"
-)
