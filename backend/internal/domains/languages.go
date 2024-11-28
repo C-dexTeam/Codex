@@ -7,20 +7,20 @@ import (
 )
 
 type ILanguagesRepository interface {
-	Filter(ctx context.Context, filterModel LanguagesFilter, limit, page int64) (languages []Languages, dataCount int64, err error)
+	Filter(ctx context.Context, filterModel LanguageFilter, limit, page int64) (languages []Language, dataCount int64, err error)
 }
 
 type ILanguagesService interface {
-	GetLanguages(ctx context.Context, languageID, value string) (languages []Languages, err error)
-	GetDefault(ctx context.Context) (language *Languages, err error)
+	GetLanguages(ctx context.Context, languageID, value string) (languages []Language, err error)
+	GetDefault(ctx context.Context) (language *Language, err error)
 }
 
-type Languages struct {
+type Language struct {
 	id    uuid.UUID
 	value string
 }
 
-type LanguagesFilter struct {
+type LanguageFilter struct {
 	ID    uuid.UUID
 	Value string
 }
@@ -30,26 +30,26 @@ const (
 	DefaultLanguageLimit = 8
 )
 
-func NewLanguage(value string) (*Languages, error) {
-	language := &Languages{}
+func NewLanguage(value string) (*Language, error) {
+	language := &Language{}
 	language.SetValue(value)
 
 	return language, nil
 }
 
-func (d *Languages) Unmarshal(id uuid.UUID, value string) {
+func (d *Language) Unmarshal(id uuid.UUID, value string) {
 	d.id = id
 	d.value = value
 }
 
-func (d *Languages) GetID() uuid.UUID {
+func (d *Language) GetID() uuid.UUID {
 	return d.id
 }
 
-func (d *Languages) GetValue() string {
+func (d *Language) GetValue() string {
 	return d.value
 }
 
-func (d *Languages) SetValue(value string) {
+func (d *Language) SetValue(value string) {
 	d.value = value
 }

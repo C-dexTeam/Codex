@@ -21,7 +21,7 @@ func newLanguageService(
 	}
 }
 
-func (s *languageService) GetLanguages(ctx context.Context, languageID, value string) (languages []domains.Languages, err error) {
+func (s *languageService) GetLanguages(ctx context.Context, languageID, value string) (languages []domains.Language, err error) {
 	var languageUUID uuid.UUID
 	if languageID != "" {
 		languageUUID, err = uuid.Parse(languageID)
@@ -30,15 +30,15 @@ func (s *languageService) GetLanguages(ctx context.Context, languageID, value st
 		}
 	}
 
-	languages, _, err = s.languageRepository.Filter(ctx, domains.LanguagesFilter{
+	languages, _, err = s.languageRepository.Filter(ctx, domains.LanguageFilter{
 		ID:    languageUUID,
 		Value: value,
 	}, domains.DefaultLanguageLimit, 1)
 	return
 }
 
-func (s *languageService) GetDefault(ctx context.Context) (language *domains.Languages, err error) {
-	langauges, _, err := s.languageRepository.Filter(ctx, domains.LanguagesFilter{
+func (s *languageService) GetDefault(ctx context.Context) (language *domains.Language, err error) {
+	langauges, _, err := s.languageRepository.Filter(ctx, domains.LanguageFilter{
 		Value: domains.DefaultLanguage,
 	}, 1, 1)
 	if len(langauges) != 1 {

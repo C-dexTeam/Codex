@@ -18,14 +18,14 @@ type dbModelLanguages struct {
 	Value sql.NullString `db:"value"`
 }
 
-func (r *LanguagesRepository) dbModelToAppModel(dbModel dbModelLanguages) (language domains.Languages) {
+func (r *LanguagesRepository) dbModelToAppModel(dbModel dbModelLanguages) (language domains.Language) {
 	language.Unmarshal(
 		uuid.MustParse(dbModel.ID.String),
 		dbModel.Value.String,
 	)
 	return
 }
-func (r *LanguagesRepository) filterModelToDBModel(filter domains.LanguagesFilter) (dbModel dbModelLanguages) {
+func (r *LanguagesRepository) filterModelToDBModel(filter domains.LanguageFilter) (dbModel dbModelLanguages) {
 	if filter.ID != uuid.Nil {
 		dbModel.ID.String = filter.ID.String()
 		dbModel.ID.Valid = true
@@ -38,7 +38,7 @@ func (r *LanguagesRepository) filterModelToDBModel(filter domains.LanguagesFilte
 	return
 }
 
-func (r *LanguagesRepository) appModelToDBModel(appModel domains.Languages) (dbModel dbModelLanguages) {
+func (r *LanguagesRepository) appModelToDBModel(appModel domains.Language) (dbModel dbModelLanguages) {
 	if appModel.GetID() != uuid.Nil {
 		dbModel.ID.String = appModel.GetID().String()
 		dbModel.ID.Valid = true
@@ -54,7 +54,7 @@ func NewLanguageRepository(db *sqlx.DB) domains.ILanguagesRepository {
 	return &LanguagesRepository{db: db}
 }
 
-func (r *LanguagesRepository) Filter(ctx context.Context, filterModel domains.LanguagesFilter, limit, page int64) (languages []domains.Languages, dataCount int64, err error) {
+func (r *LanguagesRepository) Filter(ctx context.Context, filterModel domains.LanguageFilter, limit, page int64) (languages []domains.Language, dataCount int64, err error) {
 	dbModel := r.filterModelToDBModel(filterModel)
 	dbResult := []dbModelLanguages{}
 
