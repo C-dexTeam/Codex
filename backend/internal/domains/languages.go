@@ -29,6 +29,14 @@ func (d *Languages) Unmarshal(id uuid.UUID, value string) {
 	d.value = value
 }
 
+func (d *Languages) GetID() uuid.UUID {
+	return d.id
+}
+
+func (d *Languages) GetValue() string {
+	return d.value
+}
+
 func (d *Languages) SetValue(value string) {
 	d.value = value
 }
