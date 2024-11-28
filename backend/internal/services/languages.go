@@ -22,18 +22,18 @@ func newLanguageService(
 }
 
 func (s *languageService) GetLanguages(ctx context.Context, languageID, value string) (languages []domains.Languages, err error) {
-	languageUUID, err := uuid.Parse(languageID)
-	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, domains.ErrLanguageNotFound, err)
+	var languageUUID uuid.UUID
+	if languageID != "" {
+		languageUUID, err = uuid.Parse(languageID)
+		if err != nil {
+			return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, domains.ErrLanguageNotFound, err)
+		}
 	}
 
-	langauges, _, err := s.languageRepository.Filter(ctx, domains.LanguagesFilter{
+	languages, _, err = s.languageRepository.Filter(ctx, domains.LanguagesFilter{
 		ID:    languageUUID,
 		Value: value,
-	}, 1, 1)
-	if len(langauges) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(domains.StatusNotFound, domains.ErrLanguageNotFound, err)
-	}
+	}, domains.DefaultLanguageLimit, 1)
 	return
 }
 
@@ -42,7 +42,7 @@ func (s *languageService) GetDefault(ctx context.Context) (language *domains.Lan
 		Value: domains.DefaultLanguage,
 	}, 1, 1)
 	if len(langauges) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(domains.StatusNotFound, domains.ErrLanguageNotFound, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(domains.StatusNotFound, domains.ErrLanguageDefaultNotFound, err)
 	}
 	language = &langauges[0]
 	return

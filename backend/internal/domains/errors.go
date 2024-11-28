@@ -8,5 +8,6 @@ const (
 
 // 404
 const (
-	ErrLanguageNotFound = "DEFAULT_LANGUAGE_NOT_FOUND"
+	ErrLanguageNotFound        = "LANGUAGE_NOT_FOUND"
+	ErrLanguageDefaultNotFound = "DEFAULT_LANGUAGE_NOT_FOUND"
 )

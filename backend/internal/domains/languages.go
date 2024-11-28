@@ -26,7 +26,8 @@ type LanguagesFilter struct {
 }
 
 const (
-	DefaultLanguage = "EN"
+	DefaultLanguage      = "EN"
+	DefaultLanguageLimit = 8
 )
 
 func NewLanguage(value string) (*Languages, error) {
