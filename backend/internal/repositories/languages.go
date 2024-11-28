@@ -35,7 +35,6 @@ func (r *LanguagesRepository) appModelToDBModel(appModel domains.Languages) (dbM
 		dbModel.Value.String = appModel.GetValue()
 		dbModel.Value.Valid = true
 	}
-
 	return
 }
 
