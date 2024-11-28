@@ -16,14 +16,14 @@ type LanguageDTO struct {
 	Value string    `json:"value"`
 }
 
-func (m *LanguageDTOManager) ToLanguageDTO(appModel *domains.Languages) LanguageDTO {
+func (m *LanguageDTOManager) ToLanguageDTO(appModel *domains.Language) LanguageDTO {
 	return LanguageDTO{
 		ID:    appModel.GetID(),
 		Value: appModel.GetValue(),
 	}
 }
 
-func (m *LanguageDTOManager) ToLanguageDTOs(appModels []domains.Languages) []LanguageDTO {
+func (m *LanguageDTOManager) ToLanguageDTOs(appModels []domains.Language) []LanguageDTO {
 	var languagesDTOs []LanguageDTO
 	for _, model := range appModels {
 		languagesDTOs = append(languagesDTOs, m.ToLanguageDTO(&model))
