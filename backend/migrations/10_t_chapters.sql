@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS t_chapters (
     description TEXT NOT NULL,
     content TEXT NOT NULL,
     func_name VARCHAR(30) NOT NULL,
-    code_template TEXT NOT NULL,
+    frontend_template TEXT NOT NULL,
+    docker_template TEXT NOT NULL,
+    check_template TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 
