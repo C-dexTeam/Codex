@@ -1,6 +1,8 @@
 package services
 
-import "github.com/C-dexTeam/codex/internal/domains"
+import (
+	"github.com/C-dexTeam/codex/internal/domains"
+)
 
 type IService interface {
 	UtilService() IUtilService
@@ -8,6 +10,7 @@ type IService interface {
 	UserProfileService() domains.IUserProfileService
 	RoleService() domains.IRoleService
 	AdminService() domains.IAdminService
+	RewardService() domains.IRewardService
 }
 
 type Services struct {
@@ -17,6 +20,7 @@ type Services struct {
 	userProfileService domains.IUserProfileService
 	roleService        domains.IRoleService
 	languageService    domains.ILanguagesService
+	rewardService      domains.IRewardService
 }
 
 func CreateNewServices(
@@ -26,6 +30,8 @@ func CreateNewServices(
 	transactionRepository domains.ITransactionRepository,
 	roleRepository domains.IRoleRepository,
 	languageRepository domains.ILanguagesRepository,
+	rewardRepository domains.IRewardRepository,
+	attributeRepository domains.IAttributeRepository,
 
 ) *Services {
 	utilsService := newUtilService(validatorService)
@@ -34,6 +40,7 @@ func CreateNewServices(
 	adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
 	roleService := newRoleService(roleRepository)
 	languageService := newLanguageService(languageRepository)
+	rewardService := newRewardService(rewardRepository, attributeRepository)
 
 	return &Services{
 		utilService:        utilsService,
@@ -42,6 +49,7 @@ func CreateNewServices(
 		userProfileService: userProfileService,
 		roleService:        roleService,
 		languageService:    languageService,
+		rewardService:      rewardService,
 	}
 }
 
@@ -67,6 +75,10 @@ func (s *Services) RoleService() domains.IRoleService {
 
 func (s *Services) LanguageService() domains.ILanguagesService {
 	return s.languageService
+}
+
+func (s *Services) RewardService() domains.IRewardService {
+	return s.rewardService
 }
 
 // ------------------------------------------------------

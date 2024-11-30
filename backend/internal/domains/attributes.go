@@ -1,9 +1,19 @@
-package rewardsDomains
+package domains
 
 import (
+	"context"
+
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	"github.com/google/uuid"
+)
+
+type IAttributeRepository interface {
+	Filter(ctx context.Context, filter AttributeFilter, limit, page int64) (rewards []Attribute, dataCount int64, err error)
+}
+
+const (
+	DefaultAttributeLimit = 10
 )
 
 type Attribute struct {
@@ -11,6 +21,12 @@ type Attribute struct {
 	rewardID  uuid.UUID
 	traitType string
 	value     string
+}
+
+type AttributeFilter struct {
+	ID        uuid.UUID
+	RewardID  uuid.UUID
+	TraitType string
 }
 
 func NewAttribute(
@@ -26,6 +42,16 @@ func NewAttribute(
 	}
 
 	return &attribute, nil
+}
+
+func (d *Attribute) Unmarshal(
+	id, rewardID uuid.UUID,
+	traitType, value string,
+) {
+	d.id = id
+	d.rewardID = rewardID
+	d.traitType = traitType
+	d.value = value
 }
 
 func (d *Attribute) GetID() uuid.UUID {
