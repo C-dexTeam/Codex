@@ -1,4 +1,4 @@
-package domains
+package errorDomains
 
 // HTTP Status Codes
 const (
@@ -29,4 +29,13 @@ const (
 
 	ErrRewardURICannotBeEmpty = "REWARD_URI_CANNOT_BE_EMPTY"
 	ErrRewardURITooLong       = "REWARD_URI_IS_TOO_LONG"
+
+	ErrTraitTypeCannotBeEmpty = "TRAIT_TYPE_CANNOT_BE_EMPTY"
+	ErrTraitTypeTooLong       = "TRAIT_TYPE_IS_TOO_LONG"
+
+	ErrValueCannotBeEmpty = "VALUE_CANNOT_BE_EMPTY"
+	ErrValueTooLong       = "VALUE_IS_TOO_LONG"
+
+	// General
+	ErrInvalidID = "INVALID_ID"
 )
