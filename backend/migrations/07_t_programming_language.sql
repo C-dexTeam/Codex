@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS t_programming_language (
     download_cmd VARCHAR(256) NOT NULL,
     compile_cmd VARCHAR(256) NOT NULL,
     image_path VARCHAR(60) NOT NULL,
-    file_extention VARCHAR(30) NOT NULL,
+    file_extention VARCHAR(10) NOT NULL,
     monaco_editor VARCHAR(30) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
