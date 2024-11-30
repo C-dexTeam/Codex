@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/C-dexTeam/codex/internal/domains"
+	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	"github.com/google/uuid"
 )
@@ -26,7 +27,7 @@ func (s *languageService) GetLanguages(ctx context.Context, languageID, value st
 	if languageID != "" {
 		languageUUID, err = uuid.Parse(languageID)
 		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, domains.ErrLanguageNotFound, err)
+			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 		}
 	}
 
@@ -42,7 +43,7 @@ func (s *languageService) GetDefault(ctx context.Context) (language *domains.Lan
 		Value: domains.DefaultLanguage,
 	}, 1, 1)
 	if len(langauges) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(domains.StatusNotFound, domains.ErrLanguageDefaultNotFound, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrLanguageDefaultNotFound, err)
 	}
 	language = &langauges[0]
 	return

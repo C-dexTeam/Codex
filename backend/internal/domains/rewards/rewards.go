@@ -1,13 +1,10 @@
-package domains
+package rewardsDomains
 
 import (
+	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	"github.com/google/uuid"
 )
-
-type IRewardsRepository interface{}
-
-type IRewardsService interface{}
 
 const (
 	DefaultRewardLimit = 10
@@ -21,13 +18,6 @@ type Reward struct {
 	description string
 	imagePath   string
 	uri         string
-}
-
-type RewardFilter struct {
-	ID          uuid.UUID
-	RewardType  string
-	Name        string
-	Description string
 }
 
 func NewReward(
@@ -78,10 +68,10 @@ func (d *Reward) GetRewardType() string {
 
 func (d *Reward) SetRewardType(rewardType string) error {
 	if rewardType == "" {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardTypeCannotBeEmpty)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardTypeCannotBeEmpty)
 	}
 	if len(rewardType) > 30 {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardTypeTooLong)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardTypeTooLong)
 	}
 	d.rewardType = rewardType
 	return nil
@@ -93,10 +83,10 @@ func (d *Reward) GetName() string {
 
 func (d *Reward) SetName(name string) error {
 	if name == "" {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardNameCannotBeEmpty)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardNameCannotBeEmpty)
 	}
 	if len(name) > 30 {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardNameTooLong)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardNameTooLong)
 	}
 	d.name = name
 	return nil
@@ -108,10 +98,10 @@ func (d *Reward) GetSymbol() string {
 
 func (d *Reward) SetSymbol(symbol string) error {
 	if symbol == "" {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardSymbolCannotBeEmpty)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardSymbolCannotBeEmpty)
 	}
 	if len(symbol) > 30 {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardSymbolTooLong)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardSymbolTooLong)
 	}
 	d.symbol = symbol
 	return nil
@@ -131,10 +121,10 @@ func (d *Reward) GetImagePath() string {
 
 func (d *Reward) SetImagePath(imagePath string) error {
 	if imagePath == "" {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardImagePathCannotBeEmpty)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardImagePathCannotBeEmpty)
 	}
 	if len(imagePath) > 60 {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardImagePathTooLong)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardImagePathTooLong)
 	}
 	d.imagePath = imagePath
 	return nil
@@ -146,10 +136,10 @@ func (d *Reward) GetURI() string {
 
 func (d *Reward) SetURI(uri string) error {
 	if uri == "" {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardURICannotBeEmpty)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardURICannotBeEmpty)
 	}
 	if len(uri) > 120 {
-		return serviceErrors.NewServiceErrorWithMessage(StatusBadRequest, ErrRewardURITooLong)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardURITooLong)
 	}
 	d.uri = uri
 	return nil
