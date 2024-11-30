@@ -9,23 +9,26 @@ import (
 type Reward struct {
 	id          uuid.UUID
 	rewardType  string
-	symbol      string
 	name        string
+	symbol      string
 	description string
 	imagePath   string
 	uri         string
+	attribute   []Attribute
 }
 
 type RewardFilter struct {
-	ID          uuid.UUID
-	RewardType  string
-	Name        string
-	Description string
+	ID         uuid.UUID
+	Name       string
+	Symbol     string
+	RewardType string
+	Attributes []AttributeFilter
 }
 
 func NewReward(
 	id uuid.UUID,
 	rewardType, symbol, name, description, imagePath, uri string,
+	attribute []Attribute,
 ) (*Reward, error) {
 	reward := Reward{}
 	if err := reward.SetRewardType(rewardType); err != nil {
@@ -44,6 +47,7 @@ func NewReward(
 		return nil, err
 	}
 	reward.SetDescription(description)
+	reward.SetAttribute(attribute)
 
 	return &reward, nil
 }
@@ -146,4 +150,12 @@ func (d *Reward) SetURI(uri string) error {
 	}
 	d.uri = uri
 	return nil
+}
+
+func (d *Reward) GetAttribute() []Attribute {
+	return d.attribute
+}
+
+func (d *Reward) SetAttribute(attribute []Attribute) {
+	d.attribute = attribute
 }

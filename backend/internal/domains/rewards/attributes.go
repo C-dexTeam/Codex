@@ -14,10 +14,9 @@ type Attribute struct {
 }
 
 type AttributeFilter struct {
-	ID         uuid.UUID
-	RewardID   uuid.UUID
-	TraitTaype string
-	Value      string
+	ID        uuid.UUID
+	RewardID  uuid.UUID
+	TraitType string
 }
 
 func NewAttribute(
@@ -33,6 +32,16 @@ func NewAttribute(
 	}
 
 	return &attribute, nil
+}
+
+func (d *Attribute) Unmarshal(
+	id, rewardID uuid.UUID,
+	traitType, value string,
+) {
+	d.id = id
+	d.rewardID = rewardID
+	d.traitType = traitType
+	d.value = value
 }
 
 func (d *Attribute) GetID() uuid.UUID {
