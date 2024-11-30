@@ -119,6 +119,34 @@ paths:
       summary: Get All Languages
       tags:
       - Language
+  /private/rewards/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all rewards based on the provided query parameters.
+      parameters:
+      - description: Reward ID
+        in: query
+        name: rewardID
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All Rewards
+      tags:
+      - Reward
   /private/user/profile:
     get:
       consumes:
