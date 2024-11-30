@@ -39,3 +39,8 @@ const (
 	// General
 	ErrInvalidID = "INVALID_ID"
 )
+
+// 500
+const (
+	ErrErrorWhileFilteringRewards = "ERROR_WHILE_FILTERIN_REWARDS"
+)

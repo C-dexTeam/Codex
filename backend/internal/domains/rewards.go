@@ -12,7 +12,9 @@ type IRewardRepository interface {
 	Filter(ctx context.Context, filter RewardFilter, limit, page int64) (rewards []Reward, dataCount int64, err error)
 }
 
-type IRewardService interface{}
+type IRewardService interface {
+	GetRewards(ctx context.Context, rewardID, page, limit string) (rewards []Reward, err error)
+}
 
 const (
 	DefaultRewardLimit = 10
