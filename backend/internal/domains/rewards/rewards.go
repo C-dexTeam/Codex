@@ -6,10 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const (
-	DefaultRewardLimit = 10
-)
-
 type Reward struct {
 	id          uuid.UUID
 	rewardType  string
@@ -18,6 +14,13 @@ type Reward struct {
 	description string
 	imagePath   string
 	uri         string
+}
+
+type RewardFilter struct {
+	ID          uuid.UUID
+	RewardType  string
+	Name        string
+	Description string
 }
 
 func NewReward(

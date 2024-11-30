@@ -13,6 +13,13 @@ type Attribute struct {
 	value     string
 }
 
+type AttributeFilter struct {
+	ID         uuid.UUID
+	RewardID   uuid.UUID
+	TraitTaype string
+	Value      string
+}
+
 func NewAttribute(
 	id, rewardID uuid.UUID,
 	traitType, value string,
