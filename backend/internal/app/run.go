@@ -41,12 +41,17 @@ func Run(cfg *config.Config) {
 	transactionRepository := repositories.NewTransactionRepository(conn)
 	roleRepository := repositories.NewRoleRepository(conn)
 	languageRepository := repositories.NewLanguageRepository(conn)
+	rewardRepository := repositories.NewRewardsRepository(conn)
+	attributeRepository := repositories.NewAttributesRepository(conn)
+
+	a, _, b := attributeRepository.Filter(context.Background(), domains.AttributeFilter{}, 10, 1)
+	fmt.Println(a, b)
 
 	// Utilities Initialize
 	validatorService := validatorService.NewValidatorService()
 
 	// Service Initialize
-	allServices := services.CreateNewServices(validatorService, userRepository, userProfileRepository, transactionRepository, roleRepository, languageRepository)
+	allServices := services.CreateNewServices(validatorService, userRepository, userProfileRepository, transactionRepository, roleRepository, languageRepository, rewardRepository, attributeRepository)
 
 	// First Run & Creating Default Admin
 	firstRun(conn, allServices.RoleService(), allServices.UserService())

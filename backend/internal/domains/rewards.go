@@ -1,9 +1,21 @@
-package rewardsDomains
+package domains
 
 import (
+	"context"
+
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	"github.com/google/uuid"
+)
+
+type IRewardRepository interface {
+	Filter(ctx context.Context, filter RewardFilter, limit, page int64) (rewards []Reward, dataCount int64, err error)
+}
+
+type IRewardService interface{}
+
+const (
+	DefaultRewardLimit = 10
 )
 
 type Reward struct {
@@ -22,7 +34,6 @@ type RewardFilter struct {
 	Name       string
 	Symbol     string
 	RewardType string
-	Attributes []AttributeFilter
 }
 
 func NewReward(
