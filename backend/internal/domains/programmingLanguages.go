@@ -29,6 +29,12 @@ type ProgrammingLanguage struct {
 	createdAt     time.Time
 }
 
+type ProgrammingLanguageFilter struct {
+	ID         uuid.UUID
+	LanguageID uuid.UUID
+	Name       string
+}
+
 func NewProgrammingLanguage(
 	id, languageID uuid.UUID,
 	name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,

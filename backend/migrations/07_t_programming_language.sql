@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS t_programming_language (
+CREATE TABLE IF NOT EXISTS t_programming_languages (
     id UUID PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
     language_id UUID NOT NULL,
     name VARCHAR(30) NOT NULL,

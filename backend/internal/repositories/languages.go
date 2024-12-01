@@ -25,6 +25,7 @@ func (r *LanguagesRepository) dbModelToAppModel(dbModel dbModelLanguages) (langu
 	)
 	return
 }
+
 func (r *LanguagesRepository) filterModelToDBModel(filter domains.LanguageFilter) (dbModel dbModelLanguages) {
 	if filter.ID != uuid.Nil {
 		dbModel.ID.String = filter.ID.String()
