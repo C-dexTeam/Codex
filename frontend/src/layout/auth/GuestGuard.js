@@ -18,13 +18,13 @@ const GuestGuard = props => {
       return
     }
 
-    if (window.localStorage.getItem(authConfig.userDataName)) {
+    if (window.localStorage.getItem(authConfig.session)) {
       router.replace('/')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.route])
 
-  if (auth.loading ) {
+  if (auth.loading) {
     return fallback
   }
 

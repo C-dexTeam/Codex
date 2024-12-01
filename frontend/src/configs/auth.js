@@ -1,13 +1,13 @@
 let baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
 const authConfig = {
-  account: baseUrl + '/session',
-  login: baseUrl + '/session',
-  logout: baseUrl + '/session',
-  register: baseUrl + '/sign-up',
-  sessionCookieName: 'sessionID',
+  refresh: baseUrl + '/private/user/profile',
+  login: baseUrl + '/public/login',
+  logout: baseUrl + '/public/logout',
+  register: baseUrl + '/public/register',
+  wallet: baseUrl + '/public/wallet',
 
-  userDataName: 'userData',
+  session: 'userSession',
 };
 
 export default authConfig;
