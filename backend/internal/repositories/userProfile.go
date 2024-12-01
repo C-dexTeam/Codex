@@ -148,3 +148,42 @@ func (r *UserProfileRepository) AddTx(ctx context.Context, tx *sqlx.Tx, userProf
 	}
 	return nil
 }
+
+func (r *UserProfileRepository) Update(ctx context.Context, userProfile *domains.UserProfile) (err error) {
+	dbModel := r.dbModelFromAppModel(*userProfile)
+	query := `
+		UPDATE
+         t_users
+		SET
+			name = COALESCE(:name, name),
+			surname =  COALESCE(:surname, surname),
+			first_login = :first_login
+		WHERE
+			id = :id
+
+	`
+	_, err = r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *UserProfileRepository) ChangeRole(ctx context.Context, userProfile *domains.UserProfile) error {
+	dbModel := r.dbModelFromAppModel(*userProfile)
+	query := `
+        UPDATE
+            t_users
+        SET
+            role_id = :role_id
+        WHERE
+            id = :id
+    `
+
+	_, err := r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

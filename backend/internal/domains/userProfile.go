@@ -13,7 +13,9 @@ import (
 // IUserProfileRepository is the interface that provides the methods for the user repository.
 type IUserProfileRepository interface {
 	Filter(ctx context.Context, filter UserProfileFilter, limit, page int64) (usersProfile []UserProfile, dataCount int64, err error)
+	Update(ctx context.Context, userProfile *UserProfile) (err error)
 	AddTx(ctx context.Context, tx *sqlx.Tx, userProfile *UserProfile) error
+	ChangeRole(ctx context.Context, userProfile *UserProfile) error
 }
 
 // IUserProfileService is the interface that provides the methods for the user service.
@@ -123,8 +125,8 @@ func (d *UserProfile) SetUserID(userID string) error {
 	return nil
 }
 
-func (d *UserProfile) SetRoleID(userID string) error {
-	roleUUID, err := uuid.Parse(userID)
+func (d *UserProfile) SetRoleID(roleID string) error {
+	roleUUID, err := uuid.Parse(roleID)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(400, "Invalid role id", err)
 	}
