@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS t_courses (
 
     CONSTRAINT fk_language_id FOREIGN KEY (language_id) REFERENCES t_languages(id) ON DELETE CASCADE,
     CONSTRAINT fk_reward_id FOREIGN KEY (reward_id) REFERENCES t_rewards(id) ON DELETE SET NULL,
-    CONSTRAINT fk_pl_id FOREIGN KEY (programming_language_id) REFERENCES t_programming_language(id) ON DELETE SET NULL
+    CONSTRAINT fk_pl_id FOREIGN KEY (programming_language_id) REFERENCES t_programming_languages(id) ON DELETE SET NULL
 );
 
 -- +goose StatementEnd

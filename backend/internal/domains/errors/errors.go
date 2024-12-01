@@ -60,5 +60,6 @@ const (
 
 // 500
 const (
-	ErrErrorWhileFilteringRewards = "ERROR_WHILE_FILTERIN_REWARDS"
+	ErrErrorWhileFilteringRewards              = "ERROR_WHILE_FILTERING_REWARDS"
+	ErrErrorWhileFilteringProgrammingLanguages = "ERROR_WHILE_FILTERING_PROGRAMMING_LANGUAGES"
 )

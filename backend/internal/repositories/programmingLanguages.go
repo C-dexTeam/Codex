@@ -19,7 +19,7 @@ type dbModelPLanguages struct {
 	Name          sql.NullString `db:"name"`
 	Description   sql.NullString `db:"description"`
 	DownloadCMD   sql.NullString `db:"download_cmd"`
-	CompileCMD    sql.NullString `db:"compileCMD"`
+	CompileCMD    sql.NullString `db:"compile_cmd"`
 	ImagePath     sql.NullString `db:"image_path"`
 	FileExtention sql.NullString `db:"file_extention"`
 	MonacoEditor  sql.NullString `db:"monaco_editor"`

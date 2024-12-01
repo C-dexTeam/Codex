@@ -100,6 +100,61 @@
                 }
             }
         },
+        "/private/programmingLanguages/": {
+            "get": {
+                "description": "Retrieves all Programming languages based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Get All Programming Languages",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Programming Language ID",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Language ID",
+                        "name": "languageID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Programming Language Name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/rewards/": {
             "get": {
                 "description": "Retrieves all rewards based on the provided query parameters.",

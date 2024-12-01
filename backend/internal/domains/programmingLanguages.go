@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"context"
 	"time"
 
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
@@ -8,12 +9,16 @@ import (
 	"github.com/google/uuid"
 )
 
-type IPLanguagesRepository interface{}
+type IPLanguagesRepository interface {
+	Filter(ctx context.Context, filter ProgrammingLanguageFilter, limit, page int64) (pLanguages []ProgrammingLanguage, dataCount int64, err error)
+}
 
-type IPLanguagesService interface{}
+type IPLanguagesService interface {
+	GetProgrammingLanguages(ctx context.Context, programmingLanguageID, languageID, name, page, limit string) (programmingLanguages []ProgrammingLanguage, err error)
+}
 
 const (
-	DefaultPLanguageLimit = 10
+	DefaultProgrammingLanguageLimit = 10
 )
 
 type ProgrammingLanguage struct {
