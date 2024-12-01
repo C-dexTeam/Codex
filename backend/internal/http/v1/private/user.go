@@ -66,6 +66,7 @@ func (h *PrivateHandler) UpdateProfile(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
 	// If the user First-Login Role. Change The Users role to defaultRole.
 	if userSession.RoleID == firstLoginRole.GetID().String() {
 		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, defaultRole.GetID().String()); err != nil {
