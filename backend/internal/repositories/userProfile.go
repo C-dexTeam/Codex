@@ -16,13 +16,14 @@ type UserProfileRepository struct {
 
 // dbModelUsersProfile is the struct that represents the user in the database.
 type dbModelUsersProfile struct {
-	ID        sql.NullString `db:"id"`
-	UserID    sql.NullString `db:"user_id"`
-	RoleID    sql.NullString `db:"role_id"`
-	Name      sql.NullString `db:"name"`
-	Surname   sql.NullString `db:"surname"`
-	CreatedAt sql.NullTime   `db:"created_at"`
-	DeletedAt sql.NullTime   `db:"deleted_at"`
+	ID         sql.NullString `db:"id"`
+	UserID     sql.NullString `db:"user_id"`
+	RoleID     sql.NullString `db:"role_id"`
+	Name       sql.NullString `db:"name"`
+	FirstLogin sql.NullBool   `db:"first_login"`
+	Surname    sql.NullString `db:"surname"`
+	CreatedAt  sql.NullTime   `db:"created_at"`
+	DeletedAt  sql.NullTime   `db:"deleted_at"`
 }
 
 // dbModelToAppModel converts dbModelUsersProfile to domains.UserProfile for application operations (e.g. return to client)
@@ -33,6 +34,7 @@ func (r *UserProfileRepository) dbModelToAppModel(dbModel dbModelUsersProfile) (
 		uuid.MustParse(dbModel.RoleID.String),
 		dbModel.Name.String,
 		dbModel.Surname.String,
+		dbModel.FirstLogin.Bool,
 		dbModel.CreatedAt.Time,
 		dbModel.DeletedAt.Time,
 	)

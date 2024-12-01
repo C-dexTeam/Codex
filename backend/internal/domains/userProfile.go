@@ -23,13 +23,14 @@ type IUserProfileService interface {
 
 // User represents a user entity.
 type UserProfile struct {
-	id        uuid.UUID
-	userID    uuid.UUID
-	roleID    uuid.UUID
-	name      string
-	surname   string
-	createdAt time.Time
-	deletedAt time.Time
+	id         uuid.UUID
+	userID     uuid.UUID
+	roleID     uuid.UUID
+	name       string
+	surname    string
+	firstLogin bool
+	createdAt  time.Time
+	deletedAt  time.Time
 }
 
 // UserProfileFilter is the struct that represents user's uniques.
@@ -42,7 +43,10 @@ type UserProfileFilter struct {
 }
 
 // NewUserProfile creates a new user.
-func NewUserProfile(userID, roleID, name, surname string) (*UserProfile, error) {
+func NewUserProfile(
+	userID, roleID, name, surname string,
+	firstLogin bool,
+) (*UserProfile, error) {
 	userProfile := &UserProfile{}
 	if err := userProfile.SetUserID(userID); err != nil {
 		return nil, err
@@ -53,17 +57,24 @@ func NewUserProfile(userID, roleID, name, surname string) (*UserProfile, error) 
 
 	userProfile.SetName(name)
 	userProfile.SetSurname(name)
+	userProfile.SetFirstLogin(firstLogin)
 
 	return userProfile, nil
 }
 
 // Unmarshal unmarshals the userProfile for database operations.
-func (d *UserProfile) Unmarshal(id, userID, roleID uuid.UUID, name, surname string, createdAt, deletedAt time.Time) {
+func (d *UserProfile) Unmarshal(
+	id, userID, roleID uuid.UUID,
+	name, surname string,
+	firstLogin bool,
+	createdAt, deletedAt time.Time,
+) {
 	d.id = id
 	d.userID = userID
 	d.roleID = roleID
 	d.name = name
 	d.surname = surname
+	d.firstLogin = firstLogin
 	d.createdAt = createdAt
 	d.deletedAt = deletedAt
 }
@@ -97,6 +108,10 @@ func (d *UserProfile) GetDeletedAt() time.Time {
 	return d.deletedAt
 }
 
+func (d *UserProfile) GetFirstLogin() bool {
+	return d.firstLogin
+}
+
 // Setter Functions
 func (d *UserProfile) SetUserID(userID string) error {
 	userUUID, err := uuid.Parse(userID)
@@ -124,4 +139,8 @@ func (d *UserProfile) SetName(name string) {
 
 func (d *UserProfile) SetSurname(surname string) {
 	d.surname = surname
+}
+
+func (d *UserProfile) SetFirstLogin(firstLogin bool) {
+	d.firstLogin = firstLogin
 }
