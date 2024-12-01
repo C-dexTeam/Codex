@@ -19,5 +19,5 @@ CREATE TABLE IF NOT EXISTS t_programming_languages (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS t_programming_language;
+DROP TABLE IF EXISTS t_programming_languages;
 -- +goose StatementEnd

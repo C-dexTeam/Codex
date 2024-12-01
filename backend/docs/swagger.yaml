@@ -119,6 +119,43 @@ paths:
       summary: Get All Languages
       tags:
       - Language
+  /private/programmingLanguages/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all Programming languages based on the provided query
+        parameters.
+      parameters:
+      - description: Programming Language ID
+        in: query
+        name: id
+        type: string
+      - description: Language ID
+        in: query
+        name: languageID
+        type: string
+      - description: Programming Language Name
+        in: query
+        name: name
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All Programming Languages
+      tags:
+      - Programming Language
   /private/rewards/:
     get:
       consumes:
