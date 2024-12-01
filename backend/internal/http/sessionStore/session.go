@@ -13,17 +13,19 @@ import (
 )
 
 type SessionData struct {
-	UserID   string
-	RoleID   string
-	RoleName string
-	Username string
-	Email    string
-	Name     string
-	Surname  string
+	UserID        string
+	UserProfileID string
+	RoleID        string
+	RoleName      string
+	Username      string
+	Email         string
+	Name          string
+	Surname       string
 }
 
 func (s *SessionData) ParseFromUser(user *domains.User, userProfile *domains.UserProfile, userRole *domains.Role) {
 	s.UserID = user.GetID().String()
+	s.UserProfileID = userProfile.GetID().String()
 	s.RoleID = userProfile.GetRoleID().String()
 	s.RoleName = userRole.GetName()
 	s.Username = user.GetUsername()

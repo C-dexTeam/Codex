@@ -21,6 +21,8 @@ type IUserProfileRepository interface {
 // IUserProfileService is the interface that provides the methods for the user service.
 type IUserProfileService interface {
 	GetAllUsersProfile(ctx context.Context, id, userID, roleID, name, surname, page, limit string) ([]UserProfile, error)
+	Update(ctx context.Context, userProfileID, name, surname string) (err error)
+	ChangeUserRole(ctx context.Context, userProfileID, newRoleID string) (err error)
 }
 
 // User represents a user entity.

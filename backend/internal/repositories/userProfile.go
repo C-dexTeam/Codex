@@ -153,7 +153,7 @@ func (r *UserProfileRepository) Update(ctx context.Context, userProfile *domains
 	dbModel := r.dbModelFromAppModel(*userProfile)
 	query := `
 		UPDATE
-         t_users
+         t_user_profiles
 		SET
 			name = COALESCE(:name, name),
 			surname =  COALESCE(:surname, surname),
@@ -173,7 +173,7 @@ func (r *UserProfileRepository) ChangeRole(ctx context.Context, userProfile *dom
 	dbModel := r.dbModelFromAppModel(*userProfile)
 	query := `
         UPDATE
-            t_users
+            t_user_profiles
         SET
             role_id = :role_id
         WHERE

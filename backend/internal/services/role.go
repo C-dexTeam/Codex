@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/C-dexTeam/codex/internal/domains"
+	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 
 	"github.com/google/uuid"
@@ -49,7 +50,7 @@ func (s *roleService) GetByName(ctx context.Context, name string) (role *domains
 		Name: name,
 	}, 1, 1)
 	if len(roles) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(404, "role not found", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
 	}
 	role = &roles[0]
 

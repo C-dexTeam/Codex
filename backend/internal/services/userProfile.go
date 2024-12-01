@@ -13,18 +13,15 @@ import (
 
 type userProfileService struct {
 	userProfileRepository domains.IUserProfileRepository
-	roleRepository        domains.IRoleRepository
 	utilService           IUtilService
 }
 
 func newUserProfileService(
 	userProfileRepository domains.IUserProfileRepository,
-	roleRepository domains.IRoleRepository,
 	utils IUtilService,
 ) domains.IUserProfileService {
 	return &userProfileService{
 		userProfileRepository: userProfileRepository,
-		roleRepository:        roleRepository,
 		utilService:           utils,
 	}
 }
@@ -110,11 +107,6 @@ func (s *userProfileService) ChangeUserRole(ctx context.Context, userProfileID, 
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 	}
 
-	newRoleUID, err := uuid.Parse(newRoleID)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-	}
-
 	userProfile, _, err := s.userProfileRepository.Filter(ctx, domains.UserProfileFilter{
 		ID: userProfileUUID,
 	}, 1, 1)
@@ -123,16 +115,6 @@ func (s *userProfileService) ChangeUserRole(ctx context.Context, userProfileID, 
 	}
 	if len(userProfile) == 0 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
-	}
-
-	role, _, err := s.roleRepository.Filter(ctx, domains.RoleFilter{
-		ID: newRoleUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRole, err)
-	}
-	if len(role) == 0 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound)
 	}
 
 	newProfile := userProfile[0]

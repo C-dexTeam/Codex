@@ -22,6 +22,17 @@ definitions:
     - password
     - username
     type: object
+  dto.UserProfileUpdateDTO:
+    properties:
+      name:
+        maxLength: 30
+        minLength: 1
+        type: string
+      surname:
+        maxLength: 30
+        minLength: 1
+        type: string
+    type: object
   dto.UserRegisterDTO:
     properties:
       ConfirmPassword:
@@ -197,6 +208,27 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get User Profile
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Updates users profile.
+      parameters:
+      - description: New User Profile
+        in: body
+        name: newUserProfile
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserProfileUpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update User Profile
       tags:
       - User
   /public/login:

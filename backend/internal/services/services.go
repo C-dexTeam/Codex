@@ -38,7 +38,7 @@ func CreateNewServices(
 
 ) *Services {
 	utilsService := newUtilService(validatorService)
-	userProfileService := newUserProfileService(userProfileRepository, roleRepository, utilsService)
+	userProfileService := newUserProfileService(userProfileRepository, utilsService)
 	userService := newUserService(userRepository, userProfileRepository, transactionRepository, utilsService)
 	adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
 	roleService := newRoleService(roleRepository)
