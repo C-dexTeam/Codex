@@ -10,6 +10,16 @@ func NewUserDTOManager() UserDTOManager {
 	return UserDTOManager{}
 }
 
+type LoginResponseDTO struct {
+	Role string `json:"role"`
+}
+
+func (m *UserDTOManager) ToLoginResponseDTO(role string) LoginResponseDTO {
+	return LoginResponseDTO{
+		Role: role,
+	}
+}
+
 // UserRegisterDTO
 type UserRegisterDTO struct {
 	Username        string `json:"username" validate:"required,alphanum,min=3,max=30"`
@@ -49,4 +59,9 @@ func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfi
 		Name:     userData.Name,
 		Surname:  userData.Surname,
 	}
+}
+
+type UserProfileUpdateDTO struct {
+	Name    string `json:"name" validate:"omitempty,max=30"`
+	Surname string `json:"surname" validate:"omitempty,max=30"`
 }

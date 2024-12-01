@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/C-dexTeam/codex/internal/domains"
+	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 
 	"github.com/google/uuid"
@@ -70,4 +71,57 @@ func (s *userProfileService) GetAllUsersProfile(ctx context.Context, id, userID,
 	}
 
 	return users, nil
+}
+
+func (s *userProfileService) Update(ctx context.Context, userProfileID, name, surname string) (err error) {
+	userProfileUUID, err := uuid.Parse(userProfileID)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	}
+
+	userProfile, _, err := s.userProfileRepository.Filter(ctx, domains.UserProfileFilter{
+		ID: userProfileUUID,
+	}, 1, 1)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserPorfile, err)
+	}
+	if len(userProfile) == 0 {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
+	}
+	newProfile := userProfile[0]
+
+	newProfile.SetName(name)
+	newProfile.SetSurname(surname)
+	newProfile.SetFirstLogin(true)
+
+	if err := s.userProfileRepository.Update(ctx, &newProfile); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *userProfileService) ChangeUserRole(ctx context.Context, userProfileID, newRoleID string) (err error) {
+	userProfileUUID, err := uuid.Parse(userProfileID)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	}
+
+	userProfile, _, err := s.userProfileRepository.Filter(ctx, domains.UserProfileFilter{
+		ID: userProfileUUID,
+	}, 1, 1)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserPorfile, err)
+	}
+	if len(userProfile) == 0 {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
+	}
+
+	newProfile := userProfile[0]
+	newProfile.SetRoleID(newRoleID)
+	if err := s.userProfileRepository.ChangeRole(ctx, &newProfile); err != nil {
+		return err
+	}
+
+	return nil
 }

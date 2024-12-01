@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS t_user_profiles (
     role_id UUID NOT NULL,
     name varchar(30),
     surname varchar(30),
+    first_login BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 

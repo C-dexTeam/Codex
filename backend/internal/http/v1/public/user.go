@@ -60,8 +60,9 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 	if err := sess.Save(); err != nil {
 		return err
 	}
+	loginResponse := h.dtoManager.UserManager().ToLoginResponseDTO(userRole.GetName())
 
-	return response.Response(200, "Login successful", nil)
+	return response.Response(200, "Login successful", loginResponse)
 }
 
 // @Tags Auth
@@ -81,12 +82,12 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	defaultRole, err := h.services.RoleService().GetDefault(c.Context())
+	firstLoginRole, err := h.services.RoleService().GetByName(c.Context(), domains.FirstLogin)
 	if err != nil {
 		return err
 	}
 
-	userAuthData, err := h.services.UserService().AuthWallet(c.Context(), wallet.PublicKeyBase58, wallet.Message, wallet.Signature, defaultRole.GetID())
+	userAuthData, err := h.services.UserService().AuthWallet(c.Context(), wallet.PublicKeyBase58, wallet.Message, wallet.Signature, firstLoginRole.GetID())
 	if err != nil {
 		return err
 	}
@@ -134,12 +135,12 @@ func (h *PublicHandler) Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	defaultRole, err := h.services.RoleService().GetDefault(c.Context())
+	firstLoginRole, err := h.services.RoleService().GetByName(c.Context(), domains.FirstLogin)
 	if err != nil {
 		return err
 	}
 
-	if err := h.services.UserService().Register(c.Context(), register.Username, register.Email, register.Password, register.ConfirmPassword, defaultRole.GetID()); err != nil {
+	if err := h.services.UserService().Register(c.Context(), register.Username, register.Email, register.Password, register.ConfirmPassword, firstLoginRole.GetID()); err != nil {
 		return err
 	}
 	return response.Response(200, "Register successful", nil)

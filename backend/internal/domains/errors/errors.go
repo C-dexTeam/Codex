@@ -11,6 +11,8 @@ const (
 const (
 	ErrLanguageNotFound        = "LANGUAGE_NOT_FOUND"
 	ErrLanguageDefaultNotFound = "DEFAULT_LANGUAGE_NOT_FOUND"
+	ErrUserProfileNotFound     = "USER_PROFILE_NOT_FOUND"
+	ErrRoleNotFound            = "ROLE_NOT_FOUND"
 )
 
 // 400
@@ -62,4 +64,6 @@ const (
 const (
 	ErrErrorWhileFilteringRewards              = "ERROR_WHILE_FILTERING_REWARDS"
 	ErrErrorWhileFilteringProgrammingLanguages = "ERROR_WHILE_FILTERING_PROGRAMMING_LANGUAGES"
+	ErrErrorWhileFilteringUserPorfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
+	ErrErrorWhileFilteringRole                 = "ERROR_WHILE_FILTERING_ROLES"
 )
