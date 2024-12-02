@@ -40,24 +40,30 @@ type UserAuthWallet struct {
 }
 
 type UserProfileDTO struct {
-	UserID   string `json:"userID"`
-	RoleID   string `json:"roleID"`
-	RoleName string `json:"roleName"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
+	UserID              string `json:"userID"`
+	RoleID              string `json:"roleID"`
+	RoleName            string `json:"roleName"`
+	Username            string `json:"username"`
+	Email               string `json:"email"`
+	Name                string `json:"name"`
+	Surname             string `json:"surname"`
+	Level               int    `json:"level"`
+	Experience          int    `json:"experience"`
+	NextLevelExperience int    `json:"nextLevelExperience"`
 }
 
 func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfileDTO {
 	return UserProfileDTO{
-		UserID:   userData.UserID,
-		RoleID:   userData.RoleID,
-		RoleName: userData.RoleName,
-		Username: userData.Username,
-		Email:    userData.Email,
-		Name:     userData.Name,
-		Surname:  userData.Surname,
+		UserID:              userData.UserID,
+		RoleID:              userData.RoleID,
+		RoleName:            userData.RoleName,
+		Username:            userData.Username,
+		Email:               userData.Email,
+		Name:                userData.Name,
+		Surname:             userData.Surname,
+		Level:               userData.Level,
+		Experience:          userData.Experience,
+		NextLevelExperience: userData.NextLevelExp,
 	}
 }
 

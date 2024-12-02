@@ -21,6 +21,9 @@ type SessionData struct {
 	Email         string
 	Name          string
 	Surname       string
+	Level         int
+	Experience    int
+	NextLevelExp  int
 }
 
 func (s *SessionData) ParseFromUser(user *domains.User, userProfile *domains.UserProfile, userRole *domains.Role) {
@@ -32,6 +35,9 @@ func (s *SessionData) ParseFromUser(user *domains.User, userProfile *domains.Use
 	s.Email = user.GetEmail()
 	s.Name = userProfile.GetName()
 	s.Surname = userProfile.GetSurname()
+	s.Level = userProfile.GetLevel()
+	s.Experience = userProfile.GetExperience()
+	s.NextLevelExp = userProfile.GetNextLevelExperience()
 }
 
 func GetSessionData(c *fiber.Ctx) *SessionData {

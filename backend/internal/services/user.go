@@ -103,7 +103,7 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	}
 
 	// Creating a new user profile
-	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "", true)
+	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "", true, 1, 0, 100)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
 	}
@@ -170,7 +170,7 @@ func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signat
 	}
 
 	// Creating a new user profile
-	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "", true)
+	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "", true, 1, 0, 100)
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
 	}

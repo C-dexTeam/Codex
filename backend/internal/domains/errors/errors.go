@@ -66,4 +66,5 @@ const (
 	ErrErrorWhileFilteringProgrammingLanguages = "ERROR_WHILE_FILTERING_PROGRAMMING_LANGUAGES"
 	ErrErrorWhileFilteringUserPorfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
 	ErrErrorWhileFilteringRole                 = "ERROR_WHILE_FILTERING_ROLES"
+	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"
 )
