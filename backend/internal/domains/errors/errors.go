@@ -56,6 +56,14 @@ const (
 	ErrPLanguageMonacoEditorCannotBeEmpty = "PROGRAMMING_LANGUAGE_MONACO_EDITOR_CANNOT_BE_EMPTY"
 	ErrPLanguageMonacoEditorTooLong       = "PROGRAMMING_LANGUAGE_MONACO_EDITOR_IS_TOO_LONG"
 
+	ErrCourseTitleCannotBeEmpty = "COURSE_TITLE_CANNOT_BE_EMPTY"
+	ErrCourseTitleTooLong       = "COURSE_TITLE_IS_TOO_LONG"
+
+	ErrCourseImagePathCannotBeEmpty = "COURSE_IMAGE_PATH_CANNOT_BE_EMPTY"
+	ErrCourseImagePathTooLong       = "COURSE_IMAGE_PATH_IS_TOO_LONG"
+
+	ErrCourseRewardAmountCannotBeNegative = "COURSE_REWARD_AMOUNT_CANNOT_BE_NEGATIVE"
+
 	// General
 	ErrInvalidID = "INVALID_ID"
 )
