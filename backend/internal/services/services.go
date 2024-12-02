@@ -12,6 +12,7 @@ type IService interface {
 	AdminService() domains.IAdminService
 	RewardService() domains.IRewardService
 	ProgrammingLService() domains.IPLanguagesService
+	CourseService() domains.ICourseService
 }
 
 type Services struct {
@@ -23,6 +24,7 @@ type Services struct {
 	languageService    domains.ILanguagesService
 	rewardService      domains.IRewardService
 	pLanguageService   domains.IPLanguagesService
+	courseService      domains.ICourseService
 }
 
 func CreateNewServices(
@@ -35,6 +37,7 @@ func CreateNewServices(
 	rewardRepository domains.IRewardRepository,
 	attributeRepository domains.IAttributeRepository,
 	pLanguageRepository domains.IPLanguagesRepository,
+	courseRepository domains.ICourseRepository,
 
 ) *Services {
 	utilsService := newUtilService(validatorService)
@@ -45,6 +48,7 @@ func CreateNewServices(
 	languageService := newLanguageService(languageRepository)
 	rewardService := newRewardService(rewardRepository, attributeRepository)
 	pLanguageService := newPLanguageService(pLanguageRepository)
+	courseService := newCourseService(courseRepository)
 
 	return &Services{
 		utilService:        utilsService,
@@ -55,6 +59,7 @@ func CreateNewServices(
 		languageService:    languageService,
 		rewardService:      rewardService,
 		pLanguageService:   pLanguageService,
+		courseService:      courseService,
 	}
 }
 
@@ -88,6 +93,10 @@ func (s *Services) RewardService() domains.IRewardService {
 
 func (s *Services) ProgrammingLService() domains.IPLanguagesService {
 	return s.pLanguageService
+}
+
+func (s *Services) CourseService() domains.ICourseService {
+	return s.courseService
 }
 
 // ------------------------------------------------------
