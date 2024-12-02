@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"context"
 	"time"
 
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
@@ -8,9 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
-type ICourseRepository interface{}
+type ICourseRepository interface {
+	Filter(ctx context.Context, filter CourseFilter, limit, page int64) (courses []Course, dataCount int64, err error)
+}
 
-type ICourseService interface{}
+type ICourseService interface {
+	GetCourses(ctx context.Context, courseID, langugeID, pLanguageID, title, page, limit string) (courses []Course, err error)
+}
 
 const (
 	DefaultCourseLimit = 10
