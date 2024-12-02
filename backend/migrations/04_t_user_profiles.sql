@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS t_user_profiles (
     name varchar(30),
     surname varchar(30),
     first_login BOOLEAN DEFAULT TRUE,
+    level INT DEFAULT 1,
+    experience INT DEFAULT 0,
+    next_level_exp INT DEFAULT 100,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 

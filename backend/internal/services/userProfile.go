@@ -26,7 +26,7 @@ func newUserProfileService(
 	}
 }
 
-func (s *userProfileService) GetAllUsersProfile(ctx context.Context, id, userID, roleID, name, surname, page, limit string) ([]domains.UserProfile, error) {
+func (s *userProfileService) GetUsers(ctx context.Context, id, userID, roleID, name, surname, page, limit string) ([]domains.UserProfile, error) {
 	var userProfileUUID, userAuthUUID, roleUUID uuid.UUID
 
 	// Default Values
@@ -121,6 +121,41 @@ func (s *userProfileService) ChangeUserRole(ctx context.Context, userProfileID, 
 	newProfile.SetRoleID(newRoleID)
 	if err := s.userProfileRepository.ChangeRole(ctx, &newProfile); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (s *userProfileService) AddUserExp(ctx context.Context, userProfileID string, experience int) (err error) {
+	userProfileUUID, err := uuid.Parse(userProfileID)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	}
+
+	userProfile, _, err := s.userProfileRepository.Filter(ctx, domains.UserProfileFilter{
+		ID: userProfileUUID,
+	}, 1, 1)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserPorfile, err)
+	}
+	if len(userProfile) == 0 {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
+	}
+	profile := userProfile[0]
+
+	totalExp := profile.GetExperience() + experience
+
+	for totalExp >= profile.GetNextLevelExperience() {
+		totalExp -= profile.GetNextLevelExperience()
+
+		profile.SetLevel(profile.GetLevel() + 1)
+
+		profile.SetNextLevelExperience()
+	}
+	profile.SetExperience(totalExp)
+
+	if err := s.userProfileRepository.AddExp(ctx, &profile); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileAddingExperience, err)
 	}
 
 	return nil

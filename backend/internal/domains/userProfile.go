@@ -2,6 +2,7 @@ package domains
 
 import (
 	"context"
+	"math"
 	"time"
 
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
@@ -16,40 +17,53 @@ type IUserProfileRepository interface {
 	Update(ctx context.Context, userProfile *UserProfile) (err error)
 	AddTx(ctx context.Context, tx *sqlx.Tx, userProfile *UserProfile) error
 	ChangeRole(ctx context.Context, userProfile *UserProfile) error
+	AddExp(ctx context.Context, userProfile *UserProfile) error
 }
 
 // IUserProfileService is the interface that provides the methods for the user service.
 type IUserProfileService interface {
-	GetAllUsersProfile(ctx context.Context, id, userID, roleID, name, surname, page, limit string) ([]UserProfile, error)
+	GetUsers(ctx context.Context, id, userID, roleID, name, surname, page, limit string) ([]UserProfile, error)
+	AddUserExp(ctx context.Context, userProfileID string, experience int) (err error)
 	Update(ctx context.Context, userProfileID, name, surname string) (err error)
 	ChangeUserRole(ctx context.Context, userProfileID, newRoleID string) (err error)
 }
 
+const (
+	GrowthFactor = 1.2
+)
+
 // User represents a user entity.
 type UserProfile struct {
-	id         uuid.UUID
-	userID     uuid.UUID
-	roleID     uuid.UUID
-	name       string
-	surname    string
-	firstLogin bool
-	createdAt  time.Time
-	deletedAt  time.Time
+	id           uuid.UUID
+	userID       uuid.UUID
+	roleID       uuid.UUID
+	name         string
+	surname      string
+	firstLogin   bool
+	level        int
+	experience   int
+	nextLevelExp int
+	createdAt    time.Time
+	deletedAt    time.Time
 }
 
 // UserProfileFilter is the struct that represents user's uniques.
 type UserProfileFilter struct {
-	ID      uuid.UUID
-	UserID  uuid.UUID
-	RoleID  uuid.UUID
-	Name    string
-	Surname string
+	ID                  uuid.UUID
+	UserID              uuid.UUID
+	RoleID              uuid.UUID
+	Name                string
+	Surname             string
+	Level               int
+	Experience          int
+	NextLevelExperience int
 }
 
 // NewUserProfile creates a new user.
 func NewUserProfile(
 	userID, roleID, name, surname string,
 	firstLogin bool,
+	level, experience, nextLevelInt int,
 ) (*UserProfile, error) {
 	userProfile := &UserProfile{}
 	if err := userProfile.SetUserID(userID); err != nil {
@@ -62,6 +76,8 @@ func NewUserProfile(
 	userProfile.SetName(name)
 	userProfile.SetSurname(name)
 	userProfile.SetFirstLogin(firstLogin)
+	userProfile.SetLevel(level)
+	userProfile.SetExperience(experience)
 
 	return userProfile, nil
 }
@@ -71,6 +87,7 @@ func (d *UserProfile) Unmarshal(
 	id, userID, roleID uuid.UUID,
 	name, surname string,
 	firstLogin bool,
+	level, experience, nextLevelExp int,
 	createdAt, deletedAt time.Time,
 ) {
 	d.id = id
@@ -79,6 +96,9 @@ func (d *UserProfile) Unmarshal(
 	d.name = name
 	d.surname = surname
 	d.firstLogin = firstLogin
+	d.level = level
+	d.experience = experience
+	d.nextLevelExp = nextLevelExp
 	d.createdAt = createdAt
 	d.deletedAt = deletedAt
 }
@@ -116,6 +136,18 @@ func (d *UserProfile) GetFirstLogin() bool {
 	return d.firstLogin
 }
 
+func (d *UserProfile) GetLevel() int {
+	return d.level
+}
+
+func (d *UserProfile) GetExperience() int {
+	return d.experience
+}
+
+func (d *UserProfile) GetNextLevelExperience() int {
+	return d.nextLevelExp
+}
+
 // Setter Functions
 func (d *UserProfile) SetUserID(userID string) error {
 	userUUID, err := uuid.Parse(userID)
@@ -147,4 +179,19 @@ func (d *UserProfile) SetSurname(surname string) {
 
 func (d *UserProfile) SetFirstLogin(firstLogin bool) {
 	d.firstLogin = firstLogin
+}
+
+func (d *UserProfile) SetLevel(level int) {
+	d.level = level
+}
+
+func (d *UserProfile) SetExperience(experience int) {
+	d.experience = experience
+}
+
+func (d *UserProfile) SetNextLevelExperience() {
+	if d.level <= 0 {
+		d.level = 1
+	}
+	d.nextLevelExp = d.experience + int(math.Pow(float64(d.level), GrowthFactor))
 }

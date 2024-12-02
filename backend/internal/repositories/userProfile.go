@@ -16,14 +16,17 @@ type UserProfileRepository struct {
 
 // dbModelUsersProfile is the struct that represents the user in the database.
 type dbModelUsersProfile struct {
-	ID         sql.NullString `db:"id"`
-	UserID     sql.NullString `db:"user_id"`
-	RoleID     sql.NullString `db:"role_id"`
-	Name       sql.NullString `db:"name"`
-	FirstLogin sql.NullBool   `db:"first_login"`
-	Surname    sql.NullString `db:"surname"`
-	CreatedAt  sql.NullTime   `db:"created_at"`
-	DeletedAt  sql.NullTime   `db:"deleted_at"`
+	ID                  sql.NullString `db:"id"`
+	UserID              sql.NullString `db:"user_id"`
+	RoleID              sql.NullString `db:"role_id"`
+	Name                sql.NullString `db:"name"`
+	Surname             sql.NullString `db:"surname"`
+	FirstLogin          sql.NullBool   `db:"first_login"`
+	Level               sql.NullInt64  `db:"level"`
+	Experience          sql.NullInt64  `db:"experience"`
+	NextLevelExperience sql.NullInt64  `db:"next_level_exp"`
+	CreatedAt           sql.NullTime   `db:"created_at"`
+	DeletedAt           sql.NullTime   `db:"deleted_at"`
 }
 
 // dbModelToAppModel converts dbModelUsersProfile to domains.UserProfile for application operations (e.g. return to client)
@@ -35,6 +38,9 @@ func (r *UserProfileRepository) dbModelToAppModel(dbModel dbModelUsersProfile) (
 		dbModel.Name.String,
 		dbModel.Surname.String,
 		dbModel.FirstLogin.Bool,
+		int(dbModel.Level.Int64),
+		int(dbModel.Experience.Int64),
+		int(dbModel.NextLevelExperience.Int64),
 		dbModel.CreatedAt.Time,
 		dbModel.DeletedAt.Time,
 	)
@@ -62,6 +68,18 @@ func (r *UserProfileRepository) dbModelFromAppModel(domModel domains.UserProfile
 	if domModel.GetSurname() != "" {
 		dbModel.Surname.String = domModel.GetSurname()
 		dbModel.Surname.Valid = true
+	}
+	if domModel.GetLevel() != 0 {
+		dbModel.Level.Int64 = int64(domModel.GetLevel())
+		dbModel.Level.Valid = true
+	}
+	if domModel.GetExperience() != 0 {
+		dbModel.Experience.Int64 = int64(domModel.GetExperience())
+		dbModel.Experience.Valid = true
+	}
+	if domModel.GetNextLevelExperience() != 0 {
+		dbModel.NextLevelExperience.Int64 = int64(domModel.GetNextLevelExperience())
+		dbModel.NextLevelExperience.Valid = true
 	}
 	if !domModel.GetCreatedAt().IsZero() {
 		dbModel.CreatedAt.Time = domModel.GetCreatedAt()
@@ -96,6 +114,18 @@ func (r *UserProfileRepository) dbModelFromAppFilter(filter domains.UserProfileF
 	if filter.Surname != "" {
 		dbFilter.Surname.String = filter.Surname
 		dbFilter.Surname.Valid = true
+	}
+	if filter.Level != 0 {
+		dbFilter.Level.Int64 = int64(filter.Level)
+		dbFilter.Level.Valid = true
+	}
+	if filter.Experience != 0 {
+		dbFilter.Experience.Int64 = int64(filter.Experience)
+		dbFilter.Experience.Valid = true
+	}
+	if filter.NextLevelExperience != 0 {
+		dbFilter.NextLevelExperience.Int64 = int64(filter.NextLevelExperience)
+		dbFilter.NextLevelExperience.Valid = true
 	}
 
 	return
@@ -176,6 +206,27 @@ func (r *UserProfileRepository) ChangeRole(ctx context.Context, userProfile *dom
             t_user_profiles
         SET
             role_id = :role_id
+        WHERE
+            id = :id
+    `
+
+	_, err := r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *UserProfileRepository) AddExp(ctx context.Context, userProfile *domains.UserProfile) error {
+	dbModel := r.dbModelFromAppModel(*userProfile)
+	query := `
+        UPDATE
+            t_user_profiles
+        SET
+			level =  COALESCE(:level, level),
+			experience =  COALESCE(:experience, experience),
+			next_level_Exp =  COALESCE(:next_level_Exp, next_level_Exp),
         WHERE
             id = :id
     `
