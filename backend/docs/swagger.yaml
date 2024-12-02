@@ -26,11 +26,9 @@ definitions:
     properties:
       name:
         maxLength: 30
-        minLength: 1
         type: string
       surname:
         maxLength: 30
-        minLength: 1
         type: string
     type: object
   dto.UserRegisterDTO:
@@ -106,6 +104,46 @@ paths:
       summary: Get All Users
       tags:
       - Admin
+  /private/courses/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all courses based on the provided query parameters.
+      parameters:
+      - description: Course ID
+        in: query
+        name: courseID
+        type: string
+      - description: Language ID
+        in: query
+        name: languageID
+        type: string
+      - description: Programming Language ID
+        in: query
+        name: pLanguageID
+        type: string
+      - description: Course Title
+        in: query
+        name: title
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All Courses
+      tags:
+      - Courses
   /private/language/:
     get:
       consumes:

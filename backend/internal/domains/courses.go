@@ -23,9 +23,9 @@ const (
 
 type Course struct {
 	id           uuid.UUID
-	languageID   uuid.UUID
-	pLanguageID  uuid.UUID
-	rewardID     uuid.UUID
+	languageID   *uuid.UUID
+	pLanguageID  *uuid.UUID
+	rewardID     *uuid.UUID
 	rewardAmount int
 	title        string
 	description  string
@@ -43,7 +43,8 @@ type CourseFilter struct {
 }
 
 func NewCourse(
-	id, languageID, pLanguageID, rewardID uuid.UUID,
+	id uuid.UUID,
+	languageID, pLanguageID, rewardID *uuid.UUID,
 	rewardAmount int,
 	title, description, imagePath string,
 	createdAt, deletedAt time.Time,
@@ -67,7 +68,8 @@ func NewCourse(
 }
 
 func (d *Course) Unmarshal(
-	id, languageID, pLanguageID, rewardID uuid.UUID,
+	id uuid.UUID,
+	languageID, pLanguageID, rewardID *uuid.UUID,
 	rewardAmount int,
 	title, description, imagePath string,
 	createdAt, deletedAt time.Time,
@@ -89,15 +91,15 @@ func (d *Course) GetID() uuid.UUID {
 	return d.id
 }
 
-func (d *Course) GetLanguageID() uuid.UUID {
+func (d *Course) GetLanguageID() *uuid.UUID {
 	return d.languageID
 }
 
-func (d *Course) GetPLanguageID() uuid.UUID {
+func (d *Course) GetPLanguageID() *uuid.UUID {
 	return d.pLanguageID
 }
 
-func (d *Course) GetRewardID() uuid.UUID {
+func (d *Course) GetRewardID() *uuid.UUID {
 	return d.rewardID
 }
 
@@ -126,15 +128,15 @@ func (d *Course) GetDeletedAt() time.Time {
 }
 
 // Setter
-func (d *Course) SetLanguageID(languageID uuid.UUID) {
+func (d *Course) SetLanguageID(languageID *uuid.UUID) {
 	d.languageID = languageID
 }
 
-func (d *Course) SetPLanguageID(pLanguageID uuid.UUID) {
+func (d *Course) SetPLanguageID(pLanguageID *uuid.UUID) {
 	d.pLanguageID = pLanguageID
 }
 
-func (d *Course) SetRewardID(rewardID uuid.UUID) {
+func (d *Course) SetRewardID(rewardID *uuid.UUID) {
 	d.rewardID = rewardID
 }
 
