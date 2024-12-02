@@ -46,6 +46,7 @@ func (h *PrivateHandler) Init(router fiber.Router) {
 	h.initLanguageRoutes(root)
 	h.initRewardsRoutes(root)
 	h.initProgrammingLanguageRoutes(root)
+	h.initCoursesRoutes(root)
 }
 
 func (h *PrivateHandler) authMiddleware(c *fiber.Ctx) error {

@@ -27,11 +27,33 @@ type dbModelCourse struct {
 }
 
 func (r *CourseRepository) dbModelToAppModel(dbModel dbModelCourse) (appModel domains.Course) {
+	var languageID, planguageID, rewardID *uuid.UUID
+
+	// Dil, programlama dili, ödül ID'leri için aynı şekilde kontrol yapılır
+	if parsedLanguageID, err := uuid.Parse(dbModel.LanguageID.String); err == nil {
+		languageID = &parsedLanguageID
+	} else {
+		languageID = nil
+	}
+
+	if parsedPLanguageID, err := uuid.Parse(dbModel.PLanguageID.String); err == nil {
+		planguageID = &parsedPLanguageID
+	} else {
+		planguageID = nil
+	}
+
+	if parsedRewardID, err := uuid.Parse(dbModel.RewardID.String); err == nil {
+		rewardID = &parsedRewardID
+	} else {
+		rewardID = nil
+	}
+
+	// Verileri AppModel'e aktar
 	appModel.Unmarshal(
 		uuid.MustParse(dbModel.ID.String),
-		uuid.MustParse(dbModel.LanguageID.String),
-		uuid.MustParse(dbModel.PLanguageID.String),
-		uuid.MustParse(dbModel.RewardID.String),
+		languageID,
+		planguageID,
+		rewardID,
 		int(dbModel.RewardAmount.Int64),
 		dbModel.Title.String,
 		dbModel.Description.String,
@@ -47,15 +69,15 @@ func (r *CourseRepository) dbModelFromAppModel(appModel domains.Course) (dbModel
 		dbModel.ID.String = appModel.GetID().String()
 		dbModel.ID.Valid = true
 	}
-	if appModel.GetLanguageID() != uuid.Nil {
+	if appModel.GetLanguageID() != nil {
 		dbModel.LanguageID.String = appModel.GetLanguageID().String()
 		dbModel.LanguageID.Valid = true
 	}
-	if appModel.GetPLanguageID() != uuid.Nil {
+	if appModel.GetPLanguageID() != nil {
 		dbModel.PLanguageID.String = appModel.GetPLanguageID().String()
 		dbModel.PLanguageID.Valid = true
 	}
-	if appModel.GetRewardID() != uuid.Nil {
+	if appModel.GetRewardID() != nil {
 		dbModel.RewardID.String = appModel.GetRewardID().String()
 		dbModel.RewardID.Valid = true
 	}
