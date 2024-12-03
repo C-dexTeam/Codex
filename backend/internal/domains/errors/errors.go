@@ -64,6 +64,12 @@ const (
 
 	ErrCourseRewardAmountCannotBeNegative = "COURSE_REWARD_AMOUNT_CANNOT_BE_NEGATIVE"
 
+	ErrChapterTitleCannotBeEmpty = "CHAPTER_TITLE_CANNOT_BE_EMPTY"
+	ErrChapterTitleTooLong       = "CHAPTER_TITLE_IS_TOO_LONG"
+
+	ErrChapterFuncNameCannotBeEmpty = "CHAPTER_FUNCNAME_CANNOT_BE_EMPTY"
+	ErrChapterFuncNameTooLong       = "CHAPTER_FUNCNAME_IS_TOO_LONG"
+
 	// General
 	ErrInvalidID = "INVALID_ID"
 )
