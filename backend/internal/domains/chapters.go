@@ -15,6 +15,10 @@ type IChapterRepository interface {
 
 type IChapterService interface{}
 
+const (
+	DefaultChapterLimit = 10
+)
+
 type Chapter struct {
 	id               uuid.UUID
 	languageID       *uuid.UUID

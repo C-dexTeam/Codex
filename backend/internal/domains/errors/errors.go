@@ -71,7 +71,8 @@ const (
 	ErrChapterFuncNameTooLong       = "CHAPTER_FUNCNAME_IS_TOO_LONG"
 
 	// General
-	ErrInvalidID = "INVALID_ID"
+	ErrInvalidID      = "INVALID_ID"
+	ErrInvalidBoolean = "INVALID_BOOLEAN"
 )
 
 // 500
@@ -81,5 +82,6 @@ const (
 	ErrErrorWhileFilteringUserPorfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
 	ErrErrorWhileFilteringRole                 = "ERROR_WHILE_FILTERING_ROLES"
 	ErrErrorWhileFilteringCourse               = "ERROR_WHILE_FILTERING_COURSES"
+	ErrErrorWhileFilteringChapter              = "ERROR_WHILE_FILTERING_CHAPTERS"
 	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"
 )
