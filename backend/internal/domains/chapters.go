@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"context"
 	"time"
 
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
@@ -8,9 +9,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type IChapterRepository interface{}
+type IChapterRepository interface {
+	Filter(ctx context.Context, filter ChapterFilter, limit, page int64) (chapters []Chapter, dataCount int64, err error)
+}
 
 type IChapterService interface{}
+
+const (
+	DefaultChapterLimit = 10
+)
 
 type Chapter struct {
 	id               uuid.UUID
@@ -32,9 +39,9 @@ type Chapter struct {
 
 type ChapterFilter struct {
 	ID               uuid.UUID
-	LanguageID       *uuid.UUID
-	CourseID         *uuid.UUID
-	RewardID         *uuid.UUID
+	LanguageID       uuid.UUID
+	CourseID         uuid.UUID
+	RewardID         uuid.UUID
 	Title            string
 	GrantsExperience bool
 	Active           bool
