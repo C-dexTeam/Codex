@@ -14,6 +14,7 @@ type IService interface {
 	ProgrammingLService() domains.IPLanguagesService
 	CourseService() domains.ICourseService
 	ChapterService() domains.IChapterService
+	AttributeService() domains.IAttributeService
 }
 
 type Services struct {
@@ -27,6 +28,7 @@ type Services struct {
 	pLanguageService   domains.IPLanguagesService
 	courseService      domains.ICourseService
 	chapterService     domains.IChapterService
+	attributeService   domains.IAttributeService
 }
 
 func CreateNewServices(
@@ -53,6 +55,7 @@ func CreateNewServices(
 	pLanguageService := newPLanguageService(pLanguageRepository)
 	courseService := newCourseService(courseRepository)
 	chapterService := NewChapterService(chapterRepository)
+	attributeService := NewAttributeService(attributeRepository)
 
 	return &Services{
 		utilService:        utilsService,
@@ -65,6 +68,7 @@ func CreateNewServices(
 		pLanguageService:   pLanguageService,
 		courseService:      courseService,
 		chapterService:     chapterService,
+		attributeService:   attributeService,
 	}
 }
 
@@ -106,6 +110,10 @@ func (s *Services) CourseService() domains.ICourseService {
 
 func (s *Services) ChapterService() domains.IChapterService {
 	return s.chapterService
+}
+
+func (s *Services) AttributeService() domains.IAttributeService {
+	return s.attributeService
 }
 
 // ------------------------------------------------------

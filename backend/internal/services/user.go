@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/C-dexTeam/codex/internal/domains"
+	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	hasherService "github.com/C-dexTeam/codex/pkg/hasher"
 
@@ -37,7 +38,7 @@ func (s *userService) Login(ctx context.Context, username, password string) (use
 		Username: username,
 	}, 1, 1)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while filtering users", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(users) == 0 {
 		return nil, serviceErrors.NewServiceErrorWithMessage(400, "username or password not match")
@@ -45,7 +46,7 @@ func (s *userService) Login(ctx context.Context, username, password string) (use
 	user = &users[0]
 	ok, err := hasherService.CompareHashAndPassword(user.GetPassword(), password)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while comparing password", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while comparing password", err)
 	}
 	if !ok {
 		return nil, serviceErrors.NewServiceErrorWithMessage(400, "username or password not match")
@@ -57,7 +58,7 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	// Checking if the username is already being used
 	users, _, err := s.userRepository.Filter(ctx, domains.UserFilter{Username: username}, 1, 1)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while filtering users", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(users) != 0 {
 		return serviceErrors.NewServiceErrorWithMessageAndError(400, "username already being used", nil)
@@ -66,7 +67,7 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	// Checking if the email is already being used
 	users, _, err = s.userRepository.Filter(ctx, domains.UserFilter{Email: email}, 1, 1)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while filtering users", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(users) != 0 {
 		return serviceErrors.NewServiceErrorWithMessageAndError(400, "email already being used", nil)
@@ -80,7 +81,7 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	// Begin a new transaction
 	tx, err := s.transactionRepository.Begin()
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while beginning transaction", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while beginning transaction", err)
 	}
 
 	// Rollback the transaction in case of any error
@@ -93,31 +94,31 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	// Creating a new user model
 	newUser, err := domains.NewUser("", username, email, password)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating user", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating user", err)
 	}
 
 	// Save the new user to the database within the transaction
 	authUserID, err := s.userRepository.AddTx(ctx, tx, newUser)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while adding the user", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while adding the user", err)
 	}
 
 	// Creating a new user profile
 	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "", true, 1, 0, 100)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
 	}
 
 	// Save the new user profile to the database within the transaction
 	if err := s.userProfileRepository.AddTx(ctx, tx, newUserProfile); err != nil {
 		fmt.Println(2, err)
 
-		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
 	}
 
 	// Commit the transaction
 	if err = s.transactionRepository.Commit(tx); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(500, "error while committing transaction", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while committing transaction", err)
 	}
 
 	return nil
@@ -135,7 +136,7 @@ func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signat
 	// Checking if the user already has an account
 	users, _, err := s.userRepository.Filter(ctx, domains.UserFilter{PublicKey: publicKey}, 1, 1)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while filtering users", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(users) != 0 {
 		// If the user exist return the user.
@@ -147,7 +148,7 @@ func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signat
 	// Begin a new transaction
 	tx, err := s.transactionRepository.Begin()
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while beginning transaction", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while beginning transaction", err)
 	}
 
 	// Rollback the transaction in case of any error
@@ -160,29 +161,29 @@ func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signat
 	// Creating a new user model
 	newUser, err := domains.NewUser(publicKey, "", "", "")
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating user", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating user", err)
 	}
 
 	// Save the new user to the database within the transaction
 	authUserID, err := s.userRepository.AddTx(ctx, tx, newUser)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while adding the user", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while adding the user", err)
 	}
 
 	// Creating a new user profile
 	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "", true, 1, 0, 100)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
 	}
 
 	// Save the new user profile to the database within the transaction
 	if err := s.userProfileRepository.AddTx(ctx, tx, newUserProfile); err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while creating the user profile", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
 	}
 
 	// Commit the transaction
 	if err = s.transactionRepository.Commit(tx); err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while committing transaction", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while committing transaction", err)
 	}
 	user = newUser
 

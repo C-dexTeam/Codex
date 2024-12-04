@@ -22,7 +22,9 @@ func newPLanguageService(
 	}
 }
 
-func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context, programmingLanguageID, languageID, name, page, limit string) (programmingLanguages []domains.ProgrammingLanguage, err error) {
+func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
+	id, languageID, name, page, limit string,
+) (programmingLanguages []domains.ProgrammingLanguage, err error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -33,15 +35,16 @@ func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context, programm
 		limitNum = domains.DefaultProgrammingLanguageLimit
 	}
 
-	var pLanguageUUID uuid.UUID
-	if programmingLanguageID != "" {
-		pLanguageUUID, err = uuid.Parse(programmingLanguageID)
+	var (
+		pLanguageUUID uuid.UUID
+		languageUUID  uuid.UUID
+	)
+	if id != "" {
+		pLanguageUUID, err = uuid.Parse(id)
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 		}
 	}
-
-	var languageUUID uuid.UUID
 	if languageID != "" {
 		languageUUID, err = uuid.Parse(languageID)
 		if err != nil {

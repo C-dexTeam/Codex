@@ -26,7 +26,10 @@ func newUserProfileService(
 	}
 }
 
-func (s *userProfileService) GetUsers(ctx context.Context, id, userID, roleID, name, surname, page, limit string) ([]domains.UserProfile, error) {
+func (s *userProfileService) GetUsers(
+	ctx context.Context,
+	id, userID, roleID, name, surname, page, limit string,
+) ([]domains.UserProfile, error) {
 	var userProfileUUID, userAuthUUID, roleUUID uuid.UUID
 
 	// Default Values
@@ -73,7 +76,10 @@ func (s *userProfileService) GetUsers(ctx context.Context, id, userID, roleID, n
 	return users, nil
 }
 
-func (s *userProfileService) Update(ctx context.Context, userProfileID, name, surname string) (err error) {
+func (s *userProfileService) Update(
+	ctx context.Context,
+	userProfileID, name, surname string,
+) (err error) {
 	userProfileUUID, err := uuid.Parse(userProfileID)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
@@ -101,7 +107,10 @@ func (s *userProfileService) Update(ctx context.Context, userProfileID, name, su
 	return nil
 }
 
-func (s *userProfileService) ChangeUserRole(ctx context.Context, userProfileID, newRoleID string) (err error) {
+func (s *userProfileService) ChangeUserRole(
+	ctx context.Context,
+	userProfileID, newRoleID string,
+) (err error) {
 	userProfileUUID, err := uuid.Parse(userProfileID)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
@@ -126,7 +135,9 @@ func (s *userProfileService) ChangeUserRole(ctx context.Context, userProfileID, 
 	return nil
 }
 
-func (s *userProfileService) AddUserExp(ctx context.Context, userProfileID string, experience int) (err error) {
+func (s *userProfileService) AddUserExp(ctx context.Context,
+	userProfileID string, experience int,
+) (err error) {
 	userProfileUUID, err := uuid.Parse(userProfileID)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)

@@ -15,6 +15,196 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/private/admin/attributes/": {
+            "post": {
+                "description": "Adds Attribute Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attribute"
+                ],
+                "summary": "Add Attribute",
+                "parameters": [
+                    {
+                        "description": "New Attribute",
+                        "name": "newAttribute",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddAttributeDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Attributes from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attribute"
+                ],
+                "summary": "Delete Attribute",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attribute ID",
+                        "name": "attributeID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates Attribute Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attribute"
+                ],
+                "summary": "Update Attribute",
+                "parameters": [
+                    {
+                        "description": "Update Attribute",
+                        "name": "updateAttribute",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateAttributeDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/rewards/": {
+            "post": {
+                "description": "Adds Reward Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Add Reward",
+                "parameters": [
+                    {
+                        "description": "New Reward",
+                        "name": "newReward",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddRewardDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Rewards from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Delete Reward",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "rewardID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates Reward Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Update Reward",
+                "parameters": [
+                    {
+                        "description": "Update Reward",
+                        "name": "updateReward",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateRewardDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/admin/user": {
             "get": {
                 "description": "Retrieves all logs based on the provided query parameters.",
@@ -70,6 +260,61 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/attributes/": {
+            "get": {
+                "description": "Retrieves all attribute based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attribute"
+                ],
+                "summary": "Get All Attributes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attribute ID",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "rewardID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "TraitType of Attribute",
+                        "name": "traitType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/chapters/": {
             "get": {
                 "description": "Retrieves all chapters based on the provided query parameters.",
@@ -87,7 +332,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Chapter ID",
-                        "name": "chapterID",
+                        "name": "id",
                         "in": "query"
                     },
                     {
@@ -160,7 +405,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Course ID",
-                        "name": "courseID",
+                        "name": "id",
                         "in": "query"
                     },
                     {
@@ -318,6 +563,24 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Reward Name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reward Symbol",
+                        "name": "symbol",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reward Type",
+                        "name": "rewardType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Page",
                         "name": "page",
                         "in": "query"
@@ -325,6 +588,49 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/rewards/{id}": {
+            "get": {
+                "description": "Retrieves one reward.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Get Reward By ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reward Attribute Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reward Attribute Limit",
                         "name": "limit",
                         "in": "query"
                     }
@@ -521,6 +827,114 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.AddAttributeDTO": {
+            "type": "object",
+            "required": [
+                "traitType",
+                "value"
+            ],
+            "properties": {
+                "rewardID": {
+                    "type": "string"
+                },
+                "traitType": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "value": {
+                    "type": "string",
+                    "maxLength": 30
+                }
+            }
+        },
+        "dto.AddRewardDTO": {
+            "type": "object",
+            "required": [
+                "imagePath",
+                "name",
+                "rewardType",
+                "symbol",
+                "uri"
+            ],
+            "properties": {
+                "Description": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string",
+                    "maxLength": 60
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "rewardType": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "symbol": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "uri": {
+                    "type": "string",
+                    "maxLength": 120
+                }
+            }
+        },
+        "dto.UpdateAttributeDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "traitType": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "value": {
+                    "type": "string",
+                    "maxLength": 30
+                }
+            }
+        },
+        "dto.UpdateRewardDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "Description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string",
+                    "maxLength": 60
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "rewardType": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "symbol": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "uri": {
+                    "type": "string",
+                    "maxLength": 120
+                }
+            }
+        },
         "dto.UserAuthWallet": {
             "type": "object",
             "properties": {
