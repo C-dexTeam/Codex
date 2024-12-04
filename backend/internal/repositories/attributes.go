@@ -21,12 +21,41 @@ type dbModelAttribute struct {
 }
 
 func (r *AttributesRepository) dbModelToAppModel(dbModel dbModelAttribute) (attribute domains.Attribute) {
+	var rewardID *uuid.UUID
+
+	if parsedRewardID, err := uuid.Parse(dbModel.RewardID.String); err == nil {
+		rewardID = &parsedRewardID
+	} else {
+		rewardID = nil
+	}
+
 	attribute.Unmarshal(
 		uuid.MustParse(dbModel.ID.String),
-		uuid.MustParse(dbModel.RewardID.String),
+		rewardID,
 		dbModel.TraitType.String,
 		dbModel.Value.String,
 	)
+
+	return
+}
+
+func (r *AttributesRepository) dbModelFromAppModel(appModel domains.Attribute) (dbModel dbModelAttribute) {
+	if appModel.GetID() != uuid.Nil {
+		dbModel.ID.String = appModel.GetID().String()
+		dbModel.ID.Valid = true
+	}
+	if appModel.GetRewardID() != nil {
+		dbModel.RewardID.String = appModel.GetRewardID().String()
+		dbModel.RewardID.Valid = true
+	}
+	if appModel.GetTraitType() != "" {
+		dbModel.TraitType.String = appModel.GetTraitType()
+		dbModel.TraitType.Valid = true
+	}
+	if appModel.GetValue() != "" {
+		dbModel.Value.String = appModel.GetValue()
+		dbModel.Value.Valid = true
+	}
 
 	return
 }
@@ -52,7 +81,7 @@ func NewAttributesRepository(db *sqlx.DB) domains.IAttributeRepository {
 	return &AttributesRepository{db: db}
 }
 
-func (r *AttributesRepository) Filter(ctx context.Context, filter domains.AttributeFilter, limit, page int64) (rewards []domains.Attribute, dataCount int64, err error) {
+func (r *AttributesRepository) Filter(ctx context.Context, filter domains.AttributeFilter, limit, page int64) (attributes []domains.Attribute, dataCount int64, err error) {
 	dbFilter := r.dbModelFromAppFilter(filter)
 	dbResult := []dbModelAttribute{}
 
@@ -75,7 +104,59 @@ func (r *AttributesRepository) Filter(ctx context.Context, filter domains.Attrib
 		return
 	}
 	for _, dbModel := range dbResult {
-		rewards = append(rewards, r.dbModelToAppModel(dbModel))
+		attributes = append(attributes, r.dbModelToAppModel(dbModel))
 	}
+	return
+}
+
+func (r *AttributesRepository) Add(ctx context.Context, attribute *domains.Attribute) (uuid.UUID, error) {
+	dbModel := r.dbModelFromAppModel(*attribute)
+	query := `
+		INSERT INTO
+			t_attributes (reward_id, trait_type, value)
+		VALUES
+			($1, $2, $3)
+		RETURNING id
+	`
+
+	var id uuid.UUID
+	err := r.db.QueryRowxContext(ctx, query, dbModel.RewardID, dbModel.TraitType, dbModel.Value).Scan(&id)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return id, nil
+}
+
+func (r *AttributesRepository) Update(ctx context.Context, attribute *domains.Attribute) (err error) {
+	dbModel := r.dbModelFromAppModel(*attribute)
+	query := `
+		UPDATE
+			t_attributes
+		SET
+			reward_id = COALESCE(:reward_id, reward_id),
+			trait_type = COALESCE(:trait_type, trait_type),
+			value = COALESCE(:value, value)
+		WHERE
+			id = :id
+	`
+	_, err = r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *AttributesRepository) Delete(ctx context.Context, attributeID uuid.UUID) (err error) {
+	query := `
+		DELETE FROM
+			t_attributes
+		WHERE 
+			id = $1
+	`
+	if _, err = r.db.ExecContext(ctx, query, attributeID); err != nil {
+		return
+	}
+
 	return
 }

@@ -13,6 +13,8 @@ const (
 	ErrLanguageDefaultNotFound = "DEFAULT_LANGUAGE_NOT_FOUND"
 	ErrUserProfileNotFound     = "USER_PROFILE_NOT_FOUND"
 	ErrRoleNotFound            = "ROLE_NOT_FOUND"
+	ErrRewardNotFound          = "REWARD_NOT_FOUND"
+	ErrRewardAttributeNotFound = "REWARD_ATTRIBUTE_NOT_FOUND"
 )
 
 // 400
@@ -78,10 +80,12 @@ const (
 // 500
 const (
 	ErrErrorWhileFilteringRewards              = "ERROR_WHILE_FILTERING_REWARDS"
+	ErrErrorWhileFilteringRewardsAttributes    = "ERROR_WHILE_FILTERING_REWARDS_ATTRIBUTES"
 	ErrErrorWhileFilteringProgrammingLanguages = "ERROR_WHILE_FILTERING_PROGRAMMING_LANGUAGES"
 	ErrErrorWhileFilteringUserPorfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
 	ErrErrorWhileFilteringRole                 = "ERROR_WHILE_FILTERING_ROLES"
 	ErrErrorWhileFilteringCourse               = "ERROR_WHILE_FILTERING_COURSES"
 	ErrErrorWhileFilteringChapter              = "ERROR_WHILE_FILTERING_CHAPTERS"
 	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"
+	ErrErrorWhileFilteringUsers                = "ERROR_WHILE_FILTERING_USERS"
 )

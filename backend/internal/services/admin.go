@@ -31,7 +31,7 @@ func newAdminService(
 	}
 }
 
-func (s *adminService) GetAllUsers(ctx context.Context, id, username, email, page, limit string) ([]domains.User, error) {
+func (s *adminService) GetUsers(ctx context.Context, id, username, email, page, limit string) ([]domains.User, error) {
 	// Default Values
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {

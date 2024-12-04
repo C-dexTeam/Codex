@@ -15,7 +15,7 @@ func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
 // @Description Retrieves all courses based on the provided query parameters.
 // @Accept json
 // @Produce json
-// @Param courseID query string false "Course ID"
+// @Param id query string false "Course ID"
 // @Param languageID query string false "Language ID"
 // @Param pLanguageID query string false "Programming Language ID"
 // @Param title query string false "Course Title"
@@ -24,14 +24,14 @@ func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/courses/ [get]
 func (h *PrivateHandler) GetCourses(c *fiber.Ctx) error {
-	courseID := c.Query("courseID")
+	id := c.Query("id")
 	languageID := c.Query("languageID")
 	pLanguageID := c.Query("pLanguageID")
 	title := c.Query("title")
 	page := c.Query("page")
 	limit := c.Query("limit")
 
-	courses, err := h.services.CourseService().GetCourses(c.Context(), courseID, languageID, pLanguageID, title, page, limit)
+	courses, err := h.services.CourseService().GetCourses(c.Context(), id, languageID, pLanguageID, title, page, limit)
 	if err != nil {
 		return err
 	}

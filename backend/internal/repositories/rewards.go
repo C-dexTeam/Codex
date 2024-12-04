@@ -37,6 +37,38 @@ func (r *RewardsRepository) dbModelToAppModel(dbModel dbModelReward) (reward dom
 	return
 }
 
+func (r *RewardsRepository) dbModelFromAppModel(appModel domains.Reward) (dbModel dbModelReward) {
+	if appModel.GetID() != uuid.Nil {
+		dbModel.ID.String = appModel.GetID().String()
+		dbModel.ID.Valid = true
+	}
+	if appModel.GetRewardType() != "" {
+		dbModel.RewardType.String = appModel.GetRewardType()
+		dbModel.RewardType.Valid = true
+	}
+	if appModel.GetSymbol() != "" {
+		dbModel.Symbol.String = appModel.GetSymbol()
+		dbModel.Symbol.Valid = true
+	}
+	if appModel.GetName() != "" {
+		dbModel.Name.String = appModel.GetName()
+		dbModel.Name.Valid = true
+	}
+	if appModel.GetDescription() != "" {
+		dbModel.Description.String = appModel.GetDescription()
+		dbModel.Description.Valid = true
+	}
+	if appModel.GetImagePath() != "" {
+		dbModel.ImagePath.String = appModel.GetImagePath()
+		dbModel.ImagePath.Valid = true
+	}
+	if appModel.GetURI() != "" {
+		dbModel.URI.String = appModel.GetURI()
+		dbModel.URI.Valid = true
+	}
+	return
+}
+
 func (r *RewardsRepository) dbModelFromAppFilter(filter domains.RewardFilter) (dbModelReward dbModelReward) {
 	if filter.ID != uuid.Nil {
 		dbModelReward.ID.String = filter.ID.String()
@@ -63,7 +95,7 @@ func NewRewardsRepository(db *sqlx.DB) domains.IRewardRepository {
 }
 
 func (r *RewardsRepository) Filter(ctx context.Context, filter domains.RewardFilter, limit, page int64) (rewards []domains.Reward, dataCount int64, err error) {
-	dbFilterReward := r.dbModelFromAppFilter(filter)
+	dbFilter := r.dbModelFromAppFilter(filter)
 	dbResult := []dbModelReward{}
 
 	query := `
@@ -80,12 +112,67 @@ func (r *RewardsRepository) Filter(ctx context.Context, filter domains.RewardFil
 	`
 
 	// Execute the query with the extracted fields
-	err = r.db.SelectContext(ctx, &dbResult, query, dbFilterReward.ID, dbFilterReward.RewardType, dbFilterReward.Name, dbFilterReward.Symbol, limit, (page-1)*limit)
+	err = r.db.SelectContext(ctx, &dbResult, query, dbFilter.ID, dbFilter.RewardType, dbFilter.Name, dbFilter.Symbol, limit, (page-1)*limit)
 	if err != nil {
 		return
 	}
 	for _, dbModel := range dbResult {
 		rewards = append(rewards, r.dbModelToAppModel(dbModel))
 	}
+	return
+}
+
+func (r *RewardsRepository) Add(ctx context.Context, reward *domains.Reward) (uuid.UUID, error) {
+	dbModel := r.dbModelFromAppModel(*reward)
+	query := `
+		INSERT INTO
+			t_rewards (reward_type, symbol, name, description, image_path, uri)
+		VALUES
+			($1, $2, $3, $4, $5, $6)
+		RETURNING id
+	`
+
+	var id uuid.UUID
+	err := r.db.QueryRowxContext(ctx, query, dbModel.RewardType, dbModel.Symbol, dbModel.Name, dbModel.Description, dbModel.ImagePath, dbModel.URI).Scan(&id)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return id, nil
+}
+
+func (r *RewardsRepository) Update(ctx context.Context, reward *domains.Reward) (err error) {
+	dbModel := r.dbModelFromAppModel(*reward) // thanks to this. This func behaves like patch.
+	query := `
+		UPDATE
+			t_rewards
+		SET
+			reward_type = COALESCE(:reward_type, reward_type),
+			symbol = COALESCE(:symbol, symbol),
+			name = COALESCE(:name, name),
+			description =  COALESCE(:description, description),
+			image_path =  COALESCE(:image_path, image_path),
+			uri =  COALESCE(:uri, uri)
+		WHERE
+			id = :id
+	`
+	_, err = r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *RewardsRepository) Delete(ctx context.Context, rewardID uuid.UUID) (err error) {
+	query := `
+		DELETE FROM
+			t_rewards
+		WHERE 
+			id = $1
+	`
+	if _, err = r.db.ExecContext(ctx, query, rewardID); err != nil {
+		return
+	}
+
 	return
 }

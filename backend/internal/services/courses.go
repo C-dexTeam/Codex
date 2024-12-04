@@ -22,7 +22,10 @@ func newCourseService(
 	}
 }
 
-func (s *courseService) GetCourses(ctx context.Context, courseID, langugeID, pLanguageID, title, page, limit string) (courses []domains.Course, err error) {
+func (s *courseService) GetCourses(
+	ctx context.Context,
+	id, langugeID, pLanguageID, title, page, limit string,
+) (courses []domains.Course, err error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -38,8 +41,8 @@ func (s *courseService) GetCourses(ctx context.Context, courseID, langugeID, pLa
 		languageUUID  uuid.UUID
 		pLanguageUUID uuid.UUID
 	)
-	if courseID != "" {
-		courseUUID, err = uuid.Parse(courseID)
+	if id != "" {
+		courseUUID, err = uuid.Parse(id)
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 		}

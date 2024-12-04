@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS t_attributes (
     id UUID PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-    reward_id UUID NOT NULL,
+    reward_id UUID DEFAULT NULL,
     trait_type VARCHAR(30) NOT NULL,
     value VARCHAR(30) NOT NULL,
 

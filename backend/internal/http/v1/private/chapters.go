@@ -17,7 +17,7 @@ func (h *PrivateHandler) initChaptersRoutes(root fiber.Router) {
 // @Description Retrieves all chapters based on the provided query parameters.
 // @Accept json
 // @Produce json
-// @Param chapterID query string false "Chapter ID"
+// @Param id query string false "Chapter ID"
 // @Param languageID query string false "Language ID"
 // @Param courseID query string false "Course ID"
 // @Param rewardID query string false "Reward ID"
@@ -28,7 +28,7 @@ func (h *PrivateHandler) initChaptersRoutes(root fiber.Router) {
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/chapters/ [get]
 func (h *PrivateHandler) GetChapters(c *fiber.Ctx) error {
-	chapterID := c.Query("chapterID")
+	id := c.Query("id")
 	languageID := c.Query("languageID")
 	courseID := c.Query("courseID")
 	rewardID := c.Query("rewardID")
@@ -37,7 +37,7 @@ func (h *PrivateHandler) GetChapters(c *fiber.Ctx) error {
 	limit := c.Query("limit")
 
 	// if you put "" in bool area. Its means all. Like not only true or false.
-	chapters, err := h.services.ChapterService().GetChapters(c.Context(), chapterID, languageID, courseID, rewardID, title, "", "", page, limit)
+	chapters, err := h.services.ChapterService().GetChapters(c.Context(), id, languageID, courseID, rewardID, title, "", "", page, limit)
 	if err != nil {
 		return err
 	}

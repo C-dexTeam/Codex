@@ -1,5 +1,82 @@
 basePath: /api/v1
 definitions:
+  dto.AddAttributeDTO:
+    properties:
+      rewardID:
+        type: string
+      traitType:
+        maxLength: 30
+        type: string
+      value:
+        maxLength: 30
+        type: string
+    required:
+    - traitType
+    - value
+    type: object
+  dto.AddRewardDTO:
+    properties:
+      Description:
+        type: string
+      imagePath:
+        maxLength: 60
+        type: string
+      name:
+        maxLength: 30
+        type: string
+      rewardType:
+        maxLength: 30
+        type: string
+      symbol:
+        maxLength: 30
+        type: string
+      uri:
+        maxLength: 120
+        type: string
+    required:
+    - imagePath
+    - name
+    - rewardType
+    - symbol
+    - uri
+    type: object
+  dto.UpdateAttributeDTO:
+    properties:
+      id:
+        type: string
+      rewardID:
+        type: string
+      traitType:
+        maxLength: 30
+        type: string
+      value:
+        maxLength: 30
+        type: string
+    type: object
+  dto.UpdateRewardDTO:
+    properties:
+      Description:
+        type: string
+      id:
+        type: string
+      imagePath:
+        maxLength: 60
+        type: string
+      name:
+        maxLength: 30
+        type: string
+      rewardType:
+        maxLength: 30
+        type: string
+      symbol:
+        maxLength: 30
+        type: string
+      uri:
+        maxLength: 120
+        type: string
+    required:
+    - id
+    type: object
   dto.UserAuthWallet:
     properties:
       message:
@@ -68,6 +145,130 @@ info:
   description: API Service for Codex
   title: API Service
 paths:
+  /private/admin/attributes/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Attributes from DB.
+      parameters:
+      - description: Attribute ID
+        in: query
+        name: attributeID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Attribute
+      tags:
+      - Attribute
+    patch:
+      consumes:
+      - application/json
+      description: Updates Attribute Into DB.
+      parameters:
+      - description: Update Attribute
+        in: body
+        name: updateAttribute
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAttributeDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Attribute
+      tags:
+      - Attribute
+    post:
+      consumes:
+      - application/json
+      description: Adds Attribute Into DB.
+      parameters:
+      - description: New Attribute
+        in: body
+        name: newAttribute
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddAttributeDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Attribute
+      tags:
+      - Attribute
+  /private/admin/rewards/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Rewards from DB.
+      parameters:
+      - description: Reward ID
+        in: query
+        name: rewardID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Reward
+      tags:
+      - Reward
+    patch:
+      consumes:
+      - application/json
+      description: Updates Reward Into DB.
+      parameters:
+      - description: Update Reward
+        in: body
+        name: updateReward
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateRewardDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Reward
+      tags:
+      - Reward
+    post:
+      consumes:
+      - application/json
+      description: Adds Reward Into DB.
+      parameters:
+      - description: New Reward
+        in: body
+        name: newReward
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddRewardDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Reward
+      tags:
+      - Reward
   /private/admin/user:
     get:
       consumes:
@@ -104,6 +305,42 @@ paths:
       summary: Get All Users
       tags:
       - Admin
+  /private/attributes/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all attribute based on the provided query parameters.
+      parameters:
+      - description: Attribute ID
+        in: query
+        name: id
+        type: string
+      - description: Reward ID
+        in: query
+        name: rewardID
+        type: string
+      - description: TraitType of Attribute
+        in: query
+        name: traitType
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All Attributes
+      tags:
+      - Attribute
   /private/chapters/:
     get:
       consumes:
@@ -112,7 +349,7 @@ paths:
       parameters:
       - description: Chapter ID
         in: query
-        name: chapterID
+        name: id
         type: string
       - description: Language ID
         in: query
@@ -160,7 +397,7 @@ paths:
       parameters:
       - description: Course ID
         in: query
-        name: courseID
+        name: id
         type: string
       - description: Language ID
         in: query
@@ -263,6 +500,18 @@ paths:
         in: query
         name: rewardID
         type: string
+      - description: Reward Name
+        in: query
+        name: name
+        type: string
+      - description: Reward Symbol
+        in: query
+        name: symbol
+        type: string
+      - description: Reward Type
+        in: query
+        name: rewardType
+        type: string
       - description: Page
         in: query
         name: page
@@ -279,6 +528,34 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Rewards
+      tags:
+      - Reward
+  /private/rewards/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves one reward.
+      parameters:
+      - description: Reward ID
+        in: path
+        name: id
+        type: string
+      - description: Reward Attribute Page
+        in: query
+        name: page
+        type: string
+      - description: Reward Attribute Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get Reward By ID
       tags:
       - Reward
   /private/user/profile:

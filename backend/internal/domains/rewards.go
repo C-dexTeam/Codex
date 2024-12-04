@@ -10,10 +10,17 @@ import (
 
 type IRewardRepository interface {
 	Filter(ctx context.Context, filter RewardFilter, limit, page int64) (rewards []Reward, dataCount int64, err error)
+	Add(ctx context.Context, reward *Reward) (uuid.UUID, error)
+	Update(ctx context.Context, reward *Reward) (err error)
+	Delete(ctx context.Context, rewardID uuid.UUID) (err error)
 }
 
 type IRewardService interface {
-	GetRewards(ctx context.Context, rewardID, page, limit string) (rewards []Reward, err error)
+	GetRewards(ctx context.Context, rewardID, name, symbol, rewardType, page, limit string) (rewards []Reward, err error)
+	GetReward(ctx context.Context, rewardID, page, limit string) (reward *Reward, err error)
+	AddReward(ctx context.Context, rewardType, symbol, name, description, imagePath, URI string) (uuid.UUID, error)
+	UpdateReward(ctx context.Context, id, rewardType, symbol, name, description, imagePath, URI string) error
+	DeleteReward(ctx context.Context, rewardID string) (err error)
 }
 
 const (
@@ -39,11 +46,13 @@ type RewardFilter struct {
 }
 
 func NewReward(
-	id uuid.UUID,
-	rewardType, symbol, name, description, imagePath, uri string,
+	id, rewardType, symbol, name, description, imagePath, uri string,
 	attribute []Attribute,
 ) (*Reward, error) {
 	reward := Reward{}
+	if err := reward.SetID(id); err != nil {
+		return nil, err
+	}
 	if err := reward.SetRewardType(rewardType); err != nil {
 		return nil, err
 	}
@@ -82,14 +91,23 @@ func (d *Reward) GetID() uuid.UUID {
 	return d.id
 }
 
+func (d *Reward) SetID(id string) error {
+	if id != "" {
+		idUUID, err := uuid.Parse(id)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.id = idUUID
+	}
+
+	return nil
+}
+
 func (d *Reward) GetRewardType() string {
 	return d.rewardType
 }
 
 func (d *Reward) SetRewardType(rewardType string) error {
-	if rewardType == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardTypeCannotBeEmpty)
-	}
 	if len(rewardType) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardTypeTooLong)
 	}
@@ -102,9 +120,6 @@ func (d *Reward) GetName() string {
 }
 
 func (d *Reward) SetName(name string) error {
-	if name == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardNameCannotBeEmpty)
-	}
 	if len(name) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardNameTooLong)
 	}
@@ -113,13 +128,10 @@ func (d *Reward) SetName(name string) error {
 }
 
 func (d *Reward) GetSymbol() string {
-	return d.name
+	return d.symbol
 }
 
 func (d *Reward) SetSymbol(symbol string) error {
-	if symbol == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardSymbolCannotBeEmpty)
-	}
 	if len(symbol) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardSymbolTooLong)
 	}
@@ -140,9 +152,6 @@ func (d *Reward) GetImagePath() string {
 }
 
 func (d *Reward) SetImagePath(imagePath string) error {
-	if imagePath == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardImagePathCannotBeEmpty)
-	}
 	if len(imagePath) > 60 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardImagePathTooLong)
 	}
@@ -151,13 +160,10 @@ func (d *Reward) SetImagePath(imagePath string) error {
 }
 
 func (d *Reward) GetURI() string {
-	return d.imagePath
+	return d.uri
 }
 
 func (d *Reward) SetURI(uri string) error {
-	if uri == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardURICannotBeEmpty)
-	}
 	if len(uri) > 120 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrRewardURITooLong)
 	}

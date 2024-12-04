@@ -27,7 +27,7 @@ func (s *roleService) GetDefault(ctx context.Context) (role *domains.Role, err e
 		Name: domains.DefaultRole,
 	}, 1, 1)
 	if len(roles) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "Default role not found", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
 	}
 	role = &roles[0]
 	return
@@ -38,7 +38,7 @@ func (s *roleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (role *
 		ID: roleID,
 	}, 1, 1)
 	if len(roles) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "Default role not found", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
 	}
 	role = &roles[0]
 

@@ -24,7 +24,7 @@ func NewChapterService(
 
 func (s *chapterService) GetChapters(
 	ctx context.Context,
-	chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
+	id, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
 ) (chapters []domains.Chapter, err error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
@@ -41,11 +41,11 @@ func (s *chapterService) GetChapters(
 		languageUUID  uuid.UUID
 		courseUUID    uuid.UUID
 		rewardUUID    uuid.UUID
-		grantsExpBool *bool // pointer kullanılmalı çünkü nullable
-		activeBool    *bool // pointer kullanılmalı çünkü nullable
+		grantsExpBool *bool
+		activeBool    *bool
 	)
-	if chapterID != "" {
-		chapterUUID, err = uuid.Parse(chapterID)
+	if id != "" {
+		chapterUUID, err = uuid.Parse(id)
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 		}
