@@ -13,7 +13,9 @@ type IChapterRepository interface {
 	Filter(ctx context.Context, filter ChapterFilter, limit, page int64) (chapters []Chapter, dataCount int64, err error)
 }
 
-type IChapterService interface{}
+type IChapterService interface {
+	GetChapters(ctx context.Context, chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string) (chapters []Chapter, err error)
+}
 
 const (
 	DefaultChapterLimit = 10
@@ -34,7 +36,7 @@ type Chapter struct {
 	grantsExperience bool
 	active           bool
 	createdAt        time.Time
-	deletedAt        time.Time
+	deletedAt        *time.Time
 }
 
 type ChapterFilter struct {
@@ -43,8 +45,8 @@ type ChapterFilter struct {
 	CourseID         uuid.UUID
 	RewardID         uuid.UUID
 	Title            string
-	GrantsExperience bool
-	Active           bool
+	GrantsExperience *bool
+	Active           *bool
 }
 
 func NewChapter(
@@ -52,7 +54,8 @@ func NewChapter(
 	languageID, courseID, rewardID *uuid.UUID,
 	title, description, content, funcName, frontendTmp, dockerTmp, checkTmp string,
 	grantsExperience, active bool,
-	createdAt, deletedAt time.Time,
+	createdAt time.Time,
+	deletedAt *time.Time,
 ) (chapter *Chapter, err error) {
 	if err = chapter.SetTitle(title); err != nil {
 		return
@@ -81,7 +84,8 @@ func (c *Chapter) Unmarshal(
 	languageID, courseID, rewardID *uuid.UUID,
 	title, description, content, funcName, frontendTmp, dockerTmp, checkTmp string,
 	grantsExperience, active bool,
-	createdAt, deletedAt time.Time,
+	createdAt time.Time,
+	deletedAt *time.Time,
 ) {
 	c.id = id
 	c.languageID = languageID
@@ -157,7 +161,7 @@ func (c *Chapter) GetCreatedAt() time.Time {
 	return c.createdAt
 }
 
-func (c *Chapter) GetDeletedAt() time.Time {
+func (c *Chapter) GetDeletedAt() *time.Time {
 	return c.deletedAt
 }
 
@@ -228,6 +232,6 @@ func (c *Chapter) SetCreatedAt(createdAt time.Time) {
 	c.createdAt = createdAt
 }
 
-func (c *Chapter) SetDeletedAt(deletedAt time.Time) {
+func (c *Chapter) SetDeletedAt(deletedAt *time.Time) {
 	c.deletedAt = deletedAt
 }

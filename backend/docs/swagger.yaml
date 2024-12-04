@@ -104,6 +104,54 @@ paths:
       summary: Get All Users
       tags:
       - Admin
+  /private/chapters/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all chapters based on the provided query parameters.
+      parameters:
+      - description: Chapter ID
+        in: query
+        name: chapterID
+        type: string
+      - description: Language ID
+        in: query
+        name: languageID
+        type: string
+      - description: Course ID
+        in: query
+        name: courseID
+        type: string
+      - description: Reward ID
+        in: query
+        name: rewardID
+        type: string
+      - description: Chapter Title
+        in: query
+        name: title
+        type: string
+      - description: Grants Experience
+        in: query
+        name: grantsExp
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All Chapters
+      tags:
+      - Chapter
   /private/courses/:
     get:
       consumes:
