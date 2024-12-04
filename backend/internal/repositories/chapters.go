@@ -68,7 +68,7 @@ func (r *ChapterRepository) dbModelToAppModel(dbModel dbModelChapter) (appModel 
 		dbModel.GrantsExperience.Bool,
 		dbModel.Active.Bool,
 		dbModel.CreatedAt.Time,
-		dbModel.DeletedAt.Time,
+		&dbModel.DeletedAt.Time,
 	)
 
 	return
@@ -120,7 +120,7 @@ func (r *ChapterRepository) dbModelFromAppModel(appModel domains.Chapter) (dbMod
 		dbModel.CreatedAt.Valid = true
 	}
 	if !appModel.GetDeletedAt().IsZero() {
-		dbModel.DeletedAt.Time = appModel.GetDeletedAt()
+		dbModel.DeletedAt.Time = *appModel.GetDeletedAt()
 		dbModel.DeletedAt.Valid = true
 	}
 	dbModel.GrantsExperience.Bool = appModel.GetGrantsExperience()
@@ -152,12 +152,20 @@ func (d *ChapterRepository) dbModelFromAppFilter(appFilter domains.ChapterFilter
 		dbModel.Title.String = appFilter.Title
 		dbModel.Title.Valid = true
 	}
-	dbModel.GrantsExperience.Bool = appFilter.GrantsExperience
-	dbModel.GrantsExperience.Valid = true
-	dbModel.Active.Bool = appFilter.Active
-	dbModel.Active.Valid = true
+	if appFilter.GrantsExperience != nil {
+		dbModel.GrantsExperience.Bool = *appFilter.GrantsExperience
+		dbModel.GrantsExperience.Valid = true
+	}
+	if appFilter.Active != nil {
+		dbModel.Active.Bool = *appFilter.Active
+		dbModel.Active.Valid = true
+	}
 
 	return
+}
+
+func NewChapterRepository(db *sqlx.DB) domains.IChapterRepository {
+	return &ChapterRepository{db: db}
 }
 
 func (r *ChapterRepository) Filter(ctx context.Context, filter domains.ChapterFilter, limit, page int64) (chapters []domains.Chapter, dataCount int64, err error) {
@@ -175,8 +183,8 @@ func (r *ChapterRepository) Filter(ctx context.Context, filter domains.ChapterFi
 		($3::uuid IS NULL OR course_id = $3::uuid) AND
 		($4::uuid IS NULL OR reward_id = $4::uuid) AND
 		($5::text IS NULL OR title LIKE '%' || $5::text || '%') AND
-		grants_experience = $6::boolean AND
-		active = $7::boolean AND
+		($6::boolean IS NULL OR grants_experience = $6::boolean) AND
+		($7::boolean IS NULL OR active = $7::boolean) AND
 		deleted_at IS NULL
 	LIMIT $8 OFFSET $9;
 	`

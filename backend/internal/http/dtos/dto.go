@@ -7,6 +7,7 @@ type IDTOManager interface {
 	RewardManager() *RewardDTOManager
 	ProgrammingManager() *ProgrammingLanguageDTOManager
 	CourseManager() *CourseDTOManager
+	ChapterManager() *ChapterDTOManager
 }
 
 type DTOManager struct {
@@ -16,6 +17,7 @@ type DTOManager struct {
 	rewardDTOManager    *RewardDTOManager
 	pLanguageDTOManager *ProgrammingLanguageDTOManager
 	courseDTOManager    *CourseDTOManager
+	chapterDTOManager   *ChapterDTOManager
 }
 
 func CreateNewDTOManager() IDTOManager {
@@ -25,6 +27,7 @@ func CreateNewDTOManager() IDTOManager {
 	rewardDTOManager := NewRewardDTOManager()
 	pLanguageDTOManager := NewProgrammingLanguageDTOManager()
 	courseDTOManager := NewCourseDTOManager()
+	chapterDTOManager := NewChapterDTOManager()
 
 	return &DTOManager{
 		userDTOManager:      &userDTOManager,
@@ -33,6 +36,7 @@ func CreateNewDTOManager() IDTOManager {
 		rewardDTOManager:    &rewardDTOManager,
 		pLanguageDTOManager: &pLanguageDTOManager,
 		courseDTOManager:    &courseDTOManager,
+		chapterDTOManager:   &chapterDTOManager,
 	}
 }
 
@@ -58,4 +62,8 @@ func (m *DTOManager) ProgrammingManager() *ProgrammingLanguageDTOManager {
 
 func (m *DTOManager) CourseManager() *CourseDTOManager {
 	return m.courseDTOManager
+}
+
+func (m *DTOManager) ChapterManager() *ChapterDTOManager {
+	return m.chapterDTOManager
 }

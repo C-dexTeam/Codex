@@ -22,7 +22,10 @@ func NewChapterService(
 	}
 }
 
-func (s *chapterService) GetChapters(ctx context.Context, chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string) (chapters []domains.Chapter, err error) {
+func (s *chapterService) GetChapters(
+	ctx context.Context,
+	chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
+) (chapters []domains.Chapter, err error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -38,11 +41,11 @@ func (s *chapterService) GetChapters(ctx context.Context, chapterID, langugeID, 
 		languageUUID  uuid.UUID
 		courseUUID    uuid.UUID
 		rewardUUID    uuid.UUID
-		grantsExpBool bool
-		activeBool    bool
+		grantsExpBool *bool // pointer kullanılmalı çünkü nullable
+		activeBool    *bool // pointer kullanılmalı çünkü nullable
 	)
 	if chapterID != "" {
-		chapterUUID, err = uuid.Parse(courseID)
+		chapterUUID, err = uuid.Parse(chapterID)
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 		}
@@ -66,16 +69,18 @@ func (s *chapterService) GetChapters(ctx context.Context, chapterID, langugeID, 
 		}
 	}
 	if grantsExperience != "" {
-		grantsExpBool, err = strconv.ParseBool(grantsExperience)
+		grantsExpBoolValue, err := strconv.ParseBool(grantsExperience)
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidBoolean, err)
 		}
+		grantsExpBool = &grantsExpBoolValue
 	}
 	if active != "" {
-		activeBool, err = strconv.ParseBool(active)
+		activeBoolValue, err := strconv.ParseBool(active)
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidBoolean, err)
 		}
+		activeBool = &activeBoolValue
 	}
 
 	chapters, _, err = s.chapterRepository.Filter(ctx, domains.ChapterFilter{
@@ -87,6 +92,7 @@ func (s *chapterService) GetChapters(ctx context.Context, chapterID, langugeID, 
 		GrantsExperience: grantsExpBool,
 		Active:           activeBool,
 	}, int64(limitNum), int64(pageNum))
+
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
 	}

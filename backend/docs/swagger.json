@@ -63,6 +63,79 @@
                 }
             }
         },
+        "/private/chapters/": {
+            "get": {
+                "description": "Retrieves all chapters based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapter"
+                ],
+                "summary": "Get All Chapters",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "chapterID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Language ID",
+                        "name": "languageID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "courseID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "rewardID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chapter Title",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Grants Experience",
+                        "name": "grantsExp",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/courses/": {
             "get": {
                 "description": "Retrieves all courses based on the provided query parameters.",
