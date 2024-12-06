@@ -10,7 +10,7 @@ const showToast = (type, message, position, style) => {
 
   if (message && message != '') {
     toast[type]?.(message, {
-      position: position ?? 'top-center',
+      position: position ?? 'right-top',
       duration: duration,
       style: style,
     });

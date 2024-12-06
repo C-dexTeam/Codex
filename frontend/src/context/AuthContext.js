@@ -4,6 +4,8 @@ import { createContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 // ** Axios
 import authConfig from '@/configs/auth'
+import axios from 'axios'
+import { showToast } from '@/utils/showToast'
 
 // ** Defaults
 const defaultProvider = {
@@ -11,11 +13,10 @@ const defaultProvider = {
   loading: true,
   setUser: () => null,
   setLoading: () => Boolean,
-  isInitialized: false,
-  setIsInitialized: () => Boolean,
+  login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
   register: () => Promise.resolve(),
-  initAuth: () => Promise.resolve(),
+  refreshAuth: () => Promise.resolve(),
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -24,43 +25,193 @@ const AuthProvider = ({ children }) => {
   // ** States
   const [user, setUser] = useState(defaultProvider.user)
   const [loading, setLoading] = useState(defaultProvider.loading)
-  const [isInitialized, setIsInitialized] = useState(defaultProvider.isInitialized)
 
   // ** Hooks
   const router = useRouter()
 
+  const createSession = (data) => {
+    const userData = {
+      id: data.userID,
+      username: data.username,
+      email: data.email,
+      name: data.name,
+      surname: data.surname,
+      roleID: data.roleID,
+      role: data.roleName || data.role,
+    }
+
+    setUser(userData) // Set the user data to the state
+    localStorage.setItem(authConfig.session, JSON.stringify(userData)) // Set the user data to the local storage
+  }
+
+  const checkSession = (realData) => { // returns boolean
+    const session = localStorage.getItem(authConfig.session)
+
+    if (!session) return false
+
+    const sessionData = JSON.parse(session)
+
+    const isEqual = Object.entries(sessionData).every(([key, value]) => realData[key] === value);
+    if (!isEqual) return false;
+
+    return true
+  }
+
   const deleteStorage = () => {
     setUser(null)
     setLoading(false)
-    setIsInitialized(false)
+    localStorage.removeItem(authConfig.session)
 
     // const firstPath = router.pathname.split('/')[1]
     // if (firstPath != 'login') window.location.href = '/login'
   }
 
+  // ** Handle User Login Function
+
+  const handleLogin = async (data) => {
+    // ** Set loading to true
+    setLoading(true)
+
+    // Send a POST request to the API
+    axios.post(authConfig.login, {
+      username: data.username || null,
+      password: data.password || null,
+    })
+      .then(response => {
+        // ** If the status code is 200, It means the login is successful
+        if (response.data?.statusCode === 200) {
+          // ** Send a success message to the user
+          showToast("dismiss") // Dismiss the previous toast if it exists
+          showToast("success", response.data?.message) // Show the success message
+
+          createSession(response.data?.data) // Create a session for the user
+
+          setLoading(false) // Set loading to false
+
+          router.push("/") // Redirect the user to the home page
+        } else {
+          // ** If the status code is not 200, It means the login is not successful
+          // ** Send an error message to the user
+          showToast("dismiss") // Dismiss the previous toast if it exists
+          showToast("error", response.data?.message) // Show the error message
+
+          deleteStorage() // Delete the user data
+        }
+
+      })
+      .catch(error => {
+        // ** If an error occurs, Send an error message to the user
+        showToast("dismiss") // Dismiss the previous toast if it exists
+        showToast("error", error.response.data.message) // Show the error message
+        console.error(error) // Log the error to the console
+        deleteStorage() // Delete the user data
+      })
+  }
+
+  // ** Handle User Logout Function
   const handleLogout = () => {
-    deleteStorage()
+    // ** Send a POST request to the API
+    axios.post(authConfig.logout)
+      .then(response => {
+        // ** If the status code is 200, It means the logout is successful
+        if (response.data?.statusCode === 200) {
+          // ** Send a success message to the user
+          showToast("dismiss") // Dismiss the previous toast if it exists
+          showToast("success", response.data?.message) // Show the success message
+
+          deleteStorage() // Delete the user data
+          router.push("/") // Redirect the user to the login page
+        } else {
+          // ** If the status code is not 200, It means the logout is not successful
+          // ** Send an error message to the user
+          showToast("dismiss") // Dismiss the previous toast if it exists
+          showToast("error", response.data?.message) // Show the error message
+
+          deleteStorage() // Delete the user data
+          router.push("/") // Redirect the user to the login page
+        }
+      })
+      .catch(error => {
+        // ** If an error occurs, Send an error message to the user
+        showToast("dismiss") // Dismiss the previous toast if it exists
+        showToast("error", "An error occurred. Please try again") // Show the error message
+        console.error(error) // Log the error to the console
+        deleteStorage() // Delete the user data
+        router.push("/") // Redirect the user to the login page
+      })
   }
 
-  const initAuth = async () => {
-    setIsInitialized(true)
-    const userData = window.localStorage.getItem(authConfig.userDataName)
-
-    if (userData) {
-      setUser(userData)
-    } else {
-      const user = { id: 1, name: "John Doe", role: "user" }
-      setUser(user)
-    }
-
-    setLoading(false)
-  }
-
+  // ** Handle User Register Function
   const handleRegister = async ({ params }) => {
+    // ** Set loading to true
+    setLoading(true)
+
+    // Send a POST request to the API
+    axios.post(authConfig.register, params)
+      .then(response => {
+        // ** If the status code is 200, It means the registration is successful
+        if (response.data?.statusCode === 200) {
+          // ** Send a success message to the user
+          showToast("dismiss") // Dismiss the previous toast if it exists
+          showToast("success", response.data?.message) // Show the success message
+
+          router.push("/login") // Redirect the user to the login page
+
+          setLoading(false) // Set loading to false
+        } else {
+          // ** If the status code is not 200, It means the registration is not successful
+          // ** Send an error message to the user
+          showToast("dismiss") // Dismiss the previous toast if it exists
+          showToast("error", response.data?.message) // Show the error message
+
+          deleteStorage() // Delete the user data
+        }
+      })
+      .catch(error => {
+        // ** If an error occurs, Send an error message to the user
+        showToast("dismiss") // Dismiss the previous toast if it exists
+        showToast("error", "An error occurred. Please try again") // Show the error message
+        console.error(error) // Log the error to the console
+        deleteStorage() // Delete the user data
+      })
+
+  }
+
+  // ** Refresh User's Auth Function
+  const refreshAuth = async () => {
+    // ** Set loading to true
+    setLoading(true)
+
+    // Send a GET request to the API
+    axios.get(authConfig.refresh)
+      .then(response => {
+        // ** If the status code is 200, It means the user is authenticated
+        if (response.data?.statusCode === 200) {
+          console.log(response.data?.data);
+          if (checkSession(response.data?.data)) return setLoading(false) // If the session is valid, Set loading to false
+
+          createSession(response.data?.data) // Create a session for the user
+          setLoading(false) // Set loading to false
+        } else {
+          // ** If the status code is not 200, It means the user is not authenticated
+          // ** Send an error message to the user
+          showToast("dismiss") // Dismiss the previous toast if it exists
+          showToast("error", response.data?.message) // Show the error message
+
+          deleteStorage() // Delete the user data
+          router.push("/") // Redirect the user to the login
+        }
+      })
+      .catch(error => {
+        console.error(error) // Log the error to the console
+        deleteStorage() // Delete the user data
+        router.push("/") // Redirect the user to the login
+      })
   }
 
   useEffect(() => {
-    initAuth()
+    // ** Check user's auth when the page is refreshed
+    refreshAuth()
   }, [])
 
   const values = {
@@ -68,11 +219,10 @@ const AuthProvider = ({ children }) => {
     loading,
     setUser,
     setLoading,
-    isInitialized,
-    setIsInitialized,
+    login: handleLogin,
     logout: handleLogout,
     register: handleRegister,
-    initAuth,
+    refresh: refreshAuth,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
