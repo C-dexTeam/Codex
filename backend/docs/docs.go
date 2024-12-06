@@ -791,6 +791,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/public/rewards/metadata/{id}": {
+            "get": {
+                "description": "Retrieves one reward.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Metadata"
+                ],
+                "summary": "Get Reward By ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/public/wallet": {
             "post": {
                 "description": "Auth Wallet",

@@ -16,7 +16,7 @@ type RewardDTO struct {
 	RewardType  string         `json:"rewardType"`
 	Name        string         `json:"name"`
 	Symbol      string         `json:"symbol"`
-	Description string         `json:"Description"`
+	Description string         `json:"description"`
 	ImagePath   string         `json:"imagePath"`
 	URI         string         `json:"uri"`
 	Attributes  []AttributeDTO `json:"attributes,omitempty"`

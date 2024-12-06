@@ -35,4 +35,5 @@ func (h *PublicHandler) Init(router fiber.Router) {
 	})
 
 	h.initUserRoutes(root)
+	h.initRewardsRoutes(root)
 }

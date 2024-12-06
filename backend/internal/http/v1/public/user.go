@@ -14,7 +14,6 @@ func (h *PublicHandler) initUserRoutes(root fiber.Router) {
 	root.Post("/register", h.Register)
 	root.Post("/wallet", h.AuthWallet)
 	root.Post("/logout", h.Logout)
-
 }
 
 // @Tags Auth

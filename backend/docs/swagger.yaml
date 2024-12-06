@@ -653,6 +653,26 @@ paths:
       summary: Register
       tags:
       - Auth
+  /public/rewards/metadata/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves one reward.
+      parameters:
+      - description: Reward ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get Reward By ID
+      tags:
+      - Metadata
   /public/wallet:
     post:
       consumes:
