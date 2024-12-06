@@ -8,6 +8,13 @@ const authConfig = {
   wallet: baseUrl + '/public/wallet',
 
   session: 'userSession',
+
+  homeRoute: {
+    'First-Login': '/register/wallet',
+    'nowallet-member': '/home',
+    'member': '/home',
+    'admin': '/admin',
+  }
 };
 
 export default authConfig;

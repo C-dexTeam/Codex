@@ -12,9 +12,11 @@ import Spinner from '@/components/spinner'
 
 // ** Hook Imports
 import { useAuth } from '@/hooks/useAuth'
+import authConfig from '@/configs/auth'
 
 export const getHomeRoute = role => {
-  return '/home'
+  const homeRoute = authConfig.homeRoute[role]
+  return homeRoute
 }
 
 const Home = () => {

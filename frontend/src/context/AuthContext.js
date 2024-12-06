@@ -29,7 +29,7 @@ const AuthProvider = ({ children }) => {
   // ** Hooks
   const router = useRouter()
 
-  const createSession = (data) => {
+  const createSessionData = (data) => {
     const userData = {
       id: data.userID,
       username: data.username,
@@ -40,19 +40,30 @@ const AuthProvider = ({ children }) => {
       role: data.roleName || data.role,
     }
 
+    return userData
+  }
+
+  const createSession = (data) => {
+    const userData = createSessionData(data)
+    console.log("userData", userData);
+
     setUser(userData) // Set the user data to the state
     localStorage.setItem(authConfig.session, JSON.stringify(userData)) // Set the user data to the local storage
   }
 
-  const checkSession = (realData) => { // returns boolean
+  const checkSession = (realData = null) => { // returns boolean
     const session = localStorage.getItem(authConfig.session)
 
     if (!session) return false
 
-    const sessionData = JSON.parse(session)
+    if (realData) {
+      const sessionData = JSON.parse(session)
+      const realDataFormatted = createSessionData(realData)
 
-    const isEqual = Object.entries(sessionData).every(([key, value]) => realData[key] === value);
-    if (!isEqual) return false;
+      const isEqual = Object.entries(sessionData).every(([key, value]) => realDataFormatted[key] === value);
+
+      if (!isEqual) return false;
+    }
 
     return true
   }
@@ -66,8 +77,11 @@ const AuthProvider = ({ children }) => {
     // if (firstPath != 'login') window.location.href = '/login'
   }
 
-  // ** Handle User Login Function
-
+  /** Handle User Login Function
+   * 
+   * @param {String} username
+   * @param {String} password
+   */
   const handleLogin = async (data) => {
     // ** Set loading to true
     setLoading(true)
@@ -108,7 +122,7 @@ const AuthProvider = ({ children }) => {
       })
   }
 
-  // ** Handle User Logout Function
+  //** Handle User Logout Function
   const handleLogout = () => {
     // ** Send a POST request to the API
     axios.post(authConfig.logout)
@@ -141,13 +155,23 @@ const AuthProvider = ({ children }) => {
       })
   }
 
-  // ** Handle User Register Function
-  const handleRegister = async ({ params }) => {
+  /** Handle User Register Function
+   * @param {String} confirmPassword
+   * @param {String} email
+   * @param {String} username
+   * @param {String} password
+   */
+  const handleRegister = async (data) => {
     // ** Set loading to true
     setLoading(true)
 
     // Send a POST request to the API
-    axios.post(authConfig.register, params)
+    axios.post(authConfig.register, {
+      username: data?.username || null,
+      email: data?.email || null,
+      password: data?.password || null,
+      ConfirmPassword: data?.confirmPassword || null,
+    })
       .then(response => {
         // ** If the status code is 200, It means the registration is successful
         if (response.data?.statusCode === 200) {
@@ -179,18 +203,17 @@ const AuthProvider = ({ children }) => {
 
   // ** Refresh User's Auth Function
   const refreshAuth = async () => {
-    // ** Set loading to true
-    setLoading(true)
+    setLoading(true) // ** Set loading to true
 
     // Send a GET request to the API
     axios.get(authConfig.refresh)
       .then(response => {
+        console.log("qweqweqe", response);
+
         // ** If the status code is 200, It means the user is authenticated
         if (response.data?.statusCode === 200) {
-          console.log(response.data?.data);
-          if (checkSession(response.data?.data)) return setLoading(false) // If the session is valid, Set loading to false
-
           createSession(response.data?.data) // Create a session for the user
+
           setLoading(false) // Set loading to false
         } else {
           // ** If the status code is not 200, It means the user is not authenticated
@@ -200,12 +223,14 @@ const AuthProvider = ({ children }) => {
 
           deleteStorage() // Delete the user data
           router.push("/") // Redirect the user to the login
+          setLoading(false) // Set loading to false
         }
       })
       .catch(error => {
         console.error(error) // Log the error to the console
         deleteStorage() // Delete the user data
-        router.push("/") // Redirect the user to the login
+        setLoading(false) // Set loading to false
+        // router.push("/") // Redirect the user to the login
       })
   }
 

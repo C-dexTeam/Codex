@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { TextField, Button, Container, Typography, Box } from '@mui/material'
 import BlankLayout from "@/layout/BlankLayout"
 import { useAuth } from '@/hooks/useAuth';
+import Link from 'next/link';
 
 const Login = () => {
     const [values, setValues] = useState({
@@ -63,6 +64,11 @@ const Login = () => {
                         Giriş Yap
                     </Button>
                 </form>
+
+
+                <Link href={"/register"}>
+                    Register
+                </Link>
             </Box>
         </Container>
     )

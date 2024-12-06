@@ -21,7 +21,7 @@ const AuthGuard = props => {
 
       if (auth.user === null && !window.localStorage.getItem(authConfig.session)) {
         router.replace('/login')
-      }
+      } 
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [router.route]

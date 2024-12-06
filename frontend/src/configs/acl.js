@@ -18,17 +18,30 @@ const defineRulesFor = (role, permission, permissions) => {
     return rules
   }
 
+  const memberPermissions = [
+    'home',
+    'challenges',
+    'team',
+    'team-members',
+    'team-settings'
+  ]
+
   switch (role) {
     case 'admin':
       can('manage', 'all')
       break
 
-    case 'user':
-      can(['read'], "home")
-      can(['read'], "challenges")
-      can(['read'], "team")
-      can(['read'], "team-members")
-      can(['read'], "team-settings")
+    case 'member':
+      can(['read'], "wallet")
+      can(['read'], memberPermissions)
+      break
+
+    case 'nowallet-member':
+      can(['read'], memberPermissions)
+      break
+
+    case 'First-Login':
+      can(['read'], "wallet-register")
       break
 
     default:
