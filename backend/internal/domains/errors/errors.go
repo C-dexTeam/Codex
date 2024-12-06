@@ -9,12 +9,13 @@ const (
 
 // 404
 const (
-	ErrLanguageNotFound        = "LANGUAGE_NOT_FOUND"
-	ErrLanguageDefaultNotFound = "DEFAULT_LANGUAGE_NOT_FOUND"
-	ErrUserProfileNotFound     = "USER_PROFILE_NOT_FOUND"
-	ErrRoleNotFound            = "ROLE_NOT_FOUND"
-	ErrRewardNotFound          = "REWARD_NOT_FOUND"
-	ErrRewardAttributeNotFound = "REWARD_ATTRIBUTE_NOT_FOUND"
+	ErrLanguageNotFound            = "LANGUAGE_NOT_FOUND"
+	ErrProgrammingLanguageNotFound = "PROGRAMMING_LANGUAGE_NOT_FOUND"
+	ErrLanguageDefaultNotFound     = "DEFAULT_LANGUAGE_NOT_FOUND"
+	ErrUserProfileNotFound         = "USER_PROFILE_NOT_FOUND"
+	ErrRoleNotFound                = "ROLE_NOT_FOUND"
+	ErrRewardNotFound              = "REWARD_NOT_FOUND"
+	ErrRewardAttributeNotFound     = "REWARD_ATTRIBUTE_NOT_FOUND"
 )
 
 // 400

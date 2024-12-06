@@ -15,6 +15,7 @@ type IService interface {
 	CourseService() domains.ICourseService
 	ChapterService() domains.IChapterService
 	AttributeService() domains.IAttributeService
+	LanguageService() domains.ILanguagesService
 }
 
 type Services struct {

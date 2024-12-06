@@ -11,10 +11,16 @@ import (
 
 type IPLanguagesRepository interface {
 	Filter(ctx context.Context, filter ProgrammingLanguageFilter, limit, page int64) (pLanguages []ProgrammingLanguage, dataCount int64, err error)
+	Add(ctx context.Context, pLanguage *ProgrammingLanguage) (uuid.UUID, error)
+	Update(ctx context.Context, pLanguage *ProgrammingLanguage) (err error)
+	Delete(ctx context.Context, id uuid.UUID) (err error)
 }
 
 type IPLanguagesService interface {
 	GetProgrammingLanguages(ctx context.Context, programmingLanguageID, languageID, name, page, limit string) (programmingLanguages []ProgrammingLanguage, err error)
+	AddProgrammingLanguage(ctx context.Context, languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string) (uuid.UUID, error)
+	UpdateProgrammingLanguage(ctx context.Context, id, languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string) error
+	DeleteProgrammingLanguage(ctx context.Context, id string) (err error)
 }
 
 const (
@@ -41,12 +47,16 @@ type ProgrammingLanguageFilter struct {
 }
 
 func NewProgrammingLanguage(
-	id, languageID uuid.UUID,
-	name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
-	createdAt time.Time,
+	id, languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
 ) (*ProgrammingLanguage, error) {
 	var pLanguage ProgrammingLanguage
 
+	if err := pLanguage.SetID(id); err != nil {
+		return nil, err
+	}
+	if err := pLanguage.SetLanguageID(languageID); err != nil {
+		return nil, err
+	}
 	if err := pLanguage.SetCompileCMD(compileCMD); err != nil {
 		return nil, err
 	}
@@ -92,8 +102,30 @@ func (d *ProgrammingLanguage) GetID() uuid.UUID {
 	return d.id
 }
 
+func (d *ProgrammingLanguage) SetID(id string) error {
+	if id != "" {
+		idUUID, err := uuid.Parse(id)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.id = idUUID
+	}
+
+	return nil
+}
+
 func (d *ProgrammingLanguage) GetLanguageID() uuid.UUID {
 	return d.languageID
+}
+
+func (d *ProgrammingLanguage) SetLanguageID(languageID string) error {
+	idUUID, err := uuid.Parse(languageID)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+	}
+	d.languageID = idUUID
+
+	return nil
 }
 
 func (d *ProgrammingLanguage) GetName() string {
