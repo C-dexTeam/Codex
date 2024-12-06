@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS t_programming_languages (
     id UUID PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-    language_id UUID NOT NULL,
+    language_id UUID DEFAULT NULL,
     name VARCHAR(30) NOT NULL,
     description TEXT NOT NULL,
     download_cmd VARCHAR(256) NOT NULL,
