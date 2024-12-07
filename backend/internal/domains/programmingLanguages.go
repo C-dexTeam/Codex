@@ -11,10 +11,17 @@ import (
 
 type IPLanguagesRepository interface {
 	Filter(ctx context.Context, filter ProgrammingLanguageFilter, limit, page int64) (pLanguages []ProgrammingLanguage, dataCount int64, err error)
+	Add(ctx context.Context, pLanguage *ProgrammingLanguage) (uuid.UUID, error)
+	Update(ctx context.Context, pLanguage *ProgrammingLanguage) (err error)
+	Delete(ctx context.Context, id uuid.UUID) (err error)
 }
 
 type IPLanguagesService interface {
 	GetProgrammingLanguages(ctx context.Context, programmingLanguageID, languageID, name, page, limit string) (programmingLanguages []ProgrammingLanguage, err error)
+	GetProgrammingLanguage(ctx context.Context, id string) (programmingLanguage *ProgrammingLanguage, err error)
+	AddProgrammingLanguage(ctx context.Context, languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string) (uuid.UUID, error)
+	UpdateProgrammingLanguage(ctx context.Context, id, languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string) error
+	DeleteProgrammingLanguage(ctx context.Context, id string) (err error)
 }
 
 const (
@@ -41,12 +48,16 @@ type ProgrammingLanguageFilter struct {
 }
 
 func NewProgrammingLanguage(
-	id, languageID uuid.UUID,
-	name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
-	createdAt time.Time,
+	id, languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
 ) (*ProgrammingLanguage, error) {
 	var pLanguage ProgrammingLanguage
 
+	if err := pLanguage.SetID(id); err != nil {
+		return nil, err
+	}
+	if err := pLanguage.SetLanguageID(languageID); err != nil {
+		return nil, err
+	}
 	if err := pLanguage.SetCompileCMD(compileCMD); err != nil {
 		return nil, err
 	}
@@ -92,8 +103,32 @@ func (d *ProgrammingLanguage) GetID() uuid.UUID {
 	return d.id
 }
 
+func (d *ProgrammingLanguage) SetID(id string) error {
+	if id != "" {
+		idUUID, err := uuid.Parse(id)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.id = idUUID
+	}
+
+	return nil
+}
+
 func (d *ProgrammingLanguage) GetLanguageID() uuid.UUID {
 	return d.languageID
+}
+
+func (d *ProgrammingLanguage) SetLanguageID(languageID string) error {
+	if languageID != "" {
+		idUUID, err := uuid.Parse(languageID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.languageID = idUUID
+	}
+
+	return nil
 }
 
 func (d *ProgrammingLanguage) GetName() string {
@@ -101,9 +136,6 @@ func (d *ProgrammingLanguage) GetName() string {
 }
 
 func (d *ProgrammingLanguage) SetName(name string) error {
-	if name == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageNameCannotBeEmpty)
-	}
 	if len(name) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageNameTooLong)
 	}
@@ -124,13 +156,10 @@ func (d *ProgrammingLanguage) GetDownloadCMD() string {
 }
 
 func (d *ProgrammingLanguage) SetDownloadCMD(downloadCMD string) error {
-	if downloadCMD == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageDownloadCMDCannotBeEmpty)
-	}
 	if len(downloadCMD) > 256 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageDownloadCMDTooLong)
 	}
-	d.name = downloadCMD
+	d.downloadCMD = downloadCMD
 	return nil
 }
 
@@ -139,13 +168,10 @@ func (d *ProgrammingLanguage) GetCompileCMD() string {
 }
 
 func (d *ProgrammingLanguage) SetCompileCMD(compileCMD string) error {
-	if compileCMD == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageCompileCMDCannotBeEmpty)
-	}
 	if len(compileCMD) > 256 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageCompileCMDTooLong)
 	}
-	d.name = compileCMD
+	d.compileCMD = compileCMD
 	return nil
 }
 
@@ -154,13 +180,10 @@ func (d *ProgrammingLanguage) GetImagePath() string {
 }
 
 func (d *ProgrammingLanguage) SetImagePath(imagePath string) error {
-	if imagePath == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageImagePathCannotBeEmpty)
-	}
 	if len(imagePath) > 60 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageImagePathTooLong)
 	}
-	d.name = imagePath
+	d.imagePath = imagePath
 	return nil
 }
 
@@ -169,13 +192,10 @@ func (d *ProgrammingLanguage) GetFileExtention() string {
 }
 
 func (d *ProgrammingLanguage) SetFileExtention(fileExtention string) error {
-	if fileExtention == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageFileExtentionCannotBeEmpty)
-	}
 	if len(fileExtention) > 10 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageFileExtentionTooLong)
 	}
-	d.name = fileExtention
+	d.fileExtention = fileExtention
 	return nil
 }
 
@@ -184,13 +204,10 @@ func (d *ProgrammingLanguage) GetMonacoEditor() string {
 }
 
 func (d *ProgrammingLanguage) SetMonacoEditor(monacoEditor string) error {
-	if monacoEditor == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageFileExtentionCannotBeEmpty)
-	}
 	if len(monacoEditor) > 10 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPLanguageFileExtentionTooLong)
 	}
-	d.name = monacoEditor
+	d.monacoEditor = monacoEditor
 	return nil
 }
 

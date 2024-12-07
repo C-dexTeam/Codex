@@ -110,6 +110,101 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/admin/planguages/": {
+            "post": {
+                "description": "Adds Programming Language Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Add Programming Language",
+                "parameters": [
+                    {
+                        "description": "New Programming Language",
+                        "name": "newPLanguage",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddPLanguageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Programming Languages from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Delete Programming Language",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Programming Language ID",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates Programming Language Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Update Programming Language",
+                "parameters": [
+                    {
+                        "description": "Update Programming Language",
+                        "name": "updatePLanguage",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdatePLanguageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/admin/rewards/": {
             "post": {
                 "description": "Adds Reward Into DB.",
@@ -486,7 +581,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/programmingLanguages/": {
+        "/private/planguages/": {
             "get": {
                 "description": "Retrieves all Programming languages based on the provided query parameters.",
                 "consumes": [
@@ -529,6 +624,37 @@ const docTemplate = `{
                         "description": "Limit",
                         "name": "limit",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/planguages/{id}": {
+            "get": {
+                "description": "Retrieves spesific Programming languages based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Get One Programming Language By ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Programming Language ID",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -878,6 +1004,45 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AddPLanguageDTO": {
+            "type": "object",
+            "required": [
+                "fileExtention",
+                "imagePath",
+                "monacoEditor",
+                "name"
+            ],
+            "properties": {
+                "compileCMD": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "downloadCMD": {
+                    "type": "string"
+                },
+                "fileExtention": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "imagePath": {
+                    "type": "string",
+                    "maxLength": 60
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "monacoEditor": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 30
+                }
+            }
+        },
         "dto.AddRewardDTO": {
             "type": "object",
             "required": [
@@ -929,6 +1094,38 @@ const docTemplate = `{
                 "value": {
                     "type": "string",
                     "maxLength": 30
+                }
+            }
+        },
+        "dto.UpdatePLanguageDTO": {
+            "type": "object",
+            "properties": {
+                "compileCMD": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "downloadCMD": {
+                    "type": "string"
+                },
+                "fileExtention": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "monacoEditor": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

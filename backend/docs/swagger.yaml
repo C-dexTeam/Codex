@@ -14,6 +14,34 @@ definitions:
     - traitType
     - value
     type: object
+  dto.AddPLanguageDTO:
+    properties:
+      compileCMD:
+        type: string
+      description:
+        type: string
+      downloadCMD:
+        type: string
+      fileExtention:
+        maxLength: 30
+        type: string
+      imagePath:
+        maxLength: 60
+        type: string
+      languageID:
+        type: string
+      monacoEditor:
+        maxLength: 30
+        type: string
+      name:
+        maxLength: 30
+        type: string
+    required:
+    - fileExtention
+    - imagePath
+    - monacoEditor
+    - name
+    type: object
   dto.AddRewardDTO:
     properties:
       Description:
@@ -51,6 +79,27 @@ definitions:
         type: string
       value:
         maxLength: 30
+        type: string
+    type: object
+  dto.UpdatePLanguageDTO:
+    properties:
+      compileCMD:
+        type: string
+      description:
+        type: string
+      downloadCMD:
+        type: string
+      fileExtention:
+        type: string
+      id:
+        type: string
+      imagePath:
+        type: string
+      languageID:
+        type: string
+      monacoEditor:
+        type: string
+      name:
         type: string
     type: object
   dto.UpdateRewardDTO:
@@ -207,6 +256,68 @@ paths:
       summary: Add Attribute
       tags:
       - Attribute
+  /private/admin/planguages/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Programming Languages from DB.
+      parameters:
+      - description: Programming Language ID
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Programming Language
+      tags:
+      - Programming Language
+    patch:
+      consumes:
+      - application/json
+      description: Updates Programming Language Into DB.
+      parameters:
+      - description: Update Programming Language
+        in: body
+        name: updatePLanguage
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePLanguageDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Programming Language
+      tags:
+      - Programming Language
+    post:
+      consumes:
+      - application/json
+      description: Adds Programming Language Into DB.
+      parameters:
+      - description: New Programming Language
+        in: body
+        name: newPLanguage
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddPLanguageDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Programming Language
+      tags:
+      - Programming Language
   /private/admin/rewards/:
     delete:
       consumes:
@@ -453,7 +564,7 @@ paths:
       summary: Get All Languages
       tags:
       - Language
-  /private/programmingLanguages/:
+  /private/planguages/:
     get:
       consumes:
       - application/json
@@ -488,6 +599,27 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Programming Languages
+      tags:
+      - Programming Language
+  /private/planguages/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves spesific Programming languages based on the provided
+        query parameters.
+      parameters:
+      - description: Programming Language ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get One Programming Language By ID
       tags:
       - Programming Language
   /private/rewards/:
