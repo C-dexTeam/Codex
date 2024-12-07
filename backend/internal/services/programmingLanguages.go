@@ -64,6 +64,26 @@ func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
 	return programmingLanguages, nil
 }
 
+func (s *pLanguageService) GetProgrammingLanguage(
+	ctx context.Context,
+	id string,
+) (programmingLanguage *domains.ProgrammingLanguage, err error) {
+	pLanguageUUID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	}
+
+	programmingLanguages, _, err := s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
+		ID: pLanguageUUID,
+	}, 1, 1)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages, err)
+	}
+	programmingLanguage = &programmingLanguages[0]
+
+	return programmingLanguage, nil
+}
+
 func (s *pLanguageService) AddProgrammingLanguage(
 	ctx context.Context,
 	languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
@@ -103,11 +123,6 @@ func (s *pLanguageService) UpdateProgrammingLanguage(
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 	}
-	languageUUID, err = uuid.Parse(languageID)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-	}
-
 	pLanguages, _, err := s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
 		ID: idUUID,
 	}, 1, 1)
@@ -118,14 +133,20 @@ func (s *pLanguageService) UpdateProgrammingLanguage(
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrProgrammingLanguageNotFound)
 	}
 
-	languages, _, err := s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
-		ID: languageUUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages, err)
-	}
-	if len(languages) != 1 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrLanguageNotFound)
+	if languageID != "" {
+		languageUUID, err = uuid.Parse(languageID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		}
+		languages, _, err := s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
+			ID: languageUUID,
+		}, 1, 1)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages, err)
+		}
+		if len(languages) != 1 {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrLanguageNotFound)
+		}
 	}
 
 	updateProgrammingLanguage, err := domains.NewProgrammingLanguage(

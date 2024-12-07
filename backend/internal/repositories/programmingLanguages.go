@@ -48,8 +48,8 @@ func (r *PLanguageRepository) dbModelFromAppModel(appModel domains.ProgrammingLa
 		dbModel.ID.Valid = true
 	}
 	if appModel.GetLanguageID() != uuid.Nil {
-		dbModel.ID.String = appModel.GetLanguageID().String()
-		dbModel.ID.Valid = true
+		dbModel.LanguageID.String = appModel.GetLanguageID().String()
+		dbModel.LanguageID.Valid = true
 	}
 	if appModel.GetName() != "" {
 		dbModel.Name.String = appModel.GetName()
@@ -165,7 +165,7 @@ func (r *PLanguageRepository) Update(ctx context.Context, pLanguage *domains.Pro
 	dbModel := r.dbModelFromAppModel(*pLanguage)
 	query := `
 		UPDATE
-			t_rewards
+			t_programming_languages
 		SET
 			language_id = COALESCE(:language_id, language_id),
 			name = COALESCE(:name, name),
