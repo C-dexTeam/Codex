@@ -110,6 +110,104 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/admin/courses/": {
+            "post": {
+                "description": "Adds Course Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Add Course",
+                "parameters": [
+                    {
+                        "description": "New Course",
+                        "name": "newCourse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddCourseDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates Course Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Update Course",
+                "parameters": [
+                    {
+                        "description": "Update Course",
+                        "name": "updateCourse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateCourseDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/courses/{id}": {
+            "delete": {
+                "description": "Delete Courses from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Delete Course",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/admin/planguages/": {
             "post": {
                 "description": "Adds Programming Language Into DB.",
@@ -254,8 +352,8 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Reward ID",
-                        "name": "rewardID",
-                        "in": "query"
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -530,6 +628,49 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/courses/{id}": {
+            "get": {
+                "description": "Retrieves one course.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get Course By ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chapter Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chapter Attribute Limit",
                         "name": "limit",
                         "in": "query"
                     }
@@ -1004,6 +1145,38 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AddCourseDTO": {
+            "type": "object",
+            "required": [
+                "programmingLanguageID",
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "programmingLanguageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 60
+                }
+            }
+        },
         "dto.AddPLanguageDTO": {
             "type": "object",
             "required": [
@@ -1094,6 +1267,37 @@ const docTemplate = `{
                 "value": {
                     "type": "string",
                     "maxLength": 30
+                }
+            }
+        },
+        "dto.UpdateCourseDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "programmingLanguageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 60
                 }
             }
         },

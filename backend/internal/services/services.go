@@ -54,7 +54,7 @@ func CreateNewServices(
 	languageService := newLanguageService(languageRepository)
 	rewardService := newRewardService(rewardRepository, attributeRepository)
 	pLanguageService := newPLanguageService(pLanguageRepository)
-	courseService := newCourseService(courseRepository)
+	courseService := newCourseService(courseRepository, chapterRepository)
 	chapterService := NewChapterService(chapterRepository)
 	attributeService := NewAttributeService(attributeRepository)
 

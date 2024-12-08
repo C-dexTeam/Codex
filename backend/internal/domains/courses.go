@@ -11,10 +11,17 @@ import (
 
 type ICourseRepository interface {
 	Filter(ctx context.Context, filter CourseFilter, limit, page int64) (courses []Course, dataCount int64, err error)
+	Add(ctx context.Context, course *Course) (uuid.UUID, error)
+	Update(ctx context.Context, course *Course) (err error)
+	SoftDelete(ctx context.Context, id uuid.UUID) (err error)
 }
 
 type ICourseService interface {
 	GetCourses(ctx context.Context, courseID, langugeID, pLanguageID, title, page, limit string) (courses []Course, err error)
+	GetCourse(ctx context.Context, id, page, limit string) (course *Course, err error)
+	AddCourse(ctx context.Context, languageID, pLanguageID, rewardID, title, description, imagePath string, rewardAmount int) (uuid.UUID, error)
+	UpdateCourse(ctx context.Context, id, languageID, pLanguageID, rewardID, title, description, imagePath string, rewardAmount int) error
+	DeleteCourse(ctx context.Context, id string) (err error)
 }
 
 const (
@@ -23,13 +30,14 @@ const (
 
 type Course struct {
 	id           uuid.UUID
-	languageID   *uuid.UUID
-	pLanguageID  *uuid.UUID
+	languageID   uuid.UUID
+	pLanguageID  uuid.UUID
 	rewardID     *uuid.UUID
 	rewardAmount int
 	title        string
 	description  string
 	imagePath    string
+	chapters     []Chapter
 	createdAt    time.Time
 	deletedAt    time.Time
 }
@@ -43,12 +51,24 @@ type CourseFilter struct {
 }
 
 func NewCourse(
-	id uuid.UUID,
-	languageID, pLanguageID, rewardID *uuid.UUID,
+	id, languageID, pLanguageID, rewardID string,
 	rewardAmount int,
 	title, description, imagePath string,
-	createdAt, deletedAt time.Time,
+	chapters []Chapter,
 ) (course *Course, err error) {
+	course = &Course{}
+	if err := course.SetID(id); err != nil {
+		return nil, err
+	}
+	if err := course.SetLanguageID(languageID); err != nil {
+		return nil, err
+	}
+	if err := course.SetPLanguageID(pLanguageID); err != nil {
+		return nil, err
+	}
+	if err := course.SetRewardID(rewardID); err != nil {
+		return nil, err
+	}
 	if err = course.SetTitle(title); err != nil {
 		return nil, err
 	}
@@ -59,17 +79,15 @@ func NewCourse(
 		return nil, err
 	}
 
-	course.SetLanguageID(languageID)
-	course.SetPLanguageID(pLanguageID)
-	course.SetRewardID(rewardID)
 	course.SetDescription(description)
+	course.SetChapters(chapters)
 
 	return
 }
 
 func (d *Course) Unmarshal(
-	id uuid.UUID,
-	languageID, pLanguageID, rewardID *uuid.UUID,
+	id, languageID, pLanguageID uuid.UUID,
+	rewardID *uuid.UUID,
 	rewardAmount int,
 	title, description, imagePath string,
 	createdAt, deletedAt time.Time,
@@ -91,11 +109,11 @@ func (d *Course) GetID() uuid.UUID {
 	return d.id
 }
 
-func (d *Course) GetLanguageID() *uuid.UUID {
+func (d *Course) GetLanguageID() uuid.UUID {
 	return d.languageID
 }
 
-func (d *Course) GetPLanguageID() *uuid.UUID {
+func (d *Course) GetPLanguageID() uuid.UUID {
 	return d.pLanguageID
 }
 
@@ -119,6 +137,10 @@ func (d *Course) GetImagePath() string {
 	return d.imagePath
 }
 
+func (d *Course) GetChapters() []Chapter {
+	return d.chapters
+}
+
 func (d *Course) GetCreatedAt() time.Time {
 	return d.createdAt
 }
@@ -128,20 +150,59 @@ func (d *Course) GetDeletedAt() time.Time {
 }
 
 // Setter
-func (d *Course) SetLanguageID(languageID *uuid.UUID) {
-	d.languageID = languageID
+func (d *Course) SetID(id string) error {
+	if id != "" {
+		idUUID, err := uuid.Parse(id)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.id = idUUID
+	}
+
+	return nil
 }
 
-func (d *Course) SetPLanguageID(pLanguageID *uuid.UUID) {
-	d.pLanguageID = pLanguageID
+func (d *Course) SetLanguageID(languageID string) error {
+	if languageID != "" {
+		idUUID, err := uuid.Parse(languageID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.languageID = idUUID
+	}
+
+	return nil
 }
 
-func (d *Course) SetRewardID(rewardID *uuid.UUID) {
-	d.rewardID = rewardID
+func (d *Course) SetPLanguageID(pLanguageID string) error {
+	// Update için bu boş kontrolünü yaptık. Update de boş yollarsa değişiklik yapmayalım diye
+	if pLanguageID != "" {
+		idUUID, err := uuid.Parse(pLanguageID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.pLanguageID = idUUID
+	}
+
+	return nil
 }
 
-func (d *Course) SetRewardAmount(rewardAmount int) error {
-	if rewardAmount > 0 {
+func (d *Course) SetRewardID(rewardID string) error {
+	if rewardID == "" {
+		d.rewardID = nil
+	} else {
+		idUUID, err := uuid.Parse(rewardID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.rewardID = &idUUID
+	}
+
+	return nil
+}
+
+func (d *Course) SetRewardAmount(rewardAmount int) (err error) {
+	if rewardAmount < 0 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseRewardAmountCannotBeNegative)
 	}
 	d.rewardAmount = rewardAmount
@@ -150,9 +211,6 @@ func (d *Course) SetRewardAmount(rewardAmount int) error {
 }
 
 func (d *Course) SetTitle(title string) error {
-	if title == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseTitleCannotBeEmpty)
-	}
 	if len(title) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseTitleTooLong)
 
@@ -167,14 +225,15 @@ func (d *Course) SetDescription(description string) {
 }
 
 func (d *Course) SetImagePath(imagePath string) error {
-	if imagePath == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseImagePathCannotBeEmpty)
-	}
 	if len(imagePath) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseImagePathTooLong)
 
 	}
-	d.title = imagePath
+	d.imagePath = imagePath
 
 	return nil
+}
+
+func (d *Course) SetChapters(chapters []Chapter) {
+	d.chapters = chapters
 }

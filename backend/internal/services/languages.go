@@ -41,6 +41,26 @@ func (s *languageService) GetLanguages(
 	return
 }
 
+func (s *languageService) GetLanguage(
+	ctx context.Context,
+	id string,
+) (language *domains.Language, err error) {
+	languageUUID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	}
+
+	langauges, _, err := s.languageRepository.Filter(ctx, domains.LanguageFilter{
+		ID: languageUUID,
+	}, 1, 1)
+	if len(langauges) != 1 {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrLanguageNotFound, err)
+	}
+	language = &langauges[0]
+
+	return
+}
+
 func (s *languageService) GetDefault(
 	ctx context.Context,
 ) (language *domains.Language, err error) {

@@ -1,8 +1,6 @@
 package private
 
 import (
-	"fmt"
-
 	"github.com/C-dexTeam/codex/internal/domains"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
@@ -43,7 +41,6 @@ func (h *PrivateHandler) UpdateProfile(c *fiber.Ctx) error {
 
 	var newUserProfile dto.UserProfileUpdateDTO
 	if err := c.BodyParser(&newUserProfile); err != nil {
-		fmt.Println(err)
 		return err
 	}
 	if err := h.services.UtilService().Validator().ValidateStruct(newUserProfile); err != nil {

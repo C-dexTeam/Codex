@@ -144,13 +144,13 @@ func (h *PrivateHandler) UpdateReward(c *fiber.Ctx) error {
 // @Description Delete Rewards from DB.
 // @Accept json
 // @Produce json
-// @Param rewardID query string false "Reward ID"
+// @Param id path string false "Reward ID"
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/admin/rewards/ [delete]
 func (h *PrivateHandler) DeleteReward(c *fiber.Ctx) error {
-	rewardID := c.Query("rewardID")
+	id := c.Params("id")
 
-	if err := h.services.RewardService().DeleteReward(c.Context(), rewardID); err != nil {
+	if err := h.services.RewardService().DeleteReward(c.Context(), id); err != nil {
 		return err
 	}
 	return response.Response(200, "Status OK", nil)

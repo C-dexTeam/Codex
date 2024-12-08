@@ -12,6 +12,7 @@ type ILanguagesRepository interface {
 
 type ILanguagesService interface {
 	GetLanguages(ctx context.Context, languageID, value string) (languages []Language, err error)
+	GetLanguage(ctx context.Context, id string) (language *Language, err error)
 	GetDefault(ctx context.Context) (language *Language, err error)
 }
 
