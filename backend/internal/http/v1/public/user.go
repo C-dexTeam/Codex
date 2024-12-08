@@ -59,9 +59,9 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 	if err := sess.Save(); err != nil {
 		return err
 	}
-	loginResponse := h.dtoManager.UserManager().ToLoginResponseDTO(userRole.GetName())
+	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData)
 
-	return response.Response(200, "Login successful", loginResponse)
+	return response.Response(200, "Login successful", profileResponse)
 }
 
 // @Tags Auth
@@ -113,9 +113,9 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 	if err := sess.Save(); err != nil {
 		return err
 	}
-	loginResponse := h.dtoManager.UserManager().ToLoginResponseDTO(userRole.GetName())
+	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData)
 
-	return response.Response(200, "Login successful", loginResponse)
+	return response.Response(200, "Login successful", profileResponse)
 }
 
 // @Tags Auth
