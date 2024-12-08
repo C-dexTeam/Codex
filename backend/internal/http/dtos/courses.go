@@ -15,8 +15,8 @@ func NewCourseDTOManager() CourseDTOManager {
 
 type CourseDTO struct {
 	ID           uuid.UUID  `json:"id"`
-	LanguageID   *uuid.UUID `json:"languageID"`
-	PLanguageID  *uuid.UUID `json:"programmingLanguageID"`
+	LanguageID   uuid.UUID  `json:"languageID"`
+	PLanguageID  uuid.UUID  `json:"programmingLanguageID"`
 	RewardID     *uuid.UUID `json:"rewardID"`
 	RewardAmount int        `json:"rewardAmount"`
 	Title        string     `json:"title"`

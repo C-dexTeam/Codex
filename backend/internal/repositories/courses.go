@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	"github.com/google/uuid"
@@ -27,20 +28,7 @@ type dbModelCourse struct {
 }
 
 func (r *CourseRepository) dbModelToAppModel(dbModel dbModelCourse) (appModel domains.Course) {
-	var languageID, planguageID, rewardID *uuid.UUID
-
-	// Dil, programlama dili, ödül ID'leri için aynı şekilde kontrol yapılır
-	if parsedLanguageID, err := uuid.Parse(dbModel.LanguageID.String); err == nil {
-		languageID = &parsedLanguageID
-	} else {
-		languageID = nil
-	}
-
-	if parsedPLanguageID, err := uuid.Parse(dbModel.PLanguageID.String); err == nil {
-		planguageID = &parsedPLanguageID
-	} else {
-		planguageID = nil
-	}
+	var rewardID *uuid.UUID
 
 	if parsedRewardID, err := uuid.Parse(dbModel.RewardID.String); err == nil {
 		rewardID = &parsedRewardID
@@ -51,8 +39,8 @@ func (r *CourseRepository) dbModelToAppModel(dbModel dbModelCourse) (appModel do
 	// Verileri AppModel'e aktar
 	appModel.Unmarshal(
 		uuid.MustParse(dbModel.ID.String),
-		languageID,
-		planguageID,
+		appModel.GetLanguageID(),
+		appModel.GetPLanguageID(),
 		rewardID,
 		int(dbModel.RewardAmount.Int64),
 		dbModel.Title.String,
@@ -69,11 +57,11 @@ func (r *CourseRepository) dbModelFromAppModel(appModel domains.Course) (dbModel
 		dbModel.ID.String = appModel.GetID().String()
 		dbModel.ID.Valid = true
 	}
-	if appModel.GetLanguageID() != nil {
+	if appModel.GetLanguageID() != uuid.Nil {
 		dbModel.LanguageID.String = appModel.GetLanguageID().String()
 		dbModel.LanguageID.Valid = true
 	}
-	if appModel.GetPLanguageID() != nil {
+	if appModel.GetPLanguageID() != uuid.Nil {
 		dbModel.PLanguageID.String = appModel.GetPLanguageID().String()
 		dbModel.PLanguageID.Valid = true
 	}
@@ -164,4 +152,74 @@ func (r *CourseRepository) Filter(ctx context.Context, filter domains.CourseFilt
 		courses = append(courses, r.dbModelToAppModel(dbModel))
 	}
 	return
+}
+
+func (r *CourseRepository) Add(ctx context.Context, course *domains.Course) (uuid.UUID, error) {
+	dbModel := r.dbModelFromAppModel(*course)
+	query := `
+		INSERT INTO
+			t_courses (language_id, programming_language_id, reward_id, reward_amount, title, description, image_path)
+		VALUES
+			($1, $2, $3, $4, $5, $6)
+		RETURNING id
+	`
+
+	var id uuid.UUID
+	err := r.db.QueryRowxContext(
+		ctx,
+		query,
+		dbModel.LanguageID,
+		dbModel.PLanguageID,
+		dbModel.RewardID,
+		dbModel.RewardAmount,
+		dbModel.Title,
+		dbModel.Description,
+		dbModel.ImagePath,
+	).Scan(&id)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return id, nil
+}
+
+func (r *CourseRepository) Update(ctx context.Context, course *domains.Course) (err error) {
+	dbModel := r.dbModelFromAppModel(*course)
+	query := `
+		UPDATE
+			t_courses
+		SET
+			language_id = COALESCE(:language_id, language_id),
+			programming_language_id = COALESCE(:programming_language_id, programming_language_id),
+			reward_id = COALESCE(:reward_id, reward_id),
+			reward_amount = COALESCE(:reward_amount, reward_amount),
+			title = COALESCE(:title, title),
+			description = COALESCE(:description, description),
+			image_path =  COALESCE(:image_path, image_path),
+		WHERE
+			id = :id
+	`
+	_, err = r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *CourseRepository) SoftDelete(ctx context.Context, id uuid.UUID) (err error) {
+	query := `
+		UPDATE
+			t_courses
+		SET
+			deleted_at = $1
+		WHERE
+			id = $2
+	`
+	deletedAt := time.Now()
+
+	if _, err = r.db.ExecContext(ctx, query, deletedAt, id); err != nil {
+		return
+	}
+
+	return nil
 }

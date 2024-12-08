@@ -171,16 +171,16 @@ func (s *rewardService) UpdateReward(
 
 func (s *rewardService) DeleteReward(
 	ctx context.Context,
-	rewardID string,
+	id string,
 ) (err error) {
-	var rewardUUID uuid.UUID
-	rewardUUID, err = uuid.Parse(rewardID)
+	var idUUID uuid.UUID
+	idUUID, err = uuid.Parse(id)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 	}
 
 	rewards, _, err := s.rewardRepository.Filter(ctx, domains.RewardFilter{
-		ID: rewardUUID,
+		ID: idUUID,
 	}, 1, 1)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewards, err)
@@ -189,7 +189,7 @@ func (s *rewardService) DeleteReward(
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrRewardNotFound, err)
 	}
 
-	if err = s.rewardRepository.Delete(ctx, rewardUUID); err != nil {
+	if err = s.rewardRepository.Delete(ctx, idUUID); err != nil {
 		return
 	}
 	return
