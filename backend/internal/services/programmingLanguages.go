@@ -79,6 +79,9 @@ func (s *pLanguageService) GetProgrammingLanguage(
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages, err)
 	}
+	if len(programmingLanguages) != 1 {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrProgrammingLanguageNotFound, err)
+	}
 	programmingLanguage = &programmingLanguages[0]
 
 	return programmingLanguage, nil

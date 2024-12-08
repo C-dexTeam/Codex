@@ -103,6 +103,40 @@
                 }
             }
         },
+        "/private/admin/courses/": {
+            "post": {
+                "description": "Adds Course Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Add Course",
+                "parameters": [
+                    {
+                        "description": "New Course",
+                        "name": "newCourse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddCourseDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/admin/planguages/": {
             "post": {
                 "description": "Adds Programming Language Into DB.",
@@ -994,6 +1028,38 @@
                 "value": {
                     "type": "string",
                     "maxLength": 30
+                }
+            }
+        },
+        "dto.AddCourseDTO": {
+            "type": "object",
+            "required": [
+                "programmingLanguageID",
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "programmingLanguageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 60
                 }
             }
         },

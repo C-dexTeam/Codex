@@ -118,7 +118,8 @@ func (s *courseService) GetCourse(
 
 func (s *courseService) AddCourse(
 	ctx context.Context,
-	languageID, pLanguageID, rewardID, rewardAmount, title, description, imagePath string,
+	languageID, pLanguageID, rewardID, title, description, imagePath string,
+	rewardAmount int,
 ) (uuid.UUID, error) {
 	newCourse, err := domains.NewCourse(
 		"",
@@ -145,7 +146,8 @@ func (s *courseService) AddCourse(
 
 func (s *courseService) UpdateCourse(
 	ctx context.Context,
-	id, languageID, pLanguageID, rewardID, rewardAmount, title, description, imagePath string,
+	id, languageID, pLanguageID, rewardID, title, description, imagePath string,
+	rewardAmount int,
 ) error {
 	var idUUID uuid.UUID
 	idUUID, err := uuid.Parse(id)

@@ -14,6 +14,28 @@ definitions:
     - traitType
     - value
     type: object
+  dto.AddCourseDTO:
+    properties:
+      description:
+        type: string
+      imagePath:
+        type: string
+      languageID:
+        type: string
+      programmingLanguageID:
+        type: string
+      rewardAmount:
+        minimum: 0
+        type: integer
+      rewardID:
+        type: string
+      title:
+        maxLength: 60
+        type: string
+    required:
+    - programmingLanguageID
+    - title
+    type: object
   dto.AddPLanguageDTO:
     properties:
       compileCMD:
@@ -256,6 +278,28 @@ paths:
       summary: Add Attribute
       tags:
       - Attribute
+  /private/admin/courses/:
+    post:
+      consumes:
+      - application/json
+      description: Adds Course Into DB.
+      parameters:
+      - description: New Course
+        in: body
+        name: newCourse
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddCourseDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Course
+      tags:
+      - Courses
   /private/admin/planguages/:
     delete:
       consumes:

@@ -1,6 +1,7 @@
 package private
 
 import (
+	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
 )
@@ -8,6 +9,11 @@ import (
 func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
 	coursesRoutes := root.Group("/courses")
 	coursesRoutes.Get("/", h.GetCourses)
+
+	courseAdminRoutes := root.Group("/admin/courses")
+	courseAdminRoutes.Use(h.adminRoleMiddleware)
+	courseAdminRoutes.Post("/", h.AddCourse)
+
 }
 
 // @Tags Courses
@@ -38,4 +44,56 @@ func (h *PrivateHandler) GetCourses(c *fiber.Ctx) error {
 	courseDTOs := h.dtoManager.CourseManager().ToCourseDTOs(courses)
 
 	return response.Response(200, "Status OK", courseDTOs)
+}
+
+// @Tags Courses
+// @Summary Add Course
+// @Description Adds Course Into DB.
+// @Accept json
+// @Produce json
+// @Param newCourse body dto.AddCourseDTO true "New Course"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/admin/courses/ [post]
+func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
+	var newCourse dto.AddCourseDTO
+	if err := c.BodyParser(&newCourse); err != nil {
+		return err
+	}
+	if err := h.services.UtilService().Validator().ValidateStruct(newCourse); err != nil {
+		return err
+	}
+
+	// Default Language if the languageID is ""
+	var languageID string
+	if newCourse.LanguageID == "" {
+		defaultLanguage, err := h.services.LanguageService().GetDefault(c.Context())
+		if err != nil {
+			return err
+		}
+		languageID = defaultLanguage.GetID().String()
+	} else {
+		languageID = newCourse.LanguageID
+	}
+
+	if newCourse.PLanguageID != "" {
+		if _, err := h.services.ProgrammingService().GetProgrammingLanguage(c.Context(), newCourse.PLanguageID); err != nil {
+			return err
+		}
+	}
+
+	id, err := h.services.CourseService().AddCourse(
+		c.Context(),
+		languageID,
+		newCourse.PLanguageID,
+		newCourse.RewardID,
+		newCourse.Title,
+		newCourse.Description,
+		newCourse.ImagePath,
+		newCourse.RewardAmount,
+	)
+	if err != nil {
+		return err
+	}
+
+	return response.Response(200, "Status OK", id)
 }

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/C-dexTeam/codex/internal/domains"
@@ -39,8 +40,8 @@ func (r *CourseRepository) dbModelToAppModel(dbModel dbModelCourse) (appModel do
 	// Verileri AppModel'e aktar
 	appModel.Unmarshal(
 		uuid.MustParse(dbModel.ID.String),
-		appModel.GetLanguageID(),
-		appModel.GetPLanguageID(),
+		uuid.MustParse(dbModel.LanguageID.String),
+		uuid.MustParse(dbModel.PLanguageID.String),
 		rewardID,
 		int(dbModel.RewardAmount.Int64),
 		dbModel.Title.String,
@@ -149,6 +150,7 @@ func (r *CourseRepository) Filter(ctx context.Context, filter domains.CourseFilt
 		return
 	}
 	for _, dbModel := range dbResult {
+		fmt.Println(dbModel.PLanguageID, dbModel.LanguageID)
 		courses = append(courses, r.dbModelToAppModel(dbModel))
 	}
 	return
@@ -160,7 +162,7 @@ func (r *CourseRepository) Add(ctx context.Context, course *domains.Course) (uui
 		INSERT INTO
 			t_courses (language_id, programming_language_id, reward_id, reward_amount, title, description, image_path)
 		VALUES
-			($1, $2, $3, $4, $5, $6)
+			($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id
 	`
 

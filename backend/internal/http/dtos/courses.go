@@ -49,3 +49,24 @@ func (d *CourseDTOManager) ToCourseDTOs(appModels []domains.Course) []CourseDTO 
 
 	return courseDTOs
 }
+
+type AddCourseDTO struct {
+	LanguageID   string `json:"languageID"`
+	PLanguageID  string `json:"programmingLanguageID" validate:"required,uuid4"`
+	RewardID     string `json:"rewardID"`
+	RewardAmount int    `json:"rewardAmount" validate:"gte=0"`
+	Title        string `json:"title" validate:"required,max=60"`
+	Description  string `json:"description"`
+	ImagePath    string `json:"imagePath"`
+}
+
+type UpdateCourseDTO struct {
+	ID           string `json:"id"`
+	LanguageID   string `json:"languageID"`
+	PLanguageID  string `json:"programmingLanguageID" validate:"required,uuid4"`
+	RewardID     string `json:"rewardID"`
+	RewardAmount int    `json:"rewardAmount" validate:"gte=0"`
+	Title        string `json:"title" validate:"required,max=60"`
+	Description  string `json:"description"`
+	ImagePath    string `json:"imagePath"`
+}

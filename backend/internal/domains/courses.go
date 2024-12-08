@@ -2,7 +2,6 @@ package domains
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
@@ -20,8 +19,8 @@ type ICourseRepository interface {
 type ICourseService interface {
 	GetCourses(ctx context.Context, courseID, langugeID, pLanguageID, title, page, limit string) (courses []Course, err error)
 	GetCourse(ctx context.Context, id, page, limit string) (course *Course, err error)
-	AddCourse(ctx context.Context, languageID, pLanguageID, rewardID, rewardAmount, title, description, imagePath string) (uuid.UUID, error)
-	UpdateCourse(ctx context.Context, id, languageID, pLanguageID, rewardID, rewardAmount, title, description, imagePath string) error
+	AddCourse(ctx context.Context, languageID, pLanguageID, rewardID, title, description, imagePath string, rewardAmount int) (uuid.UUID, error)
+	UpdateCourse(ctx context.Context, id, languageID, pLanguageID, rewardID, title, description, imagePath string, rewardAmount int) error
 	DeleteCourse(ctx context.Context, id string) (err error)
 }
 
@@ -52,10 +51,12 @@ type CourseFilter struct {
 }
 
 func NewCourse(
-	id, languageID, pLanguageID, rewardID, rewardAmount string,
+	id, languageID, pLanguageID, rewardID string,
+	rewardAmount int,
 	title, description, imagePath string,
 	chapters []Chapter,
 ) (course *Course, err error) {
+	course = &Course{}
 	if err := course.SetID(id); err != nil {
 		return nil, err
 	}
@@ -195,21 +196,11 @@ func (d *Course) SetRewardID(rewardID string) error {
 	return nil
 }
 
-func (d *Course) SetRewardAmount(rewardAmount string) (err error) {
-	var intRewardAmount int
-	if rewardAmount == "" {
-		intRewardAmount = 0
-	} else {
-		intRewardAmount, err = strconv.Atoi(rewardAmount)
-		if err != nil {
-			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseRewardAmountEnterInteger)
-		}
-
-		if intRewardAmount > 0 {
-			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseRewardAmountCannotBeNegative)
-		}
-		d.rewardAmount = intRewardAmount
+func (d *Course) SetRewardAmount(rewardAmount int) (err error) {
+	if rewardAmount < 0 {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseRewardAmountCannotBeNegative)
 	}
+	d.rewardAmount = rewardAmount
 
 	return nil
 }
@@ -233,7 +224,7 @@ func (d *Course) SetImagePath(imagePath string) error {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseImagePathTooLong)
 
 	}
-	d.title = imagePath
+	d.imagePath = imagePath
 
 	return nil
 }
