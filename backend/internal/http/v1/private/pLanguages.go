@@ -1,8 +1,6 @@
 package private
 
 import (
-	"fmt"
-
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
@@ -131,8 +129,6 @@ func (h *PrivateHandler) UpdateProgrammingLanguage(c *fiber.Ctx) error {
 	if err := h.services.UtilService().Validator().ValidateStruct(updatePLanguage); err != nil {
 		return err
 	}
-
-	fmt.Println(updatePLanguage)
 
 	err := h.services.ProgrammingService().UpdateProgrammingLanguage(
 		c.Context(),

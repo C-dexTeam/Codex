@@ -63,10 +63,10 @@ type AddCourseDTO struct {
 type UpdateCourseDTO struct {
 	ID           string `json:"id"`
 	LanguageID   string `json:"languageID"`
-	PLanguageID  string `json:"programmingLanguageID" validate:"required,uuid4"`
+	PLanguageID  string `json:"programmingLanguageID"`
 	RewardID     string `json:"rewardID"`
 	RewardAmount int    `json:"rewardAmount" validate:"gte=0"`
-	Title        string `json:"title" validate:"required,max=60"`
+	Title        string `json:"title" validate:"max=60"`
 	Description  string `json:"description"`
 	ImagePath    string `json:"imagePath"`
 }

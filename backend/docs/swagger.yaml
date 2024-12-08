@@ -103,6 +103,30 @@ definitions:
         maxLength: 30
         type: string
     type: object
+  dto.UpdateCourseDTO:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      imagePath:
+        type: string
+      languageID:
+        type: string
+      programmingLanguageID:
+        type: string
+      rewardAmount:
+        minimum: 0
+        type: integer
+      rewardID:
+        type: string
+      title:
+        maxLength: 60
+        type: string
+    required:
+    - programmingLanguageID
+    - title
+    type: object
   dto.UpdatePLanguageDTO:
     properties:
       compileCMD:
@@ -279,6 +303,27 @@ paths:
       tags:
       - Attribute
   /private/admin/courses/:
+    patch:
+      consumes:
+      - application/json
+      description: Updates Course Into DB.
+      parameters:
+      - description: Update Course
+        in: body
+        name: updateCourse
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCourseDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Course
+      tags:
+      - Courses
     post:
       consumes:
       - application/json

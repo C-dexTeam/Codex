@@ -13,7 +13,7 @@ func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
 	courseAdminRoutes := root.Group("/admin/courses")
 	courseAdminRoutes.Use(h.adminRoleMiddleware)
 	courseAdminRoutes.Post("/", h.AddCourse)
-
+	courseAdminRoutes.Patch("/", h.UpdateCourse)
 }
 
 // @Tags Courses
@@ -96,4 +96,51 @@ func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
 	}
 
 	return response.Response(200, "Status OK", id)
+}
+
+// @Tags Courses
+// @Summary Update Course
+// @Description Updates Course Into DB.
+// @Accept json
+// @Produce json
+// @Param updateCourse body dto.UpdateCourseDTO true "Update Course"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/admin/courses/ [patch]
+func (h *PrivateHandler) UpdateCourse(c *fiber.Ctx) error {
+	var updateCourse dto.UpdateCourseDTO
+	if err := c.BodyParser(&updateCourse); err != nil {
+		return err
+	}
+	if err := h.services.UtilService().Validator().ValidateStruct(updateCourse); err != nil {
+		return err
+	}
+
+	// Check if is exists
+	if updateCourse.LanguageID != "" {
+		if _, err := h.services.LanguageService().GetLanguage(c.Context(), updateCourse.LanguageID); err != nil {
+			return err
+		}
+	}
+	if updateCourse.PLanguageID != "" {
+		if _, err := h.services.ProgrammingService().GetProgrammingLanguage(c.Context(), updateCourse.PLanguageID); err != nil {
+			return err
+		}
+	}
+
+	err := h.services.CourseService().UpdateCourse(
+		c.Context(),
+		updateCourse.ID,
+		updateCourse.LanguageID,
+		updateCourse.PLanguageID,
+		updateCourse.RewardID,
+		updateCourse.Title,
+		updateCourse.Description,
+		updateCourse.ImagePath,
+		updateCourse.RewardAmount,
+	)
+	if err != nil {
+		return err
+	}
+
+	return response.Response(200, "Status OK", nil)
 }

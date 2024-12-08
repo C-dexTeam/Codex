@@ -163,21 +163,26 @@ func (d *Course) SetID(id string) error {
 }
 
 func (d *Course) SetLanguageID(languageID string) error {
-	idUUID, err := uuid.Parse(languageID)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+	if languageID != "" {
+		idUUID, err := uuid.Parse(languageID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.languageID = idUUID
 	}
-	d.languageID = idUUID
 
 	return nil
 }
 
 func (d *Course) SetPLanguageID(pLanguageID string) error {
-	idUUID, err := uuid.Parse(pLanguageID)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+	// Update için bu boş kontrolünü yaptık. Update de boş yollarsa değişiklik yapmayalım diye
+	if pLanguageID != "" {
+		idUUID, err := uuid.Parse(pLanguageID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.pLanguageID = idUUID
 	}
-	d.pLanguageID = idUUID
 
 	return nil
 }

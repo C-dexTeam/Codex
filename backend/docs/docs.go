@@ -142,6 +142,38 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Updates Course Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Update Course",
+                "parameters": [
+                    {
+                        "description": "Update Course",
+                        "name": "updateCourse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateCourseDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
             }
         },
         "/private/admin/planguages/": {
@@ -1160,6 +1192,41 @@ const docTemplate = `{
                 "value": {
                     "type": "string",
                     "maxLength": 30
+                }
+            }
+        },
+        "dto.UpdateCourseDTO": {
+            "type": "object",
+            "required": [
+                "programmingLanguageID",
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "programmingLanguageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 60
                 }
             }
         },

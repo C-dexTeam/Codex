@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
@@ -111,8 +110,6 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 
 	// Save the new user profile to the database within the transaction
 	if err := s.userProfileRepository.AddTx(ctx, tx, newUserProfile); err != nil {
-		fmt.Println(2, err)
-
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
 	}
 

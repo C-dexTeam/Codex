@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/C-dexTeam/codex/internal/domains"
@@ -150,7 +149,6 @@ func (r *CourseRepository) Filter(ctx context.Context, filter domains.CourseFilt
 		return
 	}
 	for _, dbModel := range dbResult {
-		fmt.Println(dbModel.PLanguageID, dbModel.LanguageID)
 		courses = append(courses, r.dbModelToAppModel(dbModel))
 	}
 	return
@@ -197,7 +195,7 @@ func (r *CourseRepository) Update(ctx context.Context, course *domains.Course) (
 			reward_amount = COALESCE(:reward_amount, reward_amount),
 			title = COALESCE(:title, title),
 			description = COALESCE(:description, description),
-			image_path =  COALESCE(:image_path, image_path),
+			image_path =  COALESCE(:image_path, image_path)
 		WHERE
 			id = :id
 	`

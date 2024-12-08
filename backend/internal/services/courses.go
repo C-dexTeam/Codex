@@ -155,13 +155,13 @@ func (s *courseService) UpdateCourse(
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 	}
 
-	rewards, _, err := s.courseRepository.Filter(ctx, domains.CourseFilter{
+	courses, _, err := s.courseRepository.Filter(ctx, domains.CourseFilter{
 		ID: idUUID,
 	}, 1, 1)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringCourse, err)
 	}
-	if len(rewards) != 1 {
+	if len(courses) != 1 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrCourseNotFound)
 	}
 
