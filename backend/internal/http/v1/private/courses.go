@@ -1,6 +1,8 @@
 package private
 
 import (
+	"fmt"
+
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
@@ -9,11 +11,13 @@ import (
 func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
 	coursesRoutes := root.Group("/courses")
 	coursesRoutes.Get("/", h.GetCourses)
+	coursesRoutes.Get("/:id", h.GetCourse)
 
 	courseAdminRoutes := root.Group("/admin/courses")
 	courseAdminRoutes.Use(h.adminRoleMiddleware)
 	courseAdminRoutes.Post("/", h.AddCourse)
 	courseAdminRoutes.Patch("/", h.UpdateCourse)
+	courseAdminRoutes.Delete("/:id", h.DeleteCourse)
 }
 
 // @Tags Courses
@@ -44,6 +48,30 @@ func (h *PrivateHandler) GetCourses(c *fiber.Ctx) error {
 	courseDTOs := h.dtoManager.CourseManager().ToCourseDTOs(courses)
 
 	return response.Response(200, "Status OK", courseDTOs)
+}
+
+// @Tags Courses
+// @Summary Get Course By ID
+// @Description Retrieves one course.
+// @Accept json
+// @Produce json
+// @Param id path string false "Course ID"
+// @Param page query string false "Chapter Page"
+// @Param limit query string false "Chapter Attribute Limit"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/courses/{id} [get]
+func (h *PrivateHandler) GetCourse(c *fiber.Ctx) error {
+	id := c.Params("id")
+	page := c.Query("page")
+	limit := c.Query("limit")
+
+	course, err := h.services.CourseService().GetCourse(c.Context(), id, page, limit)
+	if err != nil {
+		return err
+	}
+	courseDTO := h.dtoManager.CourseManager().ToCourseDTO(*course)
+
+	return response.Response(200, "Status OK", courseDTO)
 }
 
 // @Tags Courses
@@ -142,5 +170,24 @@ func (h *PrivateHandler) UpdateCourse(c *fiber.Ctx) error {
 		return err
 	}
 
+	return response.Response(200, "Status OK", nil)
+}
+
+// @Tags Courses
+// @Summary Delete Course
+// @Description Delete Courses from DB.
+// @Accept json
+// @Produce json
+// @Param id path string true "Course ID"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/admin/courses/{id} [delete]
+func (h *PrivateHandler) DeleteCourse(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	fmt.Println(id)
+
+	if err := h.services.CourseService().DeleteCourse(c.Context(), id); err != nil {
+		return err
+	}
 	return response.Response(200, "Status OK", nil)
 }

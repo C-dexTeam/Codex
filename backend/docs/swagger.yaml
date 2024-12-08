@@ -123,9 +123,6 @@ definitions:
       title:
         maxLength: 60
         type: string
-    required:
-    - programmingLanguageID
-    - title
     type: object
   dto.UpdatePLanguageDTO:
     properties:
@@ -345,6 +342,27 @@ paths:
       summary: Add Course
       tags:
       - Courses
+  /private/admin/courses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Courses from DB.
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Course
+      tags:
+      - Courses
   /private/admin/planguages/:
     delete:
       consumes:
@@ -414,8 +432,8 @@ paths:
       description: Delete Rewards from DB.
       parameters:
       - description: Reward ID
-        in: query
-        name: rewardID
+        in: path
+        name: id
         type: string
       produces:
       - application/json
@@ -627,6 +645,34 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Courses
+      tags:
+      - Courses
+  /private/courses/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves one course.
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        type: string
+      - description: Chapter Page
+        in: query
+        name: page
+        type: string
+      - description: Chapter Attribute Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get Course By ID
       tags:
       - Courses
   /private/language/:
