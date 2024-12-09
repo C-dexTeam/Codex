@@ -11,6 +11,9 @@ import (
 
 type IChapterRepository interface {
 	Filter(ctx context.Context, filter ChapterFilter, limit, page int64) (chapters []Chapter, dataCount int64, err error)
+	Add(ctx context.Context, chapter *Chapter) (uuid.UUID, error)
+	Update(ctx context.Context, chapter *Chapter) (err error)
+	SoftDelete(ctx context.Context, id uuid.UUID) (err error)
 }
 
 type IChapterService interface {

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	"github.com/google/uuid"
@@ -185,4 +186,86 @@ func (r *ChapterRepository) Filter(ctx context.Context, filter domains.ChapterFi
 		chapters = append(chapters, r.dbModelToAppModel(dbModel))
 	}
 	return
+}
+
+func (r *ChapterRepository) Add(ctx context.Context, chapter *domains.Chapter) (uuid.UUID, error) {
+	dbModel := r.dbModelFromAppModel(*chapter)
+	query := `
+		INSERT INTO
+			t_chapters (course_id, language_id, reward_id, reward_amount, title, description, content, func_name, frontend_template, docker_template, check_template, grants_experience, active)
+		VALUES
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+		RETURNING id
+	`
+
+	var id uuid.UUID
+	err := r.db.QueryRowxContext(
+		ctx,
+		query,
+		dbModel.CourseID,
+		dbModel.LanguageID,
+		dbModel.RewardID,
+		dbModel.RewardAmount,
+		dbModel.Title,
+		dbModel.Description,
+		dbModel.Content,
+		dbModel.FuncName,
+		dbModel.FrontendTmp,
+		dbModel.DockerTmp,
+		dbModel.CheckTmp,
+		dbModel.GrantsExperience,
+		dbModel.Active,
+	).Scan(&id)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return id, nil
+}
+
+func (r *ChapterRepository) Update(ctx context.Context, chapter *domains.Chapter) (err error) {
+	dbModel := r.dbModelFromAppModel(*chapter)
+	query := `
+		UPDATE
+			t_rewards
+		SET
+			course_id = COALESCE(:course_id, course_id),
+			language_id = COALESCE(:language_id, language_id),
+			reward_id = COALESCE(:reward_id, reward_id),
+			reward_amount =  COALESCE(:reward_amount, reward_amount),
+			title =  COALESCE(:title, title),
+			description =  COALESCE(:description, description)
+			content =  COALESCE(:content, content)
+			func_name =  COALESCE(:func_name, func_name)
+			frontend_template =  COALESCE(:frontend_template, frontend_template)
+			docker_template =  COALESCE(:docker_template, docker_template)
+			check_template =  COALESCE(:check_template, check_template)
+			grants_experience =  COALESCE(:grants_experience, grants_experience)
+			active =  COALESCE(:active, active)
+		WHERE
+			id = :id
+	`
+	_, err = r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *ChapterRepository) SoftDelete(ctx context.Context, id uuid.UUID) (err error) {
+	query := `
+		UPDATE
+			t_chapters
+		SET
+			deleted_at = $1
+		WHERE
+			id = $2
+	`
+	deletedAt := time.Now()
+
+	if _, err = r.db.ExecContext(ctx, query, deletedAt, id); err != nil {
+		return
+	}
+
+	return nil
 }
