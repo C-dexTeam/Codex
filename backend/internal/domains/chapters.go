@@ -17,7 +17,28 @@ type IChapterRepository interface {
 }
 
 type IChapterService interface {
-	GetChapters(ctx context.Context, chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string) (chapters []Chapter, err error)
+	GetChapters(
+		ctx context.Context,
+		chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
+	) (chapters []Chapter, err error)
+	AddChapter(
+		ctx context.Context,
+		courseID, languageID, rewardID, title, description, content, funcName string,
+		frontendTmp, dockerTmp, checkTmp string,
+		grantsExperience, active bool,
+		rewardAmount int,
+	) (uuid.UUID, error)
+	UpdateChapter(
+		ctx context.Context,
+		id, courseID, languageID, rewardID, title, description, content, funcName string,
+		frontendTmp, dockerTmp, checkTmp string,
+		grantsExperience, active bool,
+		rewardAmount int,
+	) error
+	DeleteChapter(
+		ctx context.Context,
+		id string,
+	) (err error)
 }
 
 const (
@@ -55,14 +76,18 @@ type ChapterFilter struct {
 
 func NewChapter(
 	id, languageID, courseID, rewardID, title, description, content, funcName, frontendTmp, dockerTmp, checkTmp string,
+	rewardAmount int,
 	grantsExperience, active bool,
-	createdAt time.Time,
-	deletedAt *time.Time,
 ) (chapter *Chapter, err error) {
+	chapter = &Chapter{}
+
 	if err = chapter.SetTitle(title); err != nil {
 		return
 	}
 	if err = chapter.SetFuncName(funcName); err != nil {
+		return
+	}
+	if err = chapter.SetRewardAmount(rewardAmount); err != nil {
 		return
 	}
 
@@ -75,8 +100,6 @@ func NewChapter(
 	chapter.SetDockerTmp(dockerTmp)
 	chapter.SetCheckTmp(checkTmp)
 	chapter.SetGrantsExperience(grantsExperience)
-	chapter.SetActive(active)
-	chapter.SetDeletedAt(deletedAt)
 
 	return
 }
@@ -220,6 +243,15 @@ func (c *Chapter) SetRewardID(rewardID string) error {
 		}
 		c.rewardID = &idUUID
 	}
+
+	return nil
+}
+
+func (c *Chapter) SetRewardAmount(rewardAmount int) (err error) {
+	if rewardAmount < 0 {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseRewardAmountCannotBeNegative)
+	}
+	c.rewardAmount = rewardAmount
 
 	return nil
 }
