@@ -18,6 +18,7 @@ type dbModelChapter struct {
 	CourseID         sql.NullString `db:"course_id"`
 	LanguageID       sql.NullString `db:"language_id"`
 	RewardID         sql.NullString `db:"reward_id"`
+	RewardAmount     sql.NullInt64  `db:"reward_amount"`
 	Title            sql.NullString `db:"title"`
 	Description      sql.NullString `db:"description"`
 	Content          sql.NullString `db:"content"`
@@ -32,20 +33,7 @@ type dbModelChapter struct {
 }
 
 func (r *ChapterRepository) dbModelToAppModel(dbModel dbModelChapter) (appModel domains.Chapter) {
-	var languageID, courseID, rewardID *uuid.UUID
-
-	// Dil, programlama dili, ödül ID'leri için aynı şekilde kontrol yapılır
-	if parsedLanguageID, err := uuid.Parse(dbModel.LanguageID.String); err == nil {
-		languageID = &parsedLanguageID
-	} else {
-		languageID = nil
-	}
-
-	if parsedCourseID, err := uuid.Parse(dbModel.CourseID.String); err == nil {
-		courseID = &parsedCourseID
-	} else {
-		courseID = nil
-	}
+	var rewardID *uuid.UUID
 
 	if parsedRewardID, err := uuid.Parse(dbModel.RewardID.String); err == nil {
 		rewardID = &parsedRewardID
@@ -55,9 +43,10 @@ func (r *ChapterRepository) dbModelToAppModel(dbModel dbModelChapter) (appModel 
 
 	appModel.Unmarshal(
 		uuid.MustParse(dbModel.ID.String),
-		languageID,
-		courseID,
+		uuid.MustParse(dbModel.LanguageID.String),
+		uuid.MustParse(dbModel.CourseID.String),
 		rewardID,
+		int(dbModel.RewardAmount.Int64),
 		dbModel.Title.String,
 		dbModel.Description.String,
 		dbModel.Content.String,
@@ -79,11 +68,11 @@ func (r *ChapterRepository) dbModelFromAppModel(appModel domains.Chapter) (dbMod
 		dbModel.ID.String = appModel.GetID().String()
 		dbModel.ID.Valid = true
 	}
-	if appModel.GetLanguageID() != nil {
+	if appModel.GetLanguageID() != uuid.Nil {
 		dbModel.LanguageID.String = appModel.GetLanguageID().String()
 		dbModel.LanguageID.Valid = true
 	}
-	if appModel.GetCourseID() != nil {
+	if appModel.GetCourseID() != uuid.Nil {
 		dbModel.CourseID.String = appModel.GetCourseID().String()
 		dbModel.CourseID.Valid = true
 	}
