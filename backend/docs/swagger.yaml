@@ -14,6 +14,36 @@ definitions:
     - traitType
     - value
     type: object
+  dto.AddChapterDTO:
+    properties:
+      active:
+        type: boolean
+      checkTemplate:
+        type: string
+      content:
+        type: string
+      courseID:
+        type: string
+      description:
+        type: string
+      dockerTemplate:
+        type: string
+      frontendTemplate:
+        type: string
+      fundName:
+        type: string
+      grantsExperience:
+        type: boolean
+      languageID:
+        type: string
+      rewardAmount:
+        minimum: 1
+        type: integer
+      rewardID:
+        type: string
+      title:
+        type: string
+    type: object
   dto.AddCourseDTO:
     properties:
       description:
@@ -25,7 +55,7 @@ definitions:
       programmingLanguageID:
         type: string
       rewardAmount:
-        minimum: 0
+        minimum: 1
         type: integer
       rewardID:
         type: string
@@ -103,6 +133,38 @@ definitions:
         maxLength: 30
         type: string
     type: object
+  dto.UpdateChapterDTO:
+    properties:
+      active:
+        type: boolean
+      checkTemplate:
+        type: string
+      content:
+        type: string
+      courseID:
+        type: string
+      description:
+        type: string
+      dockerTemplate:
+        type: string
+      frontendTemplate:
+        type: string
+      fundName:
+        type: string
+      grantsExperience:
+        type: boolean
+      id:
+        type: string
+      languageID:
+        type: string
+      rewardAmount:
+        minimum: 1
+        type: integer
+      rewardID:
+        type: string
+      title:
+        type: string
+    type: object
   dto.UpdateCourseDTO:
     properties:
       description:
@@ -116,7 +178,7 @@ definitions:
       programmingLanguageID:
         type: string
       rewardAmount:
-        minimum: 0
+        minimum: 1
         type: integer
       rewardID:
         type: string
@@ -299,6 +361,69 @@ paths:
       summary: Add Attribute
       tags:
       - Attribute
+  /private/admin/chapters/:
+    patch:
+      consumes:
+      - application/json
+      description: Updates Chapter Into DB.
+      parameters:
+      - description: Update Chapters
+        in: body
+        name: updateChapter
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateChapterDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Chapter
+      tags:
+      - Chapters
+    post:
+      consumes:
+      - application/json
+      description: Adds Chapter Into DB.
+      parameters:
+      - description: New Chapter
+        in: body
+        name: newChapter
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddChapterDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Chapter
+      tags:
+      - Chapters
+  /private/admin/chapters/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Chapters from DB.
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Chapter
+      tags:
+      - Chapters
   /private/admin/courses/:
     patch:
       consumes:
@@ -426,25 +551,6 @@ paths:
       tags:
       - Programming Language
   /private/admin/rewards/:
-    delete:
-      consumes:
-      - application/json
-      description: Delete Rewards from DB.
-      parameters:
-      - description: Reward ID
-        in: path
-        name: id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.BaseResponse'
-      summary: Delete Reward
-      tags:
-      - Reward
     patch:
       consumes:
       - application/json
@@ -485,6 +591,26 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Add Reward
+      tags:
+      - Reward
+  /private/admin/rewards/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Rewards from DB.
+      parameters:
+      - description: Reward ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Reward
       tags:
       - Reward
   /private/admin/user:
@@ -606,7 +732,7 @@ paths:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Chapters
       tags:
-      - Chapter
+      - Chapters
   /private/courses/:
     get:
       consumes:

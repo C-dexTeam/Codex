@@ -81,6 +81,9 @@ func NewChapter(
 ) (chapter *Chapter, err error) {
 	chapter = &Chapter{}
 
+	if err = chapter.SetID(id); err != nil {
+		return
+	}
 	if err = chapter.SetTitle(title); err != nil {
 		return
 	}

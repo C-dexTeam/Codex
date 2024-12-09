@@ -146,7 +146,7 @@ func (h *PrivateHandler) UpdateReward(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path string false "Reward ID"
 // @Success 200 {object} response.BaseResponse{}
-// @Router /private/admin/rewards/ [delete]
+// @Router /private/admin/rewards/{id} [delete]
 func (h *PrivateHandler) DeleteReward(c *fiber.Ctx) error {
 	id := c.Params("id")
 

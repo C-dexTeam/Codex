@@ -35,11 +35,16 @@ type dbModelChapter struct {
 
 func (r *ChapterRepository) dbModelToAppModel(dbModel dbModelChapter) (appModel domains.Chapter) {
 	var rewardID *uuid.UUID
+	var deletedAt *time.Time = nil
 
 	if parsedRewardID, err := uuid.Parse(dbModel.RewardID.String); err == nil {
 		rewardID = &parsedRewardID
 	} else {
 		rewardID = nil
+	}
+
+	if dbModel.DeletedAt.Valid {
+		deletedAt = &dbModel.CreatedAt.Time
 	}
 
 	appModel.Unmarshal(
@@ -58,7 +63,7 @@ func (r *ChapterRepository) dbModelToAppModel(dbModel dbModelChapter) (appModel 
 		dbModel.GrantsExperience.Bool,
 		dbModel.Active.Bool,
 		dbModel.CreatedAt.Time,
-		&dbModel.DeletedAt.Time,
+		deletedAt,
 	)
 
 	return
@@ -81,9 +86,17 @@ func (r *ChapterRepository) dbModelFromAppModel(appModel domains.Chapter) (dbMod
 		dbModel.RewardID.String = appModel.GetRewardID().String()
 		dbModel.RewardID.Valid = true
 	}
+	if appModel.GetRewardAmount() != 0 {
+		dbModel.RewardAmount.Int64 = int64(appModel.GetRewardAmount())
+		dbModel.RewardAmount.Valid = true
+	}
 	if appModel.GetTitle() != "" {
 		dbModel.Title.String = appModel.GetTitle()
 		dbModel.Title.Valid = true
+	}
+	if appModel.GetContent() != "" {
+		dbModel.Content.String = appModel.GetContent()
+		dbModel.Content.Valid = true
 	}
 	if appModel.GetDescription() != "" {
 		dbModel.Description.String = appModel.GetDescription()
@@ -109,8 +122,9 @@ func (r *ChapterRepository) dbModelFromAppModel(appModel domains.Chapter) (dbMod
 		dbModel.CreatedAt.Time = appModel.GetCreatedAt()
 		dbModel.CreatedAt.Valid = true
 	}
-	if !appModel.GetDeletedAt().IsZero() {
-		dbModel.DeletedAt.Time = *appModel.GetDeletedAt()
+	deletedAt := appModel.GetDeletedAt()
+	if deletedAt != nil && !deletedAt.IsZero() {
+		dbModel.DeletedAt.Time = *deletedAt
 		dbModel.DeletedAt.Valid = true
 	}
 	dbModel.GrantsExperience.Bool = appModel.GetGrantsExperience()
@@ -179,7 +193,20 @@ func (r *ChapterRepository) Filter(ctx context.Context, filter domains.ChapterFi
 	LIMIT $8 OFFSET $9;
 	`
 
-	if err = r.db.SelectContext(ctx, &dbResult, query, dbFilter.ID, dbFilter.LanguageID, dbFilter.CourseID, dbFilter.RewardID, dbFilter.Title, dbFilter.GrantsExperience, dbFilter.Active, limit, (page-1)*limit); err != nil {
+	if err = r.db.SelectContext(
+		ctx,
+		&dbResult,
+		query,
+		dbFilter.ID,
+		dbFilter.LanguageID,
+		dbFilter.CourseID,
+		dbFilter.RewardID,
+		dbFilter.Title,
+		dbFilter.GrantsExperience,
+		dbFilter.Active,
+		limit,
+		(page-1)*limit,
+	); err != nil {
 		return
 	}
 	for _, dbModel := range dbResult {
@@ -227,24 +254,25 @@ func (r *ChapterRepository) Update(ctx context.Context, chapter *domains.Chapter
 	dbModel := r.dbModelFromAppModel(*chapter)
 	query := `
 		UPDATE
-			t_rewards
+			t_chapters
 		SET
 			course_id = COALESCE(:course_id, course_id),
 			language_id = COALESCE(:language_id, language_id),
 			reward_id = COALESCE(:reward_id, reward_id),
 			reward_amount =  COALESCE(:reward_amount, reward_amount),
 			title =  COALESCE(:title, title),
-			description =  COALESCE(:description, description)
-			content =  COALESCE(:content, content)
-			func_name =  COALESCE(:func_name, func_name)
-			frontend_template =  COALESCE(:frontend_template, frontend_template)
-			docker_template =  COALESCE(:docker_template, docker_template)
-			check_template =  COALESCE(:check_template, check_template)
-			grants_experience =  COALESCE(:grants_experience, grants_experience)
+			description =  COALESCE(:description, description),
+			content =  COALESCE(:content, content),
+			func_name =  COALESCE(:func_name, func_name),
+			frontend_template =  COALESCE(:frontend_template, frontend_template),
+			docker_template =  COALESCE(:docker_template, docker_template),
+			check_template =  COALESCE(:check_template, check_template),
+			grants_experience =  COALESCE(:grants_experience, grants_experience),
 			active =  COALESCE(:active, active)
 		WHERE
 			id = :id
 	`
+
 	_, err = r.db.NamedExecContext(ctx, query, dbModel)
 	if err != nil {
 		return

@@ -110,6 +110,103 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/admin/chapters/": {
+            "post": {
+                "description": "Adds Chapter Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Add Chapter",
+                "parameters": [
+                    {
+                        "description": "New Chapter",
+                        "name": "newChapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddChapterDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates Chapter Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Update Chapter",
+                "parameters": [
+                    {
+                        "description": "Update Chapters",
+                        "name": "updateChapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateChapterDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/chapters/{id}": {
+            "delete": {
+                "description": "Delete Chapters from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Delete Chapter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/admin/courses/": {
             "post": {
                 "description": "Adds Course Into DB.",
@@ -336,35 +433,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "delete": {
-                "description": "Delete Rewards from DB.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Reward"
-                ],
-                "summary": "Delete Reward",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Reward ID",
-                        "name": "id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.BaseResponse"
-                        }
-                    }
-                }
-            },
             "patch": {
                 "description": "Updates Reward Into DB.",
                 "consumes": [
@@ -386,6 +454,37 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.UpdateRewardDTO"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/rewards/{id}": {
+            "delete": {
+                "description": "Delete Rewards from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Delete Reward",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -518,7 +617,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chapter"
+                    "Chapters"
                 ],
                 "summary": "Get All Chapters",
                 "parameters": [
@@ -1145,6 +1244,51 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AddChapterDTO": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "checkTemplate": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "courseID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dockerTemplate": {
+                    "type": "string"
+                },
+                "frontendTemplate": {
+                    "type": "string"
+                },
+                "fundName": {
+                    "type": "string"
+                },
+                "grantsExperience": {
+                    "type": "boolean"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.AddCourseDTO": {
             "type": "object",
             "required": [
@@ -1166,7 +1310,7 @@ const docTemplate = `{
                 },
                 "rewardAmount": {
                     "type": "integer",
-                    "minimum": 0
+                    "minimum": 1
                 },
                 "rewardID": {
                     "type": "string"
@@ -1270,6 +1414,54 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateChapterDTO": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "checkTemplate": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "courseID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dockerTemplate": {
+                    "type": "string"
+                },
+                "frontendTemplate": {
+                    "type": "string"
+                },
+                "fundName": {
+                    "type": "string"
+                },
+                "grantsExperience": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UpdateCourseDTO": {
             "type": "object",
             "properties": {
@@ -1290,7 +1482,7 @@ const docTemplate = `{
                 },
                 "rewardAmount": {
                     "type": "integer",
-                    "minimum": 0
+                    "minimum": 1
                 },
                 "rewardID": {
                     "type": "string"
