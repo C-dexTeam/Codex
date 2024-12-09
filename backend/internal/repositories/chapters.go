@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	"github.com/google/uuid"
@@ -18,6 +19,7 @@ type dbModelChapter struct {
 	CourseID         sql.NullString `db:"course_id"`
 	LanguageID       sql.NullString `db:"language_id"`
 	RewardID         sql.NullString `db:"reward_id"`
+	RewardAmount     sql.NullInt64  `db:"reward_amount"`
 	Title            sql.NullString `db:"title"`
 	Description      sql.NullString `db:"description"`
 	Content          sql.NullString `db:"content"`
@@ -32,20 +34,8 @@ type dbModelChapter struct {
 }
 
 func (r *ChapterRepository) dbModelToAppModel(dbModel dbModelChapter) (appModel domains.Chapter) {
-	var languageID, courseID, rewardID *uuid.UUID
-
-	// Dil, programlama dili, ödül ID'leri için aynı şekilde kontrol yapılır
-	if parsedLanguageID, err := uuid.Parse(dbModel.LanguageID.String); err == nil {
-		languageID = &parsedLanguageID
-	} else {
-		languageID = nil
-	}
-
-	if parsedCourseID, err := uuid.Parse(dbModel.CourseID.String); err == nil {
-		courseID = &parsedCourseID
-	} else {
-		courseID = nil
-	}
+	var rewardID *uuid.UUID
+	var deletedAt *time.Time = nil
 
 	if parsedRewardID, err := uuid.Parse(dbModel.RewardID.String); err == nil {
 		rewardID = &parsedRewardID
@@ -53,11 +43,16 @@ func (r *ChapterRepository) dbModelToAppModel(dbModel dbModelChapter) (appModel 
 		rewardID = nil
 	}
 
+	if dbModel.DeletedAt.Valid {
+		deletedAt = &dbModel.CreatedAt.Time
+	}
+
 	appModel.Unmarshal(
 		uuid.MustParse(dbModel.ID.String),
-		languageID,
-		courseID,
+		uuid.MustParse(dbModel.LanguageID.String),
+		uuid.MustParse(dbModel.CourseID.String),
 		rewardID,
+		int(dbModel.RewardAmount.Int64),
 		dbModel.Title.String,
 		dbModel.Description.String,
 		dbModel.Content.String,
@@ -68,7 +63,7 @@ func (r *ChapterRepository) dbModelToAppModel(dbModel dbModelChapter) (appModel 
 		dbModel.GrantsExperience.Bool,
 		dbModel.Active.Bool,
 		dbModel.CreatedAt.Time,
-		&dbModel.DeletedAt.Time,
+		deletedAt,
 	)
 
 	return
@@ -79,11 +74,11 @@ func (r *ChapterRepository) dbModelFromAppModel(appModel domains.Chapter) (dbMod
 		dbModel.ID.String = appModel.GetID().String()
 		dbModel.ID.Valid = true
 	}
-	if appModel.GetLanguageID() != nil {
+	if appModel.GetLanguageID() != uuid.Nil {
 		dbModel.LanguageID.String = appModel.GetLanguageID().String()
 		dbModel.LanguageID.Valid = true
 	}
-	if appModel.GetCourseID() != nil {
+	if appModel.GetCourseID() != uuid.Nil {
 		dbModel.CourseID.String = appModel.GetCourseID().String()
 		dbModel.CourseID.Valid = true
 	}
@@ -91,9 +86,17 @@ func (r *ChapterRepository) dbModelFromAppModel(appModel domains.Chapter) (dbMod
 		dbModel.RewardID.String = appModel.GetRewardID().String()
 		dbModel.RewardID.Valid = true
 	}
+	if appModel.GetRewardAmount() != 0 {
+		dbModel.RewardAmount.Int64 = int64(appModel.GetRewardAmount())
+		dbModel.RewardAmount.Valid = true
+	}
 	if appModel.GetTitle() != "" {
 		dbModel.Title.String = appModel.GetTitle()
 		dbModel.Title.Valid = true
+	}
+	if appModel.GetContent() != "" {
+		dbModel.Content.String = appModel.GetContent()
+		dbModel.Content.Valid = true
 	}
 	if appModel.GetDescription() != "" {
 		dbModel.Description.String = appModel.GetDescription()
@@ -119,8 +122,9 @@ func (r *ChapterRepository) dbModelFromAppModel(appModel domains.Chapter) (dbMod
 		dbModel.CreatedAt.Time = appModel.GetCreatedAt()
 		dbModel.CreatedAt.Valid = true
 	}
-	if !appModel.GetDeletedAt().IsZero() {
-		dbModel.DeletedAt.Time = *appModel.GetDeletedAt()
+	deletedAt := appModel.GetDeletedAt()
+	if deletedAt != nil && !deletedAt.IsZero() {
+		dbModel.DeletedAt.Time = *deletedAt
 		dbModel.DeletedAt.Valid = true
 	}
 	dbModel.GrantsExperience.Bool = appModel.GetGrantsExperience()
@@ -189,11 +193,107 @@ func (r *ChapterRepository) Filter(ctx context.Context, filter domains.ChapterFi
 	LIMIT $8 OFFSET $9;
 	`
 
-	if err = r.db.SelectContext(ctx, &dbResult, query, dbFilter.ID, dbFilter.LanguageID, dbFilter.CourseID, dbFilter.RewardID, dbFilter.Title, dbFilter.GrantsExperience, dbFilter.Active, limit, (page-1)*limit); err != nil {
+	if err = r.db.SelectContext(
+		ctx,
+		&dbResult,
+		query,
+		dbFilter.ID,
+		dbFilter.LanguageID,
+		dbFilter.CourseID,
+		dbFilter.RewardID,
+		dbFilter.Title,
+		dbFilter.GrantsExperience,
+		dbFilter.Active,
+		limit,
+		(page-1)*limit,
+	); err != nil {
 		return
 	}
 	for _, dbModel := range dbResult {
 		chapters = append(chapters, r.dbModelToAppModel(dbModel))
 	}
 	return
+}
+
+func (r *ChapterRepository) Add(ctx context.Context, chapter *domains.Chapter) (uuid.UUID, error) {
+	dbModel := r.dbModelFromAppModel(*chapter)
+	query := `
+		INSERT INTO
+			t_chapters (course_id, language_id, reward_id, reward_amount, title, description, content, func_name, frontend_template, docker_template, check_template, grants_experience, active)
+		VALUES
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+		RETURNING id
+	`
+
+	var id uuid.UUID
+	err := r.db.QueryRowxContext(
+		ctx,
+		query,
+		dbModel.CourseID,
+		dbModel.LanguageID,
+		dbModel.RewardID,
+		dbModel.RewardAmount,
+		dbModel.Title,
+		dbModel.Description,
+		dbModel.Content,
+		dbModel.FuncName,
+		dbModel.FrontendTmp,
+		dbModel.DockerTmp,
+		dbModel.CheckTmp,
+		dbModel.GrantsExperience,
+		dbModel.Active,
+	).Scan(&id)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return id, nil
+}
+
+func (r *ChapterRepository) Update(ctx context.Context, chapter *domains.Chapter) (err error) {
+	dbModel := r.dbModelFromAppModel(*chapter)
+	query := `
+		UPDATE
+			t_chapters
+		SET
+			course_id = COALESCE(:course_id, course_id),
+			language_id = COALESCE(:language_id, language_id),
+			reward_id = COALESCE(:reward_id, reward_id),
+			reward_amount =  COALESCE(:reward_amount, reward_amount),
+			title =  COALESCE(:title, title),
+			description =  COALESCE(:description, description),
+			content =  COALESCE(:content, content),
+			func_name =  COALESCE(:func_name, func_name),
+			frontend_template =  COALESCE(:frontend_template, frontend_template),
+			docker_template =  COALESCE(:docker_template, docker_template),
+			check_template =  COALESCE(:check_template, check_template),
+			grants_experience =  COALESCE(:grants_experience, grants_experience),
+			active =  COALESCE(:active, active)
+		WHERE
+			id = :id
+	`
+
+	_, err = r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *ChapterRepository) SoftDelete(ctx context.Context, id uuid.UUID) (err error) {
+	query := `
+		UPDATE
+			t_chapters
+		SET
+			deleted_at = $1
+		WHERE
+			id = $2
+	`
+	deletedAt := time.Now()
+
+	if _, err = r.db.ExecContext(ctx, query, deletedAt, id); err != nil {
+		return
+	}
+
+	return nil
 }

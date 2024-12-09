@@ -15,20 +15,21 @@ func NewChapterDTOManager() ChapterDTOManager {
 
 type ChapterDTO struct {
 	ID               uuid.UUID  `json:"id"`
-	CourseID         *uuid.UUID `json:"course_id"`
-	LanguageID       *uuid.UUID `json:"language_id"`
-	RewardID         *uuid.UUID `json:"reward_id"`
+	CourseID         uuid.UUID  `json:"courseID"`
+	LanguageID       uuid.UUID  `json:"languageID"`
+	RewardID         *uuid.UUID `json:"rewardID"`
+	RewardAmount     int        `json:"rewardAmount"`
 	Title            string     `json:"title"`
 	Description      string     `json:"description"`
 	Content          string     `json:"content"`
-	FuncName         string     `json:"func_name"`
-	FrontendTmp      string     `json:"frontend_template"`
-	DockerTmp        string     `json:"docker_template"`
+	FuncName         string     `json:"fundName"`
+	FrontendTmp      string     `json:"frontendTemplate"`
+	DockerTmp        string     `json:"dockerTemplate"`
 	CheckTmp         string     `json:"check_template"`
-	GrantsExperience bool       `json:"grants_experience"`
+	GrantsExperience bool       `json:"grantsExperience"`
 	Active           bool       `json:"active"`
-	CreatedAt        time.Time  `json:"created_at"`
-	DeletedAt        *time.Time `json:"deleted_at"`
+	CreatedAt        time.Time  `json:"createdAt"`
+	DeletedAt        *time.Time `json:"deletedAt"`
 }
 
 func (d *ChapterDTOManager) ToChapterDTO(appModel domains.Chapter) ChapterDTO {
@@ -37,6 +38,7 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel domains.Chapter) ChapterDTO {
 		CourseID:         appModel.GetCourseID(),
 		LanguageID:       appModel.GetLanguageID(),
 		RewardID:         appModel.GetRewardID(),
+		RewardAmount:     appModel.GetRewardAmount(),
 		Title:            appModel.GetTitle(),
 		Description:      appModel.GetDescription(),
 		Content:          appModel.GetContent(),
@@ -57,4 +59,37 @@ func (d *ChapterDTOManager) ToChapterDTOs(appModels []domains.Chapter) []Chapter
 		chapterDTOs = append(chapterDTOs, d.ToChapterDTO(model))
 	}
 	return chapterDTOs
+}
+
+type AddChapterDTO struct {
+	CourseID         string `json:"courseID"`
+	LanguageID       string `json:"languageID"`
+	RewardID         string `json:"rewardID"`
+	RewardAmount     int    `json:"rewardAmount" validate:"gte=1"`
+	Title            string `json:"title"`
+	Description      string `json:"description"`
+	Content          string `json:"content"`
+	FuncName         string `json:"fundName"`
+	FrontendTmp      string `json:"frontendTemplate"`
+	DockerTmp        string `json:"dockerTemplate"`
+	CheckTmp         string `json:"checkTemplate"`
+	GrantsExperience bool   `json:"grantsExperience"`
+	Active           bool   `json:"active"`
+}
+
+type UpdateChapterDTO struct {
+	ID               string `json:"id"`
+	CourseID         string `json:"courseID"`
+	LanguageID       string `json:"languageID"`
+	RewardID         string `json:"rewardID"`
+	RewardAmount     int    `json:"rewardAmount" validate:"gte=1"`
+	Title            string `json:"title"`
+	Description      string `json:"description"`
+	Content          string `json:"content"`
+	FuncName         string `json:"fundName"`
+	FrontendTmp      string `json:"frontendTemplate"`
+	DockerTmp        string `json:"dockerTemplate"`
+	CheckTmp         string `json:"checkTemplate"`
+	GrantsExperience bool   `json:"grantsExperience"`
+	Active           bool   `json:"active"`
 }

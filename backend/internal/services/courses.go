@@ -107,7 +107,7 @@ func (s *courseService) GetCourse(
 
 	courseChapters, _, err := s.chapterRepsitory.Filter(ctx, domains.ChapterFilter{
 		CourseID: course.GetID(),
-	}, int64(pageNum), int64(limitNum))
+	}, int64(limitNum), int64(pageNum))
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
 	}

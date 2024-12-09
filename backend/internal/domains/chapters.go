@@ -11,10 +11,34 @@ import (
 
 type IChapterRepository interface {
 	Filter(ctx context.Context, filter ChapterFilter, limit, page int64) (chapters []Chapter, dataCount int64, err error)
+	Add(ctx context.Context, chapter *Chapter) (uuid.UUID, error)
+	Update(ctx context.Context, chapter *Chapter) (err error)
+	SoftDelete(ctx context.Context, id uuid.UUID) (err error)
 }
 
 type IChapterService interface {
-	GetChapters(ctx context.Context, chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string) (chapters []Chapter, err error)
+	GetChapters(
+		ctx context.Context,
+		chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
+	) (chapters []Chapter, err error)
+	AddChapter(
+		ctx context.Context,
+		courseID, languageID, rewardID, title, description, content, funcName string,
+		frontendTmp, dockerTmp, checkTmp string,
+		grantsExperience, active bool,
+		rewardAmount int,
+	) (uuid.UUID, error)
+	UpdateChapter(
+		ctx context.Context,
+		id, courseID, languageID, rewardID, title, description, content, funcName string,
+		frontendTmp, dockerTmp, checkTmp string,
+		grantsExperience, active bool,
+		rewardAmount int,
+	) error
+	DeleteChapter(
+		ctx context.Context,
+		id string,
+	) (err error)
 }
 
 const (
@@ -23,9 +47,10 @@ const (
 
 type Chapter struct {
 	id               uuid.UUID
-	languageID       *uuid.UUID
-	courseID         *uuid.UUID
+	languageID       uuid.UUID
+	courseID         uuid.UUID
 	rewardID         *uuid.UUID
+	rewardAmount     int
 	title            string
 	description      string
 	content          string
@@ -50,17 +75,22 @@ type ChapterFilter struct {
 }
 
 func NewChapter(
-	id uuid.UUID,
-	languageID, courseID, rewardID *uuid.UUID,
-	title, description, content, funcName, frontendTmp, dockerTmp, checkTmp string,
+	id, languageID, courseID, rewardID, title, description, content, funcName, frontendTmp, dockerTmp, checkTmp string,
+	rewardAmount int,
 	grantsExperience, active bool,
-	createdAt time.Time,
-	deletedAt *time.Time,
 ) (chapter *Chapter, err error) {
+	chapter = &Chapter{}
+
+	if err = chapter.SetID(id); err != nil {
+		return
+	}
 	if err = chapter.SetTitle(title); err != nil {
 		return
 	}
 	if err = chapter.SetFuncName(funcName); err != nil {
+		return
+	}
+	if err = chapter.SetRewardAmount(rewardAmount); err != nil {
 		return
 	}
 
@@ -73,15 +103,14 @@ func NewChapter(
 	chapter.SetDockerTmp(dockerTmp)
 	chapter.SetCheckTmp(checkTmp)
 	chapter.SetGrantsExperience(grantsExperience)
-	chapter.SetActive(active)
-	chapter.SetDeletedAt(deletedAt)
 
 	return
 }
 
 func (c *Chapter) Unmarshal(
-	id uuid.UUID,
-	languageID, courseID, rewardID *uuid.UUID,
+	id, languageID, courseID uuid.UUID,
+	rewardID *uuid.UUID,
+	rewardAmount int,
 	title, description, content, funcName, frontendTmp, dockerTmp, checkTmp string,
 	grantsExperience, active bool,
 	createdAt time.Time,
@@ -91,6 +120,7 @@ func (c *Chapter) Unmarshal(
 	c.languageID = languageID
 	c.courseID = courseID
 	c.rewardID = rewardID
+	c.rewardAmount = rewardAmount
 	c.title = title
 	c.description = description
 	c.content = content
@@ -109,16 +139,20 @@ func (c *Chapter) GetID() uuid.UUID {
 	return c.id
 }
 
-func (c *Chapter) GetCourseID() *uuid.UUID {
+func (c *Chapter) GetCourseID() uuid.UUID {
 	return c.courseID
 }
 
-func (c *Chapter) GetLanguageID() *uuid.UUID {
+func (c *Chapter) GetLanguageID() uuid.UUID {
 	return c.languageID
 }
 
 func (c *Chapter) GetRewardID() *uuid.UUID {
 	return c.rewardID
+}
+
+func (c *Chapter) GetRewardAmount() int {
+	return c.rewardAmount
 }
 
 func (c *Chapter) GetTitle() string {
@@ -166,22 +200,66 @@ func (c *Chapter) GetDeletedAt() *time.Time {
 }
 
 // Setter
-func (c *Chapter) SetCourseID(courseID *uuid.UUID) {
-	c.courseID = courseID
+func (c *Chapter) SetID(id string) error {
+	if id != "" {
+		idUUID, err := uuid.Parse(id)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		c.id = idUUID
+	}
+
+	return nil
 }
 
-func (c *Chapter) SetLanguageID(languageID *uuid.UUID) {
-	c.languageID = languageID
+func (d *Chapter) SetCourseID(courseID string) error {
+	if courseID != "" {
+		courseUUID, err := uuid.Parse(courseID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.courseID = courseUUID
+	}
+
+	return nil
 }
 
-func (c *Chapter) SetRewardID(rewardID *uuid.UUID) {
-	c.rewardID = rewardID
+func (d *Chapter) SetLanguageID(languageID string) error {
+	if languageID != "" {
+		idUUID, err := uuid.Parse(languageID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		d.languageID = idUUID
+	}
+
+	return nil
+}
+
+func (c *Chapter) SetRewardID(rewardID string) error {
+	if rewardID == "" {
+		c.rewardID = nil
+	} else {
+		idUUID, err := uuid.Parse(rewardID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		c.rewardID = &idUUID
+	}
+
+	return nil
+}
+
+func (c *Chapter) SetRewardAmount(rewardAmount int) (err error) {
+	if rewardAmount < 0 {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseRewardAmountCannotBeNegative)
+	}
+	c.rewardAmount = rewardAmount
+
+	return nil
 }
 
 func (c *Chapter) SetTitle(title string) error {
-	if title == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrChapterTitleCannotBeEmpty)
-	}
 	if len(title) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrChapterTitleTooLong)
 	}
@@ -198,9 +276,6 @@ func (c *Chapter) SetContent(content string) {
 }
 
 func (c *Chapter) SetFuncName(funcName string) error {
-	if funcName == "" {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrChapterFuncNameCannotBeEmpty)
-	}
 	if len(funcName) > 30 {
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrChapterFuncNameTooLong)
 	}
