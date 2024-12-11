@@ -14,6 +14,86 @@ definitions:
     - traitType
     - value
     type: object
+  dto.AddChapterDTO:
+    properties:
+      active:
+        type: boolean
+      checkTemplate:
+        type: string
+      content:
+        type: string
+      courseID:
+        type: string
+      description:
+        type: string
+      dockerTemplate:
+        type: string
+      frontendTemplate:
+        type: string
+      fundName:
+        type: string
+      grantsExperience:
+        type: boolean
+      languageID:
+        type: string
+      rewardAmount:
+        minimum: 1
+        type: integer
+      rewardID:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.AddCourseDTO:
+    properties:
+      description:
+        type: string
+      imagePath:
+        type: string
+      languageID:
+        type: string
+      programmingLanguageID:
+        type: string
+      rewardAmount:
+        minimum: 1
+        type: integer
+      rewardID:
+        type: string
+      title:
+        maxLength: 60
+        type: string
+    required:
+    - programmingLanguageID
+    - title
+    type: object
+  dto.AddPLanguageDTO:
+    properties:
+      compileCMD:
+        type: string
+      description:
+        type: string
+      downloadCMD:
+        type: string
+      fileExtention:
+        maxLength: 30
+        type: string
+      imagePath:
+        maxLength: 60
+        type: string
+      languageID:
+        type: string
+      monacoEditor:
+        maxLength: 30
+        type: string
+      name:
+        maxLength: 30
+        type: string
+    required:
+    - fileExtention
+    - imagePath
+    - monacoEditor
+    - name
+    type: object
   dto.AddRewardDTO:
     properties:
       Description:
@@ -51,6 +131,80 @@ definitions:
         type: string
       value:
         maxLength: 30
+        type: string
+    type: object
+  dto.UpdateChapterDTO:
+    properties:
+      active:
+        type: boolean
+      checkTemplate:
+        type: string
+      content:
+        type: string
+      courseID:
+        type: string
+      description:
+        type: string
+      dockerTemplate:
+        type: string
+      frontendTemplate:
+        type: string
+      fundName:
+        type: string
+      grantsExperience:
+        type: boolean
+      id:
+        type: string
+      languageID:
+        type: string
+      rewardAmount:
+        minimum: 1
+        type: integer
+      rewardID:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.UpdateCourseDTO:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      imagePath:
+        type: string
+      languageID:
+        type: string
+      programmingLanguageID:
+        type: string
+      rewardAmount:
+        minimum: 1
+        type: integer
+      rewardID:
+        type: string
+      title:
+        maxLength: 60
+        type: string
+    type: object
+  dto.UpdatePLanguageDTO:
+    properties:
+      compileCMD:
+        type: string
+      description:
+        type: string
+      downloadCMD:
+        type: string
+      fileExtention:
+        type: string
+      id:
+        type: string
+      imagePath:
+        type: string
+      languageID:
+        type: string
+      monacoEditor:
+        type: string
+      name:
         type: string
     type: object
   dto.UpdateRewardDTO:
@@ -207,15 +361,58 @@ paths:
       summary: Add Attribute
       tags:
       - Attribute
-  /private/admin/rewards/:
+  /private/admin/chapters/:
+    patch:
+      consumes:
+      - application/json
+      description: Updates Chapter Into DB.
+      parameters:
+      - description: Update Chapters
+        in: body
+        name: updateChapter
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateChapterDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Chapter
+      tags:
+      - Chapters
+    post:
+      consumes:
+      - application/json
+      description: Adds Chapter Into DB.
+      parameters:
+      - description: New Chapter
+        in: body
+        name: newChapter
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddChapterDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Chapter
+      tags:
+      - Chapters
+  /private/admin/chapters/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete Rewards from DB.
+      description: Delete Chapters from DB.
       parameters:
-      - description: Reward ID
-        in: query
-        name: rewardID
+      - description: Chapter ID
+        in: path
+        name: id
         type: string
       produces:
       - application/json
@@ -224,9 +421,136 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.BaseResponse'
-      summary: Delete Reward
+      summary: Delete Chapter
       tags:
-      - Reward
+      - Chapters
+  /private/admin/courses/:
+    patch:
+      consumes:
+      - application/json
+      description: Updates Course Into DB.
+      parameters:
+      - description: Update Course
+        in: body
+        name: updateCourse
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCourseDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Course
+      tags:
+      - Courses
+    post:
+      consumes:
+      - application/json
+      description: Adds Course Into DB.
+      parameters:
+      - description: New Course
+        in: body
+        name: newCourse
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddCourseDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Course
+      tags:
+      - Courses
+  /private/admin/courses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Courses from DB.
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Course
+      tags:
+      - Courses
+  /private/admin/planguages/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Programming Languages from DB.
+      parameters:
+      - description: Programming Language ID
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Programming Language
+      tags:
+      - Programming Language
+    patch:
+      consumes:
+      - application/json
+      description: Updates Programming Language Into DB.
+      parameters:
+      - description: Update Programming Language
+        in: body
+        name: updatePLanguage
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePLanguageDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Programming Language
+      tags:
+      - Programming Language
+    post:
+      consumes:
+      - application/json
+      description: Adds Programming Language Into DB.
+      parameters:
+      - description: New Programming Language
+        in: body
+        name: newPLanguage
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddPLanguageDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Programming Language
+      tags:
+      - Programming Language
+  /private/admin/rewards/:
     patch:
       consumes:
       - application/json
@@ -267,6 +591,26 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Add Reward
+      tags:
+      - Reward
+  /private/admin/rewards/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Rewards from DB.
+      parameters:
+      - description: Reward ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Reward
       tags:
       - Reward
   /private/admin/user:
@@ -388,7 +732,7 @@ paths:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Chapters
       tags:
-      - Chapter
+      - Chapters
   /private/courses/:
     get:
       consumes:
@@ -429,6 +773,34 @@ paths:
       summary: Get All Courses
       tags:
       - Courses
+  /private/courses/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves one course.
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        type: string
+      - description: Chapter Page
+        in: query
+        name: page
+        type: string
+      - description: Chapter Attribute Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get Course By ID
+      tags:
+      - Courses
   /private/language/:
     get:
       consumes:
@@ -453,7 +825,7 @@ paths:
       summary: Get All Languages
       tags:
       - Language
-  /private/programmingLanguages/:
+  /private/planguages/:
     get:
       consumes:
       - application/json
@@ -488,6 +860,27 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Programming Languages
+      tags:
+      - Programming Language
+  /private/planguages/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves spesific Programming languages based on the provided
+        query parameters.
+      parameters:
+      - description: Programming Language ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get One Programming Language By ID
       tags:
       - Programming Language
   /private/rewards/:

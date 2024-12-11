@@ -9,12 +9,15 @@ const (
 
 // 404
 const (
-	ErrLanguageNotFound        = "LANGUAGE_NOT_FOUND"
-	ErrLanguageDefaultNotFound = "DEFAULT_LANGUAGE_NOT_FOUND"
-	ErrUserProfileNotFound     = "USER_PROFILE_NOT_FOUND"
-	ErrRoleNotFound            = "ROLE_NOT_FOUND"
-	ErrRewardNotFound          = "REWARD_NOT_FOUND"
-	ErrRewardAttributeNotFound = "REWARD_ATTRIBUTE_NOT_FOUND"
+	ErrLanguageNotFound            = "LANGUAGE_NOT_FOUND"
+	ErrCourseNotFound              = "COURSE_NOT_FOUND"
+	ErrProgrammingLanguageNotFound = "PROGRAMMING_LANGUAGE_NOT_FOUND"
+	ErrLanguageDefaultNotFound     = "DEFAULT_LANGUAGE_NOT_FOUND"
+	ErrUserProfileNotFound         = "USER_PROFILE_NOT_FOUND"
+	ErrRoleNotFound                = "ROLE_NOT_FOUND"
+	ErrRewardNotFound              = "REWARD_NOT_FOUND"
+	ErrRewardAttributeNotFound     = "REWARD_ATTRIBUTE_NOT_FOUND"
+	ErrChapterNotFound             = "CHAPTER_NOT_FOUND"
 )
 
 // 400
@@ -65,6 +68,7 @@ const (
 	ErrCourseImagePathTooLong       = "COURSE_IMAGE_PATH_IS_TOO_LONG"
 
 	ErrCourseRewardAmountCannotBeNegative = "COURSE_REWARD_AMOUNT_CANNOT_BE_NEGATIVE"
+	ErrCourseRewardAmountEnterInteger     = "COURSE_REWARD_AMAOUNT_HAS_TO_BE_INTEGER_VALUE"
 
 	ErrChapterTitleCannotBeEmpty = "CHAPTER_TITLE_CANNOT_BE_EMPTY"
 	ErrChapterTitleTooLong       = "CHAPTER_TITLE_IS_TOO_LONG"

@@ -14,19 +14,21 @@ func NewCourseDTOManager() CourseDTOManager {
 }
 
 type CourseDTO struct {
-	ID           uuid.UUID  `json:"id"`
-	LanguageID   *uuid.UUID `json:"languageID"`
-	PLanguageID  *uuid.UUID `json:"programmingLanguageID"`
-	RewardID     *uuid.UUID `json:"rewardID"`
-	RewardAmount int        `json:"rewardAmount"`
-	Title        string     `json:"title"`
-	Description  string     `json:"description"`
-	ImagePath    string     `json:"imagePath"`
-	CreatedAt    time.Time  `json:"createdAt"`
-	DeletedAt    time.Time  `json:"deletedAt"`
+	ID           uuid.UUID    `json:"id"`
+	LanguageID   uuid.UUID    `json:"languageID"`
+	PLanguageID  uuid.UUID    `json:"programmingLanguageID"`
+	RewardID     *uuid.UUID   `json:"rewardID"`
+	RewardAmount int          `json:"rewardAmount"`
+	Title        string       `json:"title"`
+	Description  string       `json:"description"`
+	ImagePath    string       `json:"imagePath"`
+	CreatedAt    time.Time    `json:"createdAt"`
+	DeletedAt    time.Time    `json:"deletedAt"`
+	Chapters     []ChapterDTO `json:"chapters"`
 }
 
 func (d *CourseDTOManager) ToCourseDTO(appModel domains.Course) CourseDTO {
+	chapterDTOManager := new(ChapterDTOManager)
 	return CourseDTO{
 		ID:           appModel.GetID(),
 		LanguageID:   appModel.GetLanguageID(),
@@ -38,6 +40,7 @@ func (d *CourseDTOManager) ToCourseDTO(appModel domains.Course) CourseDTO {
 		ImagePath:    appModel.GetImagePath(),
 		CreatedAt:    appModel.GetCreatedAt(),
 		DeletedAt:    appModel.GetDeletedAt(),
+		Chapters:     chapterDTOManager.ToChapterDTOs(appModel.GetChapters()),
 	}
 }
 
@@ -48,4 +51,25 @@ func (d *CourseDTOManager) ToCourseDTOs(appModels []domains.Course) []CourseDTO 
 	}
 
 	return courseDTOs
+}
+
+type AddCourseDTO struct {
+	LanguageID   string `json:"languageID"`
+	PLanguageID  string `json:"programmingLanguageID" validate:"required,uuid4"`
+	RewardID     string `json:"rewardID"`
+	RewardAmount int    `json:"rewardAmount" validate:"gte=1"`
+	Title        string `json:"title" validate:"required,max=60"`
+	Description  string `json:"description"`
+	ImagePath    string `json:"imagePath"`
+}
+
+type UpdateCourseDTO struct {
+	ID           string `json:"id"`
+	LanguageID   string `json:"languageID"`
+	PLanguageID  string `json:"programmingLanguageID"`
+	RewardID     string `json:"rewardID"`
+	RewardAmount int    `json:"rewardAmount" validate:"gte=1"`
+	Title        string `json:"title" validate:"max=60"`
+	Description  string `json:"description"`
+	ImagePath    string `json:"imagePath"`
 }

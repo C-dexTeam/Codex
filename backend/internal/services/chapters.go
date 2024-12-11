@@ -99,3 +99,114 @@ func (s *chapterService) GetChapters(
 
 	return
 }
+
+func (s *chapterService) AddChapter(
+	ctx context.Context,
+	courseID, languageID, rewardID, title, description, content, funcName string,
+	frontendTmp, dockerTmp, checkTmp string,
+	grantsExperience, active bool,
+	rewardAmount int,
+) (uuid.UUID, error) {
+	newChapter, err := domains.NewChapter(
+		"",
+		languageID,
+		courseID,
+		rewardID,
+		title,
+		description,
+		content,
+		funcName,
+		frontendTmp,
+		dockerTmp,
+		checkTmp,
+		rewardAmount,
+		grantsExperience,
+		active,
+	)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	id, err := s.chapterRepository.Add(ctx, newChapter)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return id, nil
+}
+
+func (s *chapterService) UpdateChapter(
+	ctx context.Context,
+	id, courseID, languageID, rewardID, title, description, content, funcName string,
+	frontendTmp, dockerTmp, checkTmp string,
+	grantsExperience, active bool,
+	rewardAmount int,
+) error {
+	var idUUID uuid.UUID
+	idUUID, err := uuid.Parse(id)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	}
+
+	rewards, _, err := s.chapterRepository.Filter(ctx, domains.ChapterFilter{
+		ID: idUUID,
+	}, 1, 1)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
+	}
+	if len(rewards) != 1 {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrChapterNotFound)
+	}
+
+	updateChapter, err := domains.NewChapter(
+		id,
+		languageID,
+		courseID,
+		rewardID,
+		title,
+		description,
+		content,
+		funcName,
+		frontendTmp,
+		dockerTmp,
+		checkTmp,
+		rewardAmount,
+		grantsExperience,
+		active,
+	)
+	if err != nil {
+		return err
+	}
+
+	if err := s.chapterRepository.Update(ctx, updateChapter); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *chapterService) DeleteChapter(
+	ctx context.Context,
+	id string,
+) (err error) {
+	var idUUID uuid.UUID
+	idUUID, err = uuid.Parse(id)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	}
+
+	chapters, _, err := s.chapterRepository.Filter(ctx, domains.ChapterFilter{
+		ID: idUUID,
+	}, 1, 1)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
+	}
+	if len(chapters) != 1 {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrChapterNotFound, err)
+	}
+
+	if err = s.chapterRepository.SoftDelete(ctx, idUUID); err != nil {
+		return
+	}
+	return
+}

@@ -1,6 +1,7 @@
 package private
 
 import (
+	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
 )
@@ -9,6 +10,12 @@ func (h *PrivateHandler) initRewardsRoutes(root fiber.Router) {
 	rewardsRoutes := root.Group("/rewards")
 	rewardsRoutes.Get("/", h.GetRewards)
 	rewardsRoutes.Get("/:id", h.GetReward)
+
+	rewardAdminRoutes := root.Group("/admin/rewards")
+	rewardAdminRoutes.Use(h.adminRoleMiddleware)
+	rewardAdminRoutes.Post("/", h.AddReward)
+	rewardAdminRoutes.Delete("/", h.DeleteReward)
+	rewardAdminRoutes.Patch("/", h.UpdateReward)
 }
 
 // @Tags Reward
@@ -63,4 +70,88 @@ func (h *PrivateHandler) GetReward(c *fiber.Ctx) error {
 	rewardDTO := h.dtoManager.RewardManager().ToRewardDTO(reward)
 
 	return response.Response(200, "Status OK", rewardDTO)
+}
+
+// @Tags Reward
+// @Summary Add Reward
+// @Description Adds Reward Into DB.
+// @Accept json
+// @Produce json
+// @Param newReward body dto.AddRewardDTO true "New Reward"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/admin/rewards/ [post]
+func (h *PrivateHandler) AddReward(c *fiber.Ctx) error {
+	var newReward dto.AddRewardDTO
+	if err := c.BodyParser(&newReward); err != nil {
+		return err
+	}
+	if err := h.services.UtilService().Validator().ValidateStruct(newReward); err != nil {
+		return err
+	}
+
+	id, err := h.services.RewardService().AddReward(
+		c.Context(),
+		newReward.RewardType,
+		newReward.Symbol,
+		newReward.Name,
+		newReward.Description,
+		newReward.ImagePath,
+		newReward.URI,
+	)
+	if err != nil {
+		return err
+	}
+
+	return response.Response(200, "Status OK", id)
+}
+
+// @Tags Reward
+// @Summary Update Reward
+// @Description Updates Reward Into DB.
+// @Accept json
+// @Produce json
+// @Param updateReward body dto.UpdateRewardDTO true "Update Reward"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/admin/rewards/ [patch]
+func (h *PrivateHandler) UpdateReward(c *fiber.Ctx) error {
+	var updateReward dto.UpdateRewardDTO
+	if err := c.BodyParser(&updateReward); err != nil {
+		return err
+	}
+	if err := h.services.UtilService().Validator().ValidateStruct(updateReward); err != nil {
+		return err
+	}
+
+	err := h.services.RewardService().UpdateReward(
+		c.Context(),
+		updateReward.ID,
+		updateReward.RewardType,
+		updateReward.Symbol,
+		updateReward.Name,
+		updateReward.Description,
+		updateReward.ImagePath,
+		updateReward.URI,
+	)
+	if err != nil {
+		return err
+	}
+
+	return response.Response(200, "Status OK", nil)
+}
+
+// @Tags Reward
+// @Summary Delete Reward
+// @Description Delete Rewards from DB.
+// @Accept json
+// @Produce json
+// @Param id path string false "Reward ID"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/admin/rewards/{id} [delete]
+func (h *PrivateHandler) DeleteReward(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	if err := h.services.RewardService().DeleteReward(c.Context(), id); err != nil {
+		return err
+	}
+	return response.Response(200, "Status OK", nil)
 }

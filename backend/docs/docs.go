@@ -110,6 +110,296 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/admin/chapters/": {
+            "post": {
+                "description": "Adds Chapter Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Add Chapter",
+                "parameters": [
+                    {
+                        "description": "New Chapter",
+                        "name": "newChapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddChapterDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates Chapter Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Update Chapter",
+                "parameters": [
+                    {
+                        "description": "Update Chapters",
+                        "name": "updateChapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateChapterDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/chapters/{id}": {
+            "delete": {
+                "description": "Delete Chapters from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Delete Chapter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/courses/": {
+            "post": {
+                "description": "Adds Course Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Add Course",
+                "parameters": [
+                    {
+                        "description": "New Course",
+                        "name": "newCourse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddCourseDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates Course Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Update Course",
+                "parameters": [
+                    {
+                        "description": "Update Course",
+                        "name": "updateCourse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateCourseDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/courses/{id}": {
+            "delete": {
+                "description": "Delete Courses from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Delete Course",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/planguages/": {
+            "post": {
+                "description": "Adds Programming Language Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Add Programming Language",
+                "parameters": [
+                    {
+                        "description": "New Programming Language",
+                        "name": "newPLanguage",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddPLanguageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Programming Languages from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Delete Programming Language",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Programming Language ID",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates Programming Language Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Update Programming Language",
+                "parameters": [
+                    {
+                        "description": "Update Programming Language",
+                        "name": "updatePLanguage",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdatePLanguageDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/admin/rewards/": {
             "post": {
                 "description": "Adds Reward Into DB.",
@@ -143,35 +433,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "delete": {
-                "description": "Delete Rewards from DB.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Reward"
-                ],
-                "summary": "Delete Reward",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Reward ID",
-                        "name": "rewardID",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.BaseResponse"
-                        }
-                    }
-                }
-            },
             "patch": {
                 "description": "Updates Reward Into DB.",
                 "consumes": [
@@ -193,6 +454,37 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.UpdateRewardDTO"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/rewards/{id}": {
+            "delete": {
+                "description": "Delete Rewards from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reward"
+                ],
+                "summary": "Delete Reward",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -325,7 +617,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chapter"
+                    "Chapters"
                 ],
                 "summary": "Get All Chapters",
                 "parameters": [
@@ -449,6 +741,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/courses/{id}": {
+            "get": {
+                "description": "Retrieves one course.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get Course By ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chapter Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chapter Attribute Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/language/": {
             "get": {
                 "description": "Retrieves all languages based on the provided query parameters.",
@@ -486,7 +821,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/programmingLanguages/": {
+        "/private/planguages/": {
             "get": {
                 "description": "Retrieves all Programming languages based on the provided query parameters.",
                 "consumes": [
@@ -529,6 +864,37 @@ const docTemplate = `{
                         "description": "Limit",
                         "name": "limit",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/planguages/{id}": {
+            "get": {
+                "description": "Retrieves spesific Programming languages based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Get One Programming Language By ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Programming Language ID",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -878,6 +1244,122 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AddChapterDTO": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "checkTemplate": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "courseID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dockerTemplate": {
+                    "type": "string"
+                },
+                "frontendTemplate": {
+                    "type": "string"
+                },
+                "fundName": {
+                    "type": "string"
+                },
+                "grantsExperience": {
+                    "type": "boolean"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AddCourseDTO": {
+            "type": "object",
+            "required": [
+                "programmingLanguageID",
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "programmingLanguageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 60
+                }
+            }
+        },
+        "dto.AddPLanguageDTO": {
+            "type": "object",
+            "required": [
+                "fileExtention",
+                "imagePath",
+                "monacoEditor",
+                "name"
+            ],
+            "properties": {
+                "compileCMD": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "downloadCMD": {
+                    "type": "string"
+                },
+                "fileExtention": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "imagePath": {
+                    "type": "string",
+                    "maxLength": 60
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "monacoEditor": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 30
+                }
+            }
+        },
         "dto.AddRewardDTO": {
             "type": "object",
             "required": [
@@ -929,6 +1411,117 @@ const docTemplate = `{
                 "value": {
                     "type": "string",
                     "maxLength": 30
+                }
+            }
+        },
+        "dto.UpdateChapterDTO": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "checkTemplate": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "courseID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dockerTemplate": {
+                    "type": "string"
+                },
+                "frontendTemplate": {
+                    "type": "string"
+                },
+                "fundName": {
+                    "type": "string"
+                },
+                "grantsExperience": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateCourseDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "programmingLanguageID": {
+                    "type": "string"
+                },
+                "rewardAmount": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "rewardID": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 60
+                }
+            }
+        },
+        "dto.UpdatePLanguageDTO": {
+            "type": "object",
+            "properties": {
+                "compileCMD": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "downloadCMD": {
+                    "type": "string"
+                },
+                "fileExtention": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imagePath": {
+                    "type": "string"
+                },
+                "languageID": {
+                    "type": "string"
+                },
+                "monacoEditor": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS t_chapters (
     course_id UUID DEFAULT NULL,
     language_id UUID DEFAULT NULL,
     reward_id UUID DEFAULT NULL,
+    reward_amount INT NOT NULL DEFAULT 1,
     title VARCHAR(30) NOT NULL,
     description TEXT NOT NULL,
     content TEXT NOT NULL,
