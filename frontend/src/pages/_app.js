@@ -26,6 +26,7 @@ import '../styles/main.css'
 import ThemeComponent from '@/layout/ThemeComponent'
 import WindowWrapper from '@/components/window-wrapper'
 import AclGuard from '@/layout/auth/AclGuard'
+import { Wallet } from '@/layout/auth/Wallet'
 
 // ** Pace Loader
 if (themeConfig.routingLoader) {
@@ -68,21 +69,23 @@ const App = props => {
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
 
-      <AuthProvider>
-        <ThemeComponent>
-          <WindowWrapper>
-            <Guard authGuard={authGuard} guestGuard={guestGuard}>
-              <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
-                {getLayout(<Component {...pageProps} />)}
-              </AclGuard>
-            </Guard>
-          </WindowWrapper>
+      <Wallet>
+        <AuthProvider>
+          <ThemeComponent>
+            <WindowWrapper>
+              <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
+                  {getLayout(<Component {...pageProps} />)}
+                </AclGuard>
+              </Guard>
+            </WindowWrapper>
 
-          <ReactHotToast>
-            <Toaster position={themeConfig.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
-          </ReactHotToast>
-        </ThemeComponent>
-      </AuthProvider>
+            <ReactHotToast>
+              <Toaster position={themeConfig.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
+            </ReactHotToast>
+          </ThemeComponent>
+        </AuthProvider>
+      </Wallet>
     </Provider>
   )
 }

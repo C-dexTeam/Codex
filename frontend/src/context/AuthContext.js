@@ -6,10 +6,23 @@ import { useRouter } from 'next/router'
 import authConfig from '@/configs/auth'
 import axios from 'axios'
 import { showToast } from '@/utils/showToast'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import { SigninMessage } from '@/layout/auth/Wallet/SignInMessage'
+import { binary_to_base58 } from 'base58-js'
+import { t } from 'i18next'
 
 // ** Defaults
 const defaultProvider = {
-  user: null,
+  user: {
+    id: null,
+    username: "user",
+    email: null,
+    name: "Space",
+    surname: "Hunter",
+    roleID: null,
+    role: "public",
+  },
   loading: true,
   setUser: () => null,
   setLoading: () => Boolean,
@@ -29,15 +42,20 @@ const AuthProvider = ({ children }) => {
   // ** Hooks
   const router = useRouter()
 
+  // ** Wallet
+  const wallet = useWallet();
+  const { disconnect } = useWallet();
+  const walletModal = useWalletModal();
+
   const createSessionData = (data) => {
     const userData = {
-      id: data.userID,
-      username: data.username,
-      email: data.email,
-      name: data.name,
-      surname: data.surname,
-      roleID: data.roleID,
-      role: data.roleName || data.role,
+      id: data?.userID || defaultProvider.id,
+      username: data?.username || defaultProvider.username,
+      email: data?.email || defaultProvider.email,
+      name: data?.name || defaultProvider.name,
+      surname: data?.surname || defaultProvider.surname,
+      roleID: data?.roleID || defaultProvider.roleID,
+      role: data?.roleName || data?.role || defaultProvider.role,
     }
 
     return userData
@@ -45,7 +63,6 @@ const AuthProvider = ({ children }) => {
 
   const createSession = (data) => {
     const userData = createSessionData(data)
-    console.log("userData", userData);
 
     setUser(userData) // Set the user data to the state
     localStorage.setItem(authConfig.session, JSON.stringify(userData)) // Set the user data to the local storage
@@ -75,6 +92,18 @@ const AuthProvider = ({ children }) => {
 
     // const firstPath = router.pathname.split('/')[1]
     // if (firstPath != 'login') window.location.href = '/login'
+  }
+
+  const restoreStorage = () => {
+    setUser(defaultProvider.user)
+    setLoading(false)
+    localStorage.setItem(authConfig.session, JSON.stringify(defaultProvider.user))
+  }
+
+  const openSignIn = () => {
+    console.log("wallet.connected", wallet.connected);
+
+    if (wallet.connected) handleSignIn();
   }
 
   /** Handle User Login Function
@@ -120,6 +149,70 @@ const AuthProvider = ({ children }) => {
         console.error(error) // Log the error to the console
         deleteStorage() // Delete the user data
       })
+  }
+
+  /**
+   * 
+   * @param {String} message
+   * @param {String} publicKeyBase58
+   * @param {String} signatureBase58
+   */
+  const handleWalletLogin = async (data) => {
+    try {
+      const response = await axios({
+        url: authConfig.wallet,
+        method: "POST",
+        data: data,
+      });
+
+      if (response.status === 200) {
+        const user = response?.data?.data;
+        createSession(user);
+
+        showToast("dismiss");
+        showToast("success", "Logged in successfully");
+      } else {
+        showToast("dismiss");
+        showToast("error", response.data.message);
+      }
+    } catch (error) {
+      showToast("dismiss");
+      showToast("error", t(error?.response?.data?.message));
+    }
+  };
+
+  const handleSignIn = async () => {
+    try {
+      // if wallet is not connected then show wallet modal
+      if (!wallet.connected) walletModal.setVisible(true)
+
+      // if wallet public key or signMessage is not available then return
+      if (!wallet.publicKey || !wallet.signMessage) return;
+
+      const pKey = localStorage.getItem(authConfig.publicKey) || null;
+      // if user already logged in do not then return 
+      if (user?.publicKey && pKey) return;
+
+      // create a new SigninMessage object
+      const message = new SigninMessage({
+        domain: window.location.host,
+        publicKey: wallet.publicKey.toBase58(),
+        statement: `Sign in to ${window.location.host}`,
+      });
+
+      const data = new TextEncoder().encode(message.prepare()); // encode the message
+      const signature = await wallet.signMessage(data); // sign the message
+      const serializedSignature = binary_to_base58(signature); // convert the signature to base58
+
+      // call the handleWalletLogin function with the message, public key and signature to communicate with the backend
+      handleWalletLogin({
+        message: message.statement, // message statement in plain text
+        publicKeyBase58: wallet.publicKey, // public key in base58
+        signatureBase58: serializedSignature, // signature in base58
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   //** Handle User Logout Function
@@ -179,7 +272,7 @@ const AuthProvider = ({ children }) => {
           showToast("dismiss") // Dismiss the previous toast if it exists
           showToast("success", response.data?.message) // Show the success message
 
-          router.push("/login") // Redirect the user to the login page
+          // router.push("/login") // Redirect the user to the login page
 
           setLoading(false) // Set loading to false
         } else {
@@ -221,23 +314,24 @@ const AuthProvider = ({ children }) => {
           showToast("dismiss") // Dismiss the previous toast if it exists
           showToast("error", response.data?.message) // Show the error message
 
-          deleteStorage() // Delete the user data
-          router.push("/") // Redirect the user to the login
-          setLoading(false) // Set loading to false
+          restoreStorage() // Restore the user data
         }
       })
       .catch(error => {
         console.error(error) // Log the error to the console
-        deleteStorage() // Delete the user data
-        setLoading(false) // Set loading to false
-        // router.push("/") // Redirect the user to the login
+        restoreStorage() // Restore the user data
       })
   }
 
   useEffect(() => {
-    // ** Check user's auth when the page is refreshed
-    refreshAuth()
-  }, [])
+    // if (!wallet.connected && user?.publicKey) {
+    //   handleLogout()
+    //   return
+    // }
+
+    if (wallet.connected) openSignIn()
+    else refreshAuth();
+  }, [wallet]);
 
   const values = {
     user,

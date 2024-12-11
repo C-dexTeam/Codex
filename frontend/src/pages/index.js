@@ -1,18 +1,6 @@
-// ** React Imports
-import { useEffect } from 'react'
 
-// ** Layout Import
-import BlankLayout from '@/layout/BlankLayout'
-
-// ** Next Imports
-import { useRouter } from 'next/router'
-
-// ** Spinner Import
-import Spinner from '@/components/spinner'
-
-// ** Hook Imports
-import { useAuth } from '@/hooks/useAuth'
 import authConfig from '@/configs/auth'
+import HomePage from "@/views/home"
 
 export const getHomeRoute = role => {
   const homeRoute = authConfig.homeRoute[role]
@@ -21,28 +9,33 @@ export const getHomeRoute = role => {
 
 const Home = () => {
   // ** Hooks
-  const auth = useAuth()
-  const router = useRouter()
+  // const auth = useAuth()
+  // const router = useRouter()
 
-  useEffect(() => {
-    if (!router.isReady) {
-      return
-    }
+  // useEffect(() => {
+  //   if (!router.isReady) {
+  //     return
+  //   }
 
-    if (auth.user && auth.user.role) {
-      const homeRoute = getHomeRoute(auth.user.role)
+  //   if (auth.user && auth.user.role) {
+  //     const homeRoute = getHomeRoute(auth.user.role)
 
-      // Redirect user to Home URL
-      router.replace(homeRoute)
-    } else {
-      // Redirect user to Login URL
-      router.replace('/login')
-    }
-  }, [])
+  //     // Redirect user to Home URL
+  //     router.replace(homeRoute)
+  //   } else {
+  //     // Redirect user to Login URL
+  //     router.replace('/login')
+  //   }
+  // }, [])
 
-  return <Spinner />
+  return (<HomePage />)
 }
 
-Home.getLayout = page => <BlankLayout>{page}</BlankLayout>
+// Home.getLayout = page => <BlankLayout>{page}</BlankLayout>
 
+// Home.authGuard = false
+Home.acl = {
+  action: 'read',
+  permission: 'home'
+}
 export default Home

@@ -36,8 +36,8 @@ const defineRulesFor = (role, permission, permissions) => {
       can(['read'], memberPermissions)
       break
 
-    case 'nowallet-member':
-      can(['read'], memberPermissions)
+    case 'public':
+      can(['read'], "home")
       break
 
     case 'First-Login':

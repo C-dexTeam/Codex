@@ -7,12 +7,13 @@ const authConfig = {
   register: baseUrl + '/public/register',
   wallet: baseUrl + '/public/wallet',
 
+  publicKey: 'publicKey',
   session: 'userSession',
 
   homeRoute: {
     'First-Login': '/register/wallet',
-    'nowallet-member': '/home',
-    'member': '/home',
+    'public': '/',
+    'member': '/',
     'admin': '/admin',
   }
 };
