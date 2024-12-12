@@ -21,9 +21,10 @@ type IRoleService interface {
 }
 
 const (
-	DefaultRole = "member"
-	AdminRole   = "admin"
-	FirstLogin  = "firstLogin"
+	RoleDefaultRole = "user"
+	RoleWalletUser  = "wallet-user"
+	RoleAdmin       = "admin"
+	RolePublic      = "public"
 )
 
 // Role represents a role entity.

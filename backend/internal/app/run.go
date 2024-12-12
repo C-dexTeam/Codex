@@ -97,7 +97,7 @@ func firstRun(db *sqlx.DB, roleService domains.IRoleService, userService domains
 		log.Fatalf("Error checking for admin user: %v", err)
 	}
 	if count == 0 {
-		adminRole, _ := roleService.GetByName(context.Background(), domains.AdminRole)
+		adminRole, _ := roleService.GetByName(context.Background(), domains.RoleAdmin)
 		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", adminRole.GetID())
 	}
 }

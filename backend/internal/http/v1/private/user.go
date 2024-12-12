@@ -53,25 +53,6 @@ func (h *PrivateHandler) UpdateProfile(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Get Default Role
-	defaultRole, err := h.services.RoleService().GetByName(c.Context(), domains.DefaultRole)
-	if err != nil {
-		return err
-	}
-
-	// Get First Login Role
-	firstLoginRole, err := h.services.RoleService().GetByName(c.Context(), domains.FirstLogin)
-	if err != nil {
-		return err
-	}
-
-	// If the user First-Login Role. Change The Users role to defaultRole.
-	if userSession.RoleID == firstLoginRole.GetID().String() {
-		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, defaultRole.GetID().String()); err != nil {
-			return err
-		}
-	}
-
 	return response.Response(200, "Status OK", nil)
 }
 
@@ -96,6 +77,19 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 
 	if err := h.services.UserService().ConnectWallet(c.Context(), userSession.UserID, newWallet.PublicKeyBase58, newWallet.Message, newWallet.Signature); err != nil {
 		return err
+	}
+
+	// Get First Login Role
+	walletUser, err := h.services.RoleService().GetByName(c.Context(), domains.RoleWalletUser)
+	if err != nil {
+		return err
+	}
+
+	// If the user in user Role. Change The Users role to wallet-user.
+	if userSession.Role != domains.RoleAdmin {
+		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, walletUser.GetID().String()); err != nil {
+			return err
+		}
 	}
 
 	return response.Response(200, "Status OK", nil)

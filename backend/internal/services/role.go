@@ -24,7 +24,7 @@ func newRoleService(
 
 func (s *roleService) GetDefault(ctx context.Context) (role *domains.Role, err error) {
 	roles, _, err := s.roleRepository.Filter(ctx, domains.RoleFilter{
-		Name: domains.DefaultRole,
+		Name: domains.RoleDefaultRole,
 	}, 1, 1)
 	if len(roles) != 1 {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
