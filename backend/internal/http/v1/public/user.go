@@ -81,12 +81,7 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	firstLoginRole, err := h.services.RoleService().GetByName(c.Context(), domains.FirstLogin)
-	if err != nil {
-		return err
-	}
-
-	userAuthData, err := h.services.UserService().AuthWallet(c.Context(), wallet.PublicKeyBase58, wallet.Message, wallet.Signature, firstLoginRole.GetID())
+	userAuthData, err := h.services.UserService().AuthWallet(c.Context(), wallet.PublicKeyBase58, wallet.Message, wallet.Signature)
 	if err != nil {
 		return err
 	}
@@ -135,7 +130,7 @@ func (h *PublicHandler) Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	firstLoginRole, err := h.services.RoleService().GetByName(c.Context(), domains.FirstLogin)
+	firstLoginRole, err := h.services.RoleService().GetByName(c.Context(), domains.RoleDefaultRole)
 	if err != nil {
 		return err
 	}

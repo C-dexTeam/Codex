@@ -41,7 +41,7 @@ type UserAuthWallet struct {
 
 type UserProfileDTO struct {
 	PublicKey           string `json:"publicKey"`
-	RoleName            string `json:"roleName"`
+	RoleName            string `json:"role"`
 	Username            string `json:"username"`
 	Email               string `json:"email"`
 	Name                string `json:"name"`
