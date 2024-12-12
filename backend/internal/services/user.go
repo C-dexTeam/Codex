@@ -121,7 +121,7 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	return nil
 }
 
-func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signature string, defaultRoleID uuid.UUID) (user *domains.User, err error) {
+func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signature string) (user *domains.User, err error) {
 	ok, err := hasherService.VerifySignature(publicKey, message, signature)
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(400, "error while verifing signature", err)

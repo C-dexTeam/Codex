@@ -6,8 +6,9 @@ CREATE TABLE IF NOT EXISTS t_roles (
 );
 
 INSERT INTO t_roles (name) VALUES ('admin');
-INSERT INTO t_roles (name) VALUES ('member');
-INSERT INTO t_roles (name) VALUES ('firstLogin');
+INSERT INTO t_roles (name) VALUES ('public');
+INSERT INTO t_roles (name) VALUES ('user');
+INSERT INTO t_roles (name) VALUES ('wallet-user');
 -- +goose StatementEnd
 
 -- +goose Down
