@@ -13,6 +13,7 @@ func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
 	coursesRoutes.Get("/", h.GetCourses)
 	coursesRoutes.Get("/:id", h.GetCourse)
 
+	// TODO: Reward Atama için Ayrı Endpoint
 	courseAdminRoutes := root.Group("/admin/courses")
 	courseAdminRoutes.Use(h.adminRoleMiddleware)
 	courseAdminRoutes.Post("/", h.AddCourse)

@@ -64,7 +64,7 @@ func (h *PrivateHandler) authMiddleware(c *fiber.Ctx) error {
 	if !ok {
 		return serviceErrors.NewServiceErrorWithMessage(500, "session data error")
 	}
-	if session_data.RoleName == "Banned" {
+	if session_data.Role == "Banned" {
 		return serviceErrors.NewServiceErrorWithMessage(403, "Banned")
 	}
 	c.Locals("user", session_data)
@@ -86,10 +86,10 @@ func (h *PrivateHandler) adminRoleMiddleware(c *fiber.Ctx) error {
 		return serviceErrors.NewServiceErrorWithMessage(500, "session data error")
 	}
 
-	if session_data.RoleName == "Banned" {
+	if session_data.Role == "Banned" {
 		return serviceErrors.NewServiceErrorWithMessage(403, "Banned")
 	}
-	if session_data.RoleName != "Admin" {
+	if session_data.Role != "Admin" {
 		return serviceErrors.NewServiceErrorWithMessage(403, "unauthorized!")
 	}
 	c.Locals("user", session_data)

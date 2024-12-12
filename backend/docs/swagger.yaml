@@ -951,6 +951,28 @@ paths:
       summary: Get Reward By ID
       tags:
       - Reward
+  /private/user/connect:
+    post:
+      consumes:
+      - application/json
+      description: Connects Wallet.
+      parameters:
+      - description: New User Wallet
+        in: body
+        name: newWallet
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserAuthWallet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Connect Wallet To User
+      tags:
+      - User
   /private/user/profile:
     get:
       consumes:

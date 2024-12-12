@@ -12,6 +12,7 @@ func (h *PrivateHandler) initUserRoutes(root fiber.Router) {
 	user := root.Group("/user")
 	user.Get("/profile", h.Profile)
 	user.Post("/profile", h.UpdateProfile)
+	user.Post("/connect", h.ConnectWallet)
 }
 
 // @Tags User
@@ -69,6 +70,32 @@ func (h *PrivateHandler) UpdateProfile(c *fiber.Ctx) error {
 		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, defaultRole.GetID().String()); err != nil {
 			return err
 		}
+	}
+
+	return response.Response(200, "Status OK", nil)
+}
+
+// @Tags User
+// @Summary Connect Wallet To User
+// @Description Connects Wallet.
+// @Accept json
+// @Produce json
+// @Param newWallet body dto.UserAuthWallet true "New User Wallet"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/user/connect [post]
+func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
+	userSession := sessionStore.GetSessionData(c)
+
+	var newWallet dto.UserAuthWallet
+	if err := c.BodyParser(&newWallet); err != nil {
+		return err
+	}
+	if err := h.services.UtilService().Validator().ValidateStruct(newWallet); err != nil {
+		return err
+	}
+
+	if err := h.services.UserService().ConnectWallet(c.Context(), userSession.UserID, newWallet.PublicKeyBase58, newWallet.Message, newWallet.Signature); err != nil {
+		return err
 	}
 
 	return response.Response(200, "Status OK", nil)
