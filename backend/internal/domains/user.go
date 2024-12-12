@@ -14,6 +14,7 @@ import (
 type IUserRepository interface {
 	Filter(ctx context.Context, filter UserFilter, limit, page int64) (users []User, dataCount int64, err error)
 	AddTx(ctx context.Context, tx *sqlx.Tx, user *User) (uuid.UUID, error)
+	Update(ctx context.Context, userAuth *User) (err error)
 }
 
 // IUserService is the interface that provides the methods for the user service.
@@ -21,6 +22,7 @@ type IUserService interface {
 	Login(ctx context.Context, username, password string) (user *User, err error)
 	Register(ctx context.Context, username, email, password, confirmPassword string, defaultRoleID uuid.UUID) (err error)
 	AuthWallet(ctx context.Context, publicKey, message, signature string, defaultRoleID uuid.UUID) (user *User, err error)
+	ConnectWallet(ctx context.Context, userAuthID, publicKey, message, signature string) (err error)
 }
 
 // User represents a user entity.

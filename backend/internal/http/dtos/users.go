@@ -40,8 +40,7 @@ type UserAuthWallet struct {
 }
 
 type UserProfileDTO struct {
-	UserID              string `json:"userID"`
-	RoleID              string `json:"roleID"`
+	PublicKey           string `json:"publicKey"`
 	RoleName            string `json:"roleName"`
 	Username            string `json:"username"`
 	Email               string `json:"email"`
@@ -54,9 +53,8 @@ type UserProfileDTO struct {
 
 func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfileDTO {
 	return UserProfileDTO{
-		UserID:              userData.UserID,
-		RoleID:              userData.RoleID,
-		RoleName:            userData.RoleName,
+		PublicKey:           userData.PublicKey,
+		RoleName:            userData.Role,
 		Username:            userData.Username,
 		Email:               userData.Email,
 		Name:                userData.Name,

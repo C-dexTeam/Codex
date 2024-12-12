@@ -1011,6 +1011,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/user/connect": {
+            "post": {
+                "description": "Connects Wallet.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Connect Wallet To User",
+                "parameters": [
+                    {
+                        "description": "New User Wallet",
+                        "name": "newWallet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserAuthWallet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/user/profile": {
             "get": {
                 "description": "Retrieves users profile.",

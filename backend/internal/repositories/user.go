@@ -132,3 +132,22 @@ func (r *UserRepository) AddTx(ctx context.Context, tx *sqlx.Tx, user *domains.U
 
 	return id, nil
 }
+
+func (r *UserRepository) Update(ctx context.Context, userAuth *domains.User) (err error) {
+	dbModel := r.dbModelFromAppModel(*userAuth)
+	query := `
+		UPDATE
+			t_users
+		SET
+			public_key = COALESCE(:public_key, public_key),
+			username = COALESCE(:username, username),
+			email = COALESCE(:email, email)
+		WHERE
+			id = :id
+	`
+	_, err = r.db.NamedExecContext(ctx, query, dbModel)
+	if err != nil {
+		return
+	}
+	return
+}

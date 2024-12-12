@@ -135,54 +135,38 @@ func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signat
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
-	if len(users) != 0 {
-		// If the user exist return the user.
-		user = &users[0]
-
-		return user, nil
+	if len(users) == 0 {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrUserProfileNotFound, err)
 	}
+	user = &users[0]
 
-	// Begin a new transaction
-	tx, err := s.transactionRepository.Begin()
+	return
+}
+
+func (s *userService) ConnectWallet(ctx context.Context, userAuthID, publicKey, message, signature string) (err error) {
+	ok, err := hasherService.VerifySignature(publicKey, message, signature)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while beginning transaction", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(400, "error while verifing signature", err)
+	}
+	if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(400, "unable to verify the signature with the provided public key")
 	}
 
-	// Rollback the transaction in case of any error
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
-
-	// Creating a new user model
-	newUser, err := domains.NewUser(publicKey, "", "", "")
+	userAuths, _, err := s.userRepository.Filter(ctx, domains.UserFilter{
+		ID: uuid.MustParse(userAuthID),
+	}, 1, 1)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating user", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
+	if len(userAuths) == 0 {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrUserNotFound, err)
+	}
+	user := &userAuths[0]
+	user.SetPublicKey(publicKey)
 
-	// Save the new user to the database within the transaction
-	authUserID, err := s.userRepository.AddTx(ctx, tx, newUser)
-	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while adding the user", err)
+	if err := s.userRepository.Update(ctx, user); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileUpdatingUserAuth, err)
 	}
-
-	// Creating a new user profile
-	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "", true, 1, 0, 100)
-	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
-	}
-
-	// Save the new user profile to the database within the transaction
-	if err := s.userProfileRepository.AddTx(ctx, tx, newUserProfile); err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
-	}
-
-	// Commit the transaction
-	if err = s.transactionRepository.Commit(tx); err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while committing transaction", err)
-	}
-	user = newUser
 
 	return
 }
