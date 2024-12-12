@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS t_roles (
     name VARCHAR(30) NOT NULL
 );
 
-INSERT INTO t_roles (name) VALUES ('Admin');
-INSERT INTO t_roles (name) VALUES ('Member');
-INSERT INTO t_roles (name) VALUES ('First-Login');
+INSERT INTO t_roles (name) VALUES ('admin');
+INSERT INTO t_roles (name) VALUES ('member');
+INSERT INTO t_roles (name) VALUES ('firstLogin');
 -- +goose StatementEnd
 
 -- +goose Down

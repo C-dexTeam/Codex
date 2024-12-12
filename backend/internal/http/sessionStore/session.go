@@ -15,8 +15,9 @@ import (
 type SessionData struct {
 	UserID        string
 	UserProfileID string
+	PublicKey     string
 	RoleID        string
-	RoleName      string
+	Role          string
 	Username      string
 	Email         string
 	Name          string
@@ -29,8 +30,9 @@ type SessionData struct {
 func (s *SessionData) ParseFromUser(user *domains.User, userProfile *domains.UserProfile, userRole *domains.Role) {
 	s.UserID = user.GetID().String()
 	s.UserProfileID = userProfile.GetID().String()
+	s.PublicKey = user.GetPublicKey()
 	s.RoleID = userProfile.GetRoleID().String()
-	s.RoleName = userRole.GetName()
+	s.Role = userRole.GetName()
 	s.Username = user.GetUsername()
 	s.Email = user.GetEmail()
 	s.Name = userProfile.GetName()

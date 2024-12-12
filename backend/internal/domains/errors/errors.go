@@ -14,6 +14,7 @@ const (
 	ErrProgrammingLanguageNotFound = "PROGRAMMING_LANGUAGE_NOT_FOUND"
 	ErrLanguageDefaultNotFound     = "DEFAULT_LANGUAGE_NOT_FOUND"
 	ErrUserProfileNotFound         = "USER_PROFILE_NOT_FOUND"
+	ErrUserNotFound                = "USER_NOT_FOUND"
 	ErrRoleNotFound                = "ROLE_NOT_FOUND"
 	ErrRewardNotFound              = "REWARD_NOT_FOUND"
 	ErrRewardAttributeNotFound     = "REWARD_ATTRIBUTE_NOT_FOUND"
@@ -91,4 +92,5 @@ const (
 	ErrErrorWhileFilteringChapter              = "ERROR_WHILE_FILTERING_CHAPTERS"
 	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"
 	ErrErrorWhileFilteringUsers                = "ERROR_WHILE_FILTERING_USERS"
+	ErrErrorWhileUpdatingUserAuth              = "ERROR_WHILE_UPDATING_USERS"
 )
