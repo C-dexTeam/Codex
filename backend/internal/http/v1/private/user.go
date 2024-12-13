@@ -79,6 +79,9 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 		return err
 	}
 
+	// TODO: Session'a public keyi ekle
+	userSession.PublicKey = newWallet.PublicKeyBase58
+
 	// Get First Login Role
 	walletUser, err := h.services.RoleService().GetByName(c.Context(), domains.RoleWalletUser)
 	if err != nil {

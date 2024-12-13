@@ -89,7 +89,7 @@ func (h *PrivateHandler) adminRoleMiddleware(c *fiber.Ctx) error {
 	if session_data.Role == "Banned" {
 		return serviceErrors.NewServiceErrorWithMessage(403, "Banned")
 	}
-	if session_data.Role != "Admin" {
+	if session_data.Role != "admin" {
 		return serviceErrors.NewServiceErrorWithMessage(403, "unauthorized!")
 	}
 	c.Locals("user", session_data)

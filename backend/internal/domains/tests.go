@@ -1,14 +1,30 @@
 package domains
 
 import (
+	"context"
+
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	"github.com/google/uuid"
 )
 
+type ITestRepository interface {
+	FilterTest(ctx context.Context, filter TestFilter, limit, page int64) (tests []Test, dataCount int64, err error)
+	FilterInput(ctx context.Context, filter GeneralFilter, limit, page int64) (inputs []Input, dataCount int64, err error)
+	FilterOutput(ctx context.Context, filter GeneralFilter, limit, page int64) (outputs []Output, dataCount int64, err error)
+}
+type ITestService interface{}
+
 type Test struct {
-	inputs  []Input
-	outputs []Output
+	id        uuid.UUID
+	chapterID uuid.UUID
+	inputs    []Input
+	outputs   []Output
+}
+
+type TestFilter struct {
+	ID        uuid.UUID
+	ChapterID uuid.UUID
 }
 
 type Input struct {
@@ -17,14 +33,15 @@ type Input struct {
 	value  string
 }
 
-type InputFilter struct {
-	ID      uuid.UUID
-	InputID uuid.UUID
+type GeneralFilter struct {
+	ID     uuid.UUID
+	TestID uuid.UUID
 }
 
 type Output struct {
-	inputID uuid.UUID
-	value   string
+	id     uuid.UUID
+	testID uuid.UUID
+	value  string
 }
 
 type OutputFilter struct {
@@ -42,9 +59,12 @@ func NewTest(
 }
 
 func (t *Test) Unmarshal(
+	id, chapterID uuid.UUID,
 	inputs []Input,
 	outputs []Output,
 ) {
+	t.id = id
+	t.chapterID = chapterID
 	t.inputs = inputs
 	t.outputs = outputs
 }
@@ -73,9 +93,9 @@ func (i *Input) Unmarshal(
 }
 
 func NewOutput(
-	inputID, value string,
+	testID, value string,
 ) (output *Output, err error) {
-	if err := output.SetInputID(inputID); err != nil {
+	if err := output.SetTestID(testID); err != nil {
 		return nil, err
 	}
 	output.SetValue(value)
@@ -84,14 +104,23 @@ func NewOutput(
 }
 
 func (o *Output) Unmarshal(
-	inputID uuid.UUID,
+	id, testID uuid.UUID,
 	value string,
 ) {
-	o.inputID = inputID
+	o.id = id
+	o.testID = testID
 	o.value = value
 }
 
 // FOR TEST - Getter
+func (t *Test) GetID() uuid.UUID {
+	return t.id
+}
+
+func (t *Test) ChapterID() uuid.UUID {
+	return t.chapterID
+}
+
 func (t *Test) GetInputs() []Input {
 	return t.inputs
 }
@@ -101,6 +130,30 @@ func (t *Test) GetOutputs() []Output {
 }
 
 // FOR TEST - Setter
+func (t *Test) SetID(id string) error {
+	if id != "" {
+		idUUID, err := uuid.Parse(id)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		t.id = idUUID
+	}
+
+	return nil
+}
+
+func (t *Test) SetChapterID(id string) error {
+	if id != "" {
+		idUUID, err := uuid.Parse(id)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		t.id = idUUID
+	}
+
+	return nil
+}
+
 func (t *Test) SetInputs(inputs []Input) {
 	t.inputs = inputs
 }
@@ -152,8 +205,8 @@ func (i *Input) SetValue(value string) {
 }
 
 // FOR OUTPUT - Getter
-func (o *Output) GetInputID() uuid.UUID {
-	return o.inputID
+func (o *Output) GetTestID() uuid.UUID {
+	return o.testID
 }
 
 func (o *Output) GetValue() string {
@@ -161,13 +214,13 @@ func (o *Output) GetValue() string {
 }
 
 // FOR OUTPUT - Setter
-func (o *Output) SetInputID(inputID string) error {
-	if inputID != "" {
-		idUUID, err := uuid.Parse(inputID)
+func (o *Output) SetTestID(testID string) error {
+	if testID != "" {
+		idUUID, err := uuid.Parse(testID)
 		if err != nil {
 			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
 		}
-		o.inputID = idUUID
+		o.testID = idUUID
 	}
 
 	return nil
