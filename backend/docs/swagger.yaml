@@ -837,6 +837,38 @@ paths:
       summary: Get Course By ID
       tags:
       - Courses
+  /private/input/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all inputs based on the provided query parameters.
+      parameters:
+      - description: Input ID
+        in: query
+        name: id
+        type: string
+      - description: Input's Test ID
+        in: query
+        name: testID
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All inputs
+      tags:
+      - Inputs
   /private/language/:
     get:
       consumes:

@@ -22,6 +22,14 @@ type ITestService interface {
 		ctx context.Context,
 		id, chapterID, page, limit string,
 	) (tests []Test, err error)
+	GetInputs(
+		ctx context.Context,
+		id, testID, page, limit string,
+	) (inputs []Input, err error)
+	AddInput(
+		ctx context.Context,
+		testID, value string,
+	) (uuid.UUID, error)
 }
 
 const (

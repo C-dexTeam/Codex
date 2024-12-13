@@ -82,6 +82,46 @@ func (s *testService) GetTests(
 	return tests, nil
 }
 
+func (s *testService) GetInputs(
+	ctx context.Context,
+	id, testID, page, limit string,
+) (inputs []domains.Input, err error) {
+	pageNum, err := strconv.Atoi(page)
+	if err != nil || page == "" {
+		pageNum = 1
+	}
+
+	limitNum, err := strconv.Atoi(limit)
+	if err != nil || limit == "" {
+		limitNum = domains.DefaultTestLimit
+	}
+
+	var idUUID uuid.UUID
+	var testUUID uuid.UUID
+	if id != "" {
+		idUUID, err = uuid.Parse(id)
+		if err != nil {
+			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		}
+	}
+	if testID != "" {
+		testUUID, err = uuid.Parse(testID)
+		if err != nil {
+			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		}
+	}
+
+	inputs, _, err = s.testRepository.FilterInput(ctx, domains.GeneralFilter{
+		ID:     idUUID,
+		TestID: testUUID,
+	}, int64(limitNum), int64(pageNum))
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringInputs, err)
+	}
+
+	return
+}
+
 func (s *testService) AddInput(
 	ctx context.Context,
 	testID, value string,

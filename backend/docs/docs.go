@@ -831,6 +831,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/input/": {
+            "get": {
+                "description": "Retrieves all inputs based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inputs"
+                ],
+                "summary": "Get All inputs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Input ID",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Input's Test ID",
+                        "name": "testID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/language/": {
             "get": {
                 "description": "Retrieves all languages based on the provided query parameters.",
