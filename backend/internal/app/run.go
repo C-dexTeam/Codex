@@ -46,6 +46,7 @@ func Run(cfg *config.Config) {
 	pLanguageRepository := repositories.NewPLanguageRepository(conn)
 	courseRepository := repositories.NewCourseRepository(conn)
 	chapterRepository := repositories.NewChapterRepository(conn)
+	testRepository := repositories.NewTestRepository(conn)
 
 	// Utilities Initialize
 	validatorService := validatorService.NewValidatorService()
@@ -63,6 +64,7 @@ func Run(cfg *config.Config) {
 		pLanguageRepository,
 		courseRepository,
 		chapterRepository,
+		testRepository,
 	)
 
 	// First Run & Creating Default Admin

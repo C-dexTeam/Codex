@@ -13,7 +13,16 @@ type ITestRepository interface {
 	FilterInput(ctx context.Context, filter GeneralFilter, limit, page int64) (inputs []Input, dataCount int64, err error)
 	FilterOutput(ctx context.Context, filter GeneralFilter, limit, page int64) (outputs []Output, dataCount int64, err error)
 }
-type ITestService interface{}
+type ITestService interface {
+	GetTests(
+		ctx context.Context,
+		id, chapterID, page, limit string,
+	) (tests []Test, err error)
+}
+
+const (
+	DefaultTestLimit = 10
+)
 
 type Test struct {
 	id        uuid.UUID
