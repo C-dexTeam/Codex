@@ -1,6 +1,10 @@
 package domains
 
-import "github.com/google/uuid"
+import (
+	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
+	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	"github.com/google/uuid"
+)
 
 type Test struct {
 	inputs  []Input
@@ -46,11 +50,14 @@ func (t *Test) Unmarshal(
 }
 
 func NewInput(
-	id, testID uuid.UUID,
-	value string,
+	id, testID, value string,
 ) (input *Input, err error) {
-	input.SetID(id)
-	input.SetTestID(testID)
+	if err := input.SetID(id); err != nil {
+		return nil, err
+	}
+	if err := input.SetTestID(testID); err != nil {
+		return nil, err
+	}
 	input.SetValue(value)
 
 	return
@@ -66,10 +73,11 @@ func (i *Input) Unmarshal(
 }
 
 func NewOutput(
-	inputID uuid.UUID,
-	value string,
+	inputID, value string,
 ) (output *Output, err error) {
-	output.SetInputID(inputID)
+	if err := output.SetInputID(inputID); err != nil {
+		return nil, err
+	}
 	output.SetValue(value)
 
 	return
@@ -115,12 +123,28 @@ func (i *Input) GetValue() string {
 }
 
 // FOR INPUT - Setter
-func (i *Input) SetID(id uuid.UUID) {
-	i.id = id
+func (i *Input) SetID(id string) error {
+	if id != "" {
+		idUUID, err := uuid.Parse(id)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		i.id = idUUID
+	}
+
+	return nil
 }
 
-func (i *Input) SetTestID(testID uuid.UUID) {
-	i.testID = testID
+func (i *Input) SetTestID(testID string) error {
+	if testID != "" {
+		idUUID, err := uuid.Parse(testID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		i.testID = idUUID
+	}
+
+	return nil
 }
 
 func (i *Input) SetValue(value string) {
@@ -137,8 +161,16 @@ func (o *Output) GetValue() string {
 }
 
 // FOR OUTPUT - Setter
-func (o *Output) SetInputID(inputID uuid.UUID) {
-	o.inputID = inputID
+func (o *Output) SetInputID(inputID string) error {
+	if inputID != "" {
+		idUUID, err := uuid.Parse(inputID)
+		if err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		}
+		o.inputID = idUUID
+	}
+
+	return nil
 }
 
 func (o *Output) SetValue(value string) {
