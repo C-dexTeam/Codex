@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 // ** Hooks Import
 import { useAuth } from '@/hooks/useAuth'
+import authConfig from '@/configs/auth'
 
 const AuthGuard = props => {
   const { children, fallback } = props
@@ -21,7 +22,7 @@ const AuthGuard = props => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router.route]
+    [auth.user, router.route]
   )
   if (auth.loading && !auth.user) {
     return fallback

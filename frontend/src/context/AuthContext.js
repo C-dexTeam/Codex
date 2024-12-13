@@ -11,20 +11,17 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { SigninMessage } from '@/layout/auth/Wallet/SignInMessage'
 import { binary_to_base58 } from 'base58-js'
 
+
 // ** Defaults
 const defaultProvider = {
   user: {
     username: "user",
     email: null,
-    name: "Space",
-    surname: "Hunter",
     role: "public",
-    experience: 0,
-    level: 0,
-    nextLevelExperience: 0,
     publicKey: null,
   },
   loading: true,
+  walletConnected: false,
   setUser: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
@@ -39,6 +36,7 @@ const AuthProvider = ({ children }) => {
   // ** States
   const [user, setUser] = useState(defaultProvider.user)
   const [loading, setLoading] = useState(defaultProvider.loading)
+  const [walletConnected, setWalletConnected] = useState(defaultProvider.walletConnected)
 
   // ** Hooks
   const router = useRouter()
@@ -49,15 +47,15 @@ const AuthProvider = ({ children }) => {
 
   const createSessionData = (data) => {
     const userData = {
-      username: data?.username || defaultProvider.username,
-      email: data?.email || defaultProvider.email,
-      name: data?.name || defaultProvider.name,
-      surname: data?.surname || defaultProvider.surname,
-      role: data?.roleName || data?.role || defaultProvider.role,
-      experience: data?.experience || defaultProvider.experience,
-      level: data?.level || defaultProvider.level,
-      nextLevelExperience: data?.nextLevelExperience || defaultProvider.nextLevelExperience,
-      publicKey: data?.publicKey || defaultProvider.publicKey,
+      username: data?.username || defaultProvider.user.username,
+      email: data?.email || defaultProvider.user.email,
+      name: data?.name || defaultProvider.user.name,
+      surname: data?.surname || defaultProvider.user.surname,
+      role: data?.roleName || data?.role || defaultProvider.user.role,
+      experience: data?.experience || defaultProvider.user.experience,
+      level: data?.level || defaultProvider.user.level,
+      nextLevelExperience: data?.nextLevelExperience || defaultProvider.user.nextLevelExperience,
+      publicKey: data?.publicKey || defaultProvider.user.publicKey,
     }
 
     return userData
@@ -65,6 +63,8 @@ const AuthProvider = ({ children }) => {
 
   const createSession = (data) => {
     const userData = createSessionData(data)
+
+    if (userData.publicKey) setWalletConnected(true)
 
     setUser(userData) // Set the user data to the state
     localStorage.setItem(authConfig.session, JSON.stringify(userData)) // Set the user data to the local storage
@@ -88,14 +88,17 @@ const AuthProvider = ({ children }) => {
   }
 
   const restoreStorage = () => {
-    setUser(defaultProvider.user)
     setLoading(false)
+    setWalletConnected(false)
+    setUser(defaultProvider.user)
     localStorage.setItem(authConfig.session, JSON.stringify(defaultProvider.user))
   }
 
   const walletConnection = () => {
-    if (wallet.connected) {
-      if (!user?.publicKey)
+    console.log("wallet connected", user);
+
+    if (wallet.connected && !user?.publicKey) {
+      if (user?.role != "public")
         handleConnectWallet();
       else
         handleSignIn();
@@ -159,21 +162,25 @@ const AuthProvider = ({ children }) => {
     // if user already logged in do not then return 
     if (user?.publicKey && pKey) return;
 
-    // create a new SigninMessage object
-    const signMessage = new SigninMessage({
-      domain: window.location.host,
-      publicKey: wallet.publicKey.toBase58(),
-      statement: message,
-    });
+    try {
+      // create a new SigninMessage object
+      const signMessage = new SigninMessage({
+        domain: window.location.host,
+        publicKey: wallet.publicKey.toBase58(),
+        statement: message,
+      });
 
-    const data = new TextEncoder().encode(signMessage.prepare()); // encode the message
-    const signature = await wallet.signMessage(data); // sign the message
-    const serializedSignature = binary_to_base58(signature); // convert the signature to base58
+      const data = new TextEncoder().encode(signMessage.prepare()); // encode the message
+      const signature = await wallet?.signMessage(data); // sign the message
+      const serializedSignature = binary_to_base58(signature); // convert the signature to base58
 
-    return {
-      message: signMessage.statement, // message statement in plain text
-      publicKeyBase58: wallet.publicKey, // public key in base58
-      signatureBase58: serializedSignature, // signature in base58
+      return {
+        message: signMessage.statement, // message statement in plain text
+        publicKeyBase58: wallet.publicKey, // public key in base58
+        signatureBase58: serializedSignature, // signature in base58
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -192,6 +199,7 @@ const AuthProvider = ({ children }) => {
       });
       if (response.status === 200) {
         const user = response?.data?.data;
+
         createSession(user);
 
         showToast("dismiss");
@@ -342,7 +350,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true) // ** Set loading to true
 
     // Send a GET request to the API
-    axios.get(authConfig.refresh)
+    await axios.get(authConfig.refresh)
       .then(response => {
         // ** If the status code is 200, It means the user is authenticated
         if (response.data?.statusCode === 200) {
@@ -351,27 +359,34 @@ const AuthProvider = ({ children }) => {
           setLoading(false) // Set loading to false
         } else {
           // ** If the status code is not 200, It means the user is not authenticated
-          // ** Send an error message to the user
+
           showToast("dismiss") // Dismiss the previous toast if it exists
           showToast("error", response.data?.message) // Show the error message
+
+          console.log("weqweqwewqe123213213");
 
           restoreStorage() // Restore the user data
         }
       })
       .catch(error => {
+        console.log("sadasdasdasd12321312");
         console.error(error) // Log the error to the console
         restoreStorage() // Restore the user data
       })
   }
 
   useEffect(() => {
-    // if (!wallet.connected && user?.publicKey) {
-    //   handleLogout()
-    //   return
-    // }
-    if (wallet.connected) walletConnection()
-    else refreshAuth();
-  }, [wallet.connected]);
+    if (!router.isReady) return;
+
+    if (!wallet.connected)
+      refreshAuth();
+    else
+      walletConnection()
+
+    if (!wallet.connected && walletConnected) {
+      handleLogout()
+    }
+  }, [router.isReady, wallet.connected]);
 
   const values = {
     user,
