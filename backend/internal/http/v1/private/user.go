@@ -79,6 +79,19 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 		return err
 	}
 
+	userSession.SetPublicKey(newWallet.PublicKeyBase58)
+
+	// Mevcut session'ı alıyoruz
+	sess, err := h.sess_store.Get(c)
+	if err != nil {
+		return err
+	}
+	userSession.SetPublicKey(newWallet.PublicKeyBase58)
+	sess.Set("user", userSession)
+	if err := sess.Save(); err != nil {
+		return err
+	}
+
 	// Get First Login Role
 	walletUser, err := h.services.RoleService().GetByName(c.Context(), domains.RoleWalletUser)
 	if err != nil {

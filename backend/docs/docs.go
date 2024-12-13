@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Attribute"
+                    "Attributes"
                 ],
                 "summary": "Add Attribute",
                 "parameters": [
@@ -48,35 +48,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "delete": {
-                "description": "Delete Attributes from DB.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Attribute"
-                ],
-                "summary": "Delete Attribute",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Attribute ID",
-                        "name": "attributeID",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.BaseResponse"
-                        }
-                    }
-                }
-            },
             "patch": {
                 "description": "Updates Attribute Into DB.",
                 "consumes": [
@@ -86,7 +57,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Attribute"
+                    "Attributes"
                 ],
                 "summary": "Update Attribute",
                 "parameters": [
@@ -98,6 +69,37 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.UpdateAttributeDTO"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/attributes/:id": {
+            "delete": {
+                "description": "Delete Attributes from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attributes"
+                ],
+                "summary": "Delete Attribute",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attribute ID",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -338,35 +340,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "delete": {
-                "description": "Delete Programming Languages from DB.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Programming Language"
-                ],
-                "summary": "Delete Programming Language",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Programming Language ID",
-                        "name": "id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.BaseResponse"
-                        }
-                    }
-                }
-            },
             "patch": {
                 "description": "Updates Programming Language Into DB.",
                 "consumes": [
@@ -388,6 +361,37 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.UpdatePLanguageDTO"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/planguages/{id}": {
+            "delete": {
+                "description": "Delete Programming Languages from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Programming Language"
+                ],
+                "summary": "Delete Programming Language",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Programming Language ID",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -562,7 +566,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Attribute"
+                    "Attributes"
                 ],
                 "summary": "Get All Attributes",
                 "parameters": [
@@ -656,6 +660,49 @@ const docTemplate = `{
                         "description": "Grants Experience",
                         "name": "grantsExp",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/chapters/{id}": {
+            "get": {
+                "description": "Retrieves spesific chapters based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Get One Chapter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "type": "string",
@@ -1643,7 +1690,9 @@ const docTemplate = `{
             "required": [
                 "ConfirmPassword",
                 "email",
+                "name",
                 "password",
+                "surname",
                 "username"
             ],
             "properties": {
@@ -1654,9 +1703,15 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string",
                     "minLength": 8
+                },
+                "surname": {
+                    "type": "string"
                 },
                 "username": {
                     "type": "string",

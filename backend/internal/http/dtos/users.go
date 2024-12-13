@@ -24,6 +24,8 @@ func (m *UserDTOManager) ToLoginResponseDTO(role string) LoginResponseDTO {
 type UserRegisterDTO struct {
 	Username        string `json:"username" validate:"required,alphanum,min=3,max=30"`
 	Email           string `json:"email" validate:"required,email"`
+	Name            string `json:"name" validate:"required"`
+	Surname         string `json:"surname" validate:"required"`
 	Password        string `json:"password" validate:"required,min=8"`
 	ConfirmPassword string `json:"ConfirmPassword" validate:"required,min=8"`
 }

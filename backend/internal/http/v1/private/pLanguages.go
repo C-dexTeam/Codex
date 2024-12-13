@@ -15,7 +15,7 @@ func (h *PrivateHandler) initProgrammingLanguageRoutes(root fiber.Router) {
 	pLanguagesAdminRoutes.Use(h.adminRoleMiddleware)
 	pLanguagesAdminRoutes.Post("/", h.AddProgrammingLanguage)
 	pLanguagesAdminRoutes.Patch("/", h.UpdateProgrammingLanguage)
-	pLanguagesAdminRoutes.Delete("/", h.DeleteProgrammingLanguage)
+	pLanguagesAdminRoutes.Delete("/:id", h.DeleteProgrammingLanguage)
 }
 
 // @Tags Programming Language
@@ -154,11 +154,11 @@ func (h *PrivateHandler) UpdateProgrammingLanguage(c *fiber.Ctx) error {
 // @Description Delete Programming Languages from DB.
 // @Accept json
 // @Produce json
-// @Param id query string false "Programming Language ID"
+// @Param id path string false "Programming Language ID"
 // @Success 200 {object} response.BaseResponse{}
-// @Router /private/admin/planguages/ [delete]
+// @Router /private/admin/planguages/{id} [delete]
 func (h *PrivateHandler) DeleteProgrammingLanguage(c *fiber.Ctx) error {
-	id := c.Query("id")
+	id := c.Params("id")
 
 	if err := h.services.ProgrammingService().DeleteProgrammingLanguage(c.Context(), id); err != nil {
 		return err

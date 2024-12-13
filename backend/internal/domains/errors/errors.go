@@ -94,4 +94,7 @@ const (
 	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"
 	ErrErrorWhileFilteringUsers                = "ERROR_WHILE_FILTERING_USERS"
 	ErrErrorWhileUpdatingUserAuth              = "ERROR_WHILE_UPDATING_USERS"
+	ErrErrorWhileFilteringTests                = "ERROR_WHILE_FILTERING_TESTS"
+	ErrErrorWhileFilteringInputs               = "ERROR_WHILE_FILTERING_INPUTS"
+	ErrErrorWhileFilteringOutputs              = "ERROR_WHILE_FILTERING_OUTPUTS"
 )

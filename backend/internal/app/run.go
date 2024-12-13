@@ -46,6 +46,7 @@ func Run(cfg *config.Config) {
 	pLanguageRepository := repositories.NewPLanguageRepository(conn)
 	courseRepository := repositories.NewCourseRepository(conn)
 	chapterRepository := repositories.NewChapterRepository(conn)
+	testRepository := repositories.NewTestRepository(conn)
 
 	// Utilities Initialize
 	validatorService := validatorService.NewValidatorService()
@@ -63,6 +64,7 @@ func Run(cfg *config.Config) {
 		pLanguageRepository,
 		courseRepository,
 		chapterRepository,
+		testRepository,
 	)
 
 	// First Run & Creating Default Admin
@@ -98,6 +100,6 @@ func firstRun(db *sqlx.DB, roleService domains.IRoleService, userService domains
 	}
 	if count == 0 {
 		adminRole, _ := roleService.GetByName(context.Background(), domains.RoleAdmin)
-		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", adminRole.GetID())
+		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", "admin", "admin", adminRole.GetID())
 	}
 }

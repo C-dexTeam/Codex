@@ -92,10 +92,32 @@ func (s *chapterService) GetChapters(
 		GrantsExperience: grantsExpBool,
 		Active:           activeBool,
 	}, int64(limitNum), int64(pageNum))
-
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
 	}
+
+	return
+}
+
+func (s *chapterService) GetChapter(
+	ctx context.Context,
+	id, page, limit string,
+) (chapter *domains.Chapter, err error) {
+	chapterUUID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	}
+
+	chapters, _, err := s.chapterRepository.Filter(ctx, domains.ChapterFilter{
+		ID: chapterUUID,
+	}, 1, 1)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
+	}
+	if len(chapters) == 0 {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrChapterNotFound, err)
+	}
+	chapter = &chapters[0]
 
 	return
 }

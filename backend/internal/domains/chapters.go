@@ -21,6 +21,10 @@ type IChapterService interface {
 		ctx context.Context,
 		chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
 	) (chapters []Chapter, err error)
+	GetChapter(
+		ctx context.Context,
+		id, page, limit string,
+	) (chapter *Chapter, err error)
 	AddChapter(
 		ctx context.Context,
 		courseID, languageID, rewardID, title, description, content, funcName string,
@@ -62,6 +66,7 @@ type Chapter struct {
 	active           bool
 	createdAt        time.Time
 	deletedAt        *time.Time
+	tests            []Test
 }
 
 type ChapterFilter struct {
@@ -199,6 +204,10 @@ func (c *Chapter) GetDeletedAt() *time.Time {
 	return c.deletedAt
 }
 
+func (c *Chapter) GetTests() []Test {
+	return c.tests
+}
+
 // Setter
 func (c *Chapter) SetID(id string) error {
 	if id != "" {
@@ -309,4 +318,8 @@ func (c *Chapter) SetCreatedAt(createdAt time.Time) {
 
 func (c *Chapter) SetDeletedAt(deletedAt *time.Time) {
 	c.deletedAt = deletedAt
+}
+
+func (c *Chapter) SetTests(tests []Test) {
+	c.tests = tests
 }

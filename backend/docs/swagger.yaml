@@ -269,8 +269,12 @@ definitions:
         type: string
       email:
         type: string
+      name:
+        type: string
       password:
         minLength: 8
+        type: string
+      surname:
         type: string
       username:
         maxLength: 30
@@ -279,7 +283,9 @@ definitions:
     required:
     - ConfirmPassword
     - email
+    - name
     - password
+    - surname
     - username
     type: object
   response.BaseResponse:
@@ -300,25 +306,6 @@ info:
   title: API Service
 paths:
   /private/admin/attributes/:
-    delete:
-      consumes:
-      - application/json
-      description: Delete Attributes from DB.
-      parameters:
-      - description: Attribute ID
-        in: query
-        name: attributeID
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.BaseResponse'
-      summary: Delete Attribute
-      tags:
-      - Attribute
     patch:
       consumes:
       - application/json
@@ -339,7 +326,7 @@ paths:
             $ref: '#/definitions/response.BaseResponse'
       summary: Update Attribute
       tags:
-      - Attribute
+      - Attributes
     post:
       consumes:
       - application/json
@@ -360,7 +347,27 @@ paths:
             $ref: '#/definitions/response.BaseResponse'
       summary: Add Attribute
       tags:
-      - Attribute
+      - Attributes
+  /private/admin/attributes/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Attributes from DB.
+      parameters:
+      - description: Attribute ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Attribute
+      tags:
+      - Attributes
   /private/admin/chapters/:
     patch:
       consumes:
@@ -489,25 +496,6 @@ paths:
       tags:
       - Courses
   /private/admin/planguages/:
-    delete:
-      consumes:
-      - application/json
-      description: Delete Programming Languages from DB.
-      parameters:
-      - description: Programming Language ID
-        in: query
-        name: id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.BaseResponse'
-      summary: Delete Programming Language
-      tags:
-      - Programming Language
     patch:
       consumes:
       - application/json
@@ -548,6 +536,26 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Add Programming Language
+      tags:
+      - Programming Language
+  /private/admin/planguages/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Programming Languages from DB.
+      parameters:
+      - description: Programming Language ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Programming Language
       tags:
       - Programming Language
   /private/admin/rewards/:
@@ -684,7 +692,7 @@ paths:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Attributes
       tags:
-      - Attribute
+      - Attributes
   /private/chapters/:
     get:
       consumes:
@@ -731,6 +739,34 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Chapters
+      tags:
+      - Chapters
+  /private/chapters/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves spesific chapters based on the provided query parameters.
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: id
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get One Chapter
       tags:
       - Chapters
   /private/courses/:

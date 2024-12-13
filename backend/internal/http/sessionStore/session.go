@@ -42,6 +42,10 @@ func (s *SessionData) ParseFromUser(user *domains.User, userProfile *domains.Use
 	s.NextLevelExp = userProfile.GetNextLevelExperience()
 }
 
+func (s *SessionData) SetPublicKey(publicKey string) {
+	s.PublicKey = publicKey
+}
+
 func GetSessionData(c *fiber.Ctx) *SessionData {
 	user := c.Locals("user")
 	if user == nil {

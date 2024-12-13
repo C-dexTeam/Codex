@@ -9,6 +9,7 @@ import (
 func (h *PrivateHandler) initChaptersRoutes(root fiber.Router) {
 	chapterRoutes := root.Group("/chapters")
 	chapterRoutes.Get("/", h.GetChapters)
+	chapterRoutes.Get("/:id", h.GetChapter)
 
 	chapterAdminRoutes := root.Group("/admin/chapters")
 	chapterAdminRoutes.Use(h.adminRoleMiddleware)
@@ -49,6 +50,36 @@ func (h *PrivateHandler) GetChapters(c *fiber.Ctx) error {
 	chapterDTOs := h.dtoManager.ChapterManager().ToChapterDTOs(chapters)
 
 	return response.Response(200, "Status OK", chapterDTOs)
+}
+
+// @Tags Chapters
+// @Summary Get One Chapter
+// @Description Retrieves spesific chapters based on the provided query parameters.
+// @Accept json
+// @Produce json
+// @Param id path string false "Chapter ID"
+// @Param page query string false "Page"
+// @Param limit query string false "Limit"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/chapters/{id} [get]
+func (h *PrivateHandler) GetChapter(c *fiber.Ctx) error {
+	id := c.Params("id")
+	page := c.Query("page")
+	limit := c.Query("limit")
+
+	chapter, err := h.services.ChapterService().GetChapter(c.Context(), id, page, limit)
+	if err != nil {
+		return err
+	}
+
+	tests, err := h.services.TestService().GetTests(c.Context(), "", chapter.GetID().String(), page, limit)
+	if err != nil {
+		return err
+	}
+	chapter.SetTests(tests)
+	chapterDTO := h.dtoManager.ChapterManager().ToChapterDTO(*chapter)
+
+	return response.Response(200, "Status OK", chapterDTO)
 }
 
 // @Tags Chapters

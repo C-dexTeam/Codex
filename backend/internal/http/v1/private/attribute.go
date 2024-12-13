@@ -17,7 +17,7 @@ func (h *PrivateHandler) initAttributesRoutes(root fiber.Router) {
 	attributeAdminRoutes.Patch("/", h.UpdateAttribute)
 }
 
-// @Tags Attribute
+// @Tags Attributes
 // @Summary Get All Attributes
 // @Description Retrieves all attribute based on the provided query parameters.
 // @Accept json
@@ -45,7 +45,7 @@ func (h *PrivateHandler) GetAttributes(c *fiber.Ctx) error {
 	return response.Response(200, "Status OK", attributeDTOs)
 }
 
-// @Tags Attribute
+// @Tags Attributes
 // @Summary Add Attribute
 // @Description Adds Attribute Into DB.
 // @Accept json
@@ -75,7 +75,7 @@ func (h *PrivateHandler) AddAttribute(c *fiber.Ctx) error {
 	return response.Response(200, "Status OK", id)
 }
 
-// @Tags Attribute
+// @Tags Attributes
 // @Summary Update Attribute
 // @Description Updates Attribute Into DB.
 // @Accept json
@@ -106,18 +106,18 @@ func (h *PrivateHandler) UpdateAttribute(c *fiber.Ctx) error {
 	return response.Response(200, "Status OK", nil)
 }
 
-// @Tags Attribute
+// @Tags Attributes
 // @Summary Delete Attribute
 // @Description Delete Attributes from DB.
 // @Accept json
 // @Produce json
-// @Param attributeID query string false "Attribute ID"
+// @Param id path string false "Attribute ID"
 // @Success 200 {object} response.BaseResponse{}
-// @Router /private/admin/attributes/ [delete]
+// @Router /private/admin/attributes/:id [delete]
 func (h *PrivateHandler) DeleteAttribute(c *fiber.Ctx) error {
-	attributeID := c.Query("attributeID")
+	id := c.Params("id")
 
-	if err := h.services.AttributeService().DeleteAttribute(c.Context(), attributeID); err != nil {
+	if err := h.services.AttributeService().DeleteAttribute(c.Context(), id); err != nil {
 		return err
 	}
 	return response.Response(200, "Status OK", nil)
