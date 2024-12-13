@@ -72,3 +72,8 @@ func (t *TestDTOManager) ToTestDTOs(appModels []domains.Test) []TestDTO {
 
 	return testDTOs
 }
+
+type AddGeneralDTO struct {
+	TestID string `json:"value" validate:"required,uuid4"`
+	Value  string `json:"value"`
+}
