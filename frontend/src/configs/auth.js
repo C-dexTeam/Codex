@@ -6,14 +6,15 @@ const authConfig = {
   logout: baseUrl + '/public/logout',
   register: baseUrl + '/public/register',
   wallet: baseUrl + '/public/wallet',
+  walletConnect: baseUrl + '/private/user/connect',
 
   publicKey: 'publicKey',
   session: 'userSession',
 
   homeRoute: {
-    'First-Login': '/register/wallet',
     'public': '/',
-    'member': '/',
+    'user': '/',
+    'wallet-user': '/',
     'admin': '/admin',
   }
 };

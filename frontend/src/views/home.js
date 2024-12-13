@@ -1,7 +1,7 @@
 
-// import Can from "@/layout/components/acl/Can"
 
 import WalletConnectionButton from "@/layout/auth/Wallet/WalletConnectionButton"
+import Can from "@/layout/components/acl/Can"
 
 const Home = () => {
 
@@ -11,9 +11,9 @@ const Home = () => {
 
             <WalletConnectionButton />
 
-            {/* <Can I="read" a="wallet">
+            <Can I="read" a="wallet">
                 If you see this message. Your wallet has been connected
-            </Can> */}
+            </Can>
         </div>
     )
 }

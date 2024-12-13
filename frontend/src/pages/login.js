@@ -3,6 +3,7 @@ import { TextField, Button, Container, Typography, Box } from '@mui/material'
 import BlankLayout from "@/layout/BlankLayout"
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
+import WalletConnectionButton from '@/layout/auth/Wallet/WalletConnectionButton';
 
 const Login = () => {
     const [values, setValues] = useState({
@@ -65,6 +66,7 @@ const Login = () => {
                     </Button>
                 </form>
 
+                <WalletConnectionButton text="Login Wallet" />
 
                 <Link href={"/register"}>
                     Register

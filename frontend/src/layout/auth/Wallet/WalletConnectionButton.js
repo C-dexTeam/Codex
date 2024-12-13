@@ -1,6 +1,6 @@
 import { BaseWalletMultiButton } from '@solana/wallet-adapter-react-ui'
 
-const WalletConnectionButton = () => {
+const WalletConnectionButton = ({ text }) => {
     return <BaseWalletMultiButton
         labels={{
             'change-wallet': 'Change wallet',
@@ -9,7 +9,7 @@ const WalletConnectionButton = () => {
             copied: 'Copied',
             disconnect: 'Disconnect',
             'has-wallet': 'Connect',
-            'no-wallet': 'Connect Wallet',
+            'no-wallet': text || 'Connect Wallet',
         }}
     />
 }

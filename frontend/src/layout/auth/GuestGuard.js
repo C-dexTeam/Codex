@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 // ** Hooks Import
 import { useAuth } from '@/hooks/useAuth'
 import authConfig from '@/configs/auth'
-import {  } from '@/pages'
 
 const GuestGuard = props => {
   const { children, fallback } = props
@@ -17,15 +16,15 @@ const GuestGuard = props => {
       return
     }
 
-    if (window.localStorage.getItem(authConfig.session)) {
+    if (window.localStorage.getItem(authConfig.session) && auth.user.role != "public") {
       router.replace("/")
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.route])
 
-  // if (auth.loading) {
-  //   return fallback
-  // }
+  if (auth.loading) {
+    return fallback
+  }
 
   return <>{children}</>
 }

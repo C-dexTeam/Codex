@@ -1,4 +1,4 @@
-// ** React Imports
+// ** Reac Impors
 import { createContext, useEffect, useState } from 'react'
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -10,18 +10,19 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { SigninMessage } from '@/layout/auth/Wallet/SignInMessage'
 import { binary_to_base58 } from 'base58-js'
-import { t } from 'i18next'
 
 // ** Defaults
 const defaultProvider = {
   user: {
-    id: null,
     username: "user",
     email: null,
     name: "Space",
     surname: "Hunter",
-    roleID: null,
     role: "public",
+    experience: 0,
+    level: 0,
+    nextLevelExperience: 0,
+    publicKey: null,
   },
   loading: true,
   setUser: () => null,
@@ -44,18 +45,19 @@ const AuthProvider = ({ children }) => {
 
   // ** Wallet
   const wallet = useWallet();
-  const { disconnect } = useWallet();
   const walletModal = useWalletModal();
 
   const createSessionData = (data) => {
     const userData = {
-      id: data?.userID || defaultProvider.id,
       username: data?.username || defaultProvider.username,
       email: data?.email || defaultProvider.email,
       name: data?.name || defaultProvider.name,
       surname: data?.surname || defaultProvider.surname,
-      roleID: data?.roleID || defaultProvider.roleID,
       role: data?.roleName || data?.role || defaultProvider.role,
+      experience: data?.experience || defaultProvider.experience,
+      level: data?.level || defaultProvider.level,
+      nextLevelExperience: data?.nextLevelExperience || defaultProvider.nextLevelExperience,
+      publicKey: data?.publicKey || defaultProvider.publicKey,
     }
 
     return userData
@@ -85,25 +87,19 @@ const AuthProvider = ({ children }) => {
     return true
   }
 
-  const deleteStorage = () => {
-    setUser(null)
-    setLoading(false)
-    localStorage.removeItem(authConfig.session)
-
-    // const firstPath = router.pathname.split('/')[1]
-    // if (firstPath != 'login') window.location.href = '/login'
-  }
-
   const restoreStorage = () => {
     setUser(defaultProvider.user)
     setLoading(false)
     localStorage.setItem(authConfig.session, JSON.stringify(defaultProvider.user))
   }
 
-  const openSignIn = () => {
-    console.log("wallet.connected", wallet.connected);
-
-    if (wallet.connected) handleSignIn();
+  const walletConnection = () => {
+    if (wallet.connected) {
+      if (!user?.publicKey)
+        handleConnectWallet();
+      else
+        handleSignIn();
+    }
   }
 
   /** Handle User Login Function
@@ -128,7 +124,6 @@ const AuthProvider = ({ children }) => {
           showToast("success", response.data?.message) // Show the success message
 
           createSession(response.data?.data) // Create a session for the user
-
           setLoading(false) // Set loading to false
 
           router.push("/") // Redirect the user to the home page
@@ -138,7 +133,7 @@ const AuthProvider = ({ children }) => {
           showToast("dismiss") // Dismiss the previous toast if it exists
           showToast("error", response.data?.message) // Show the error message
 
-          deleteStorage() // Delete the user data
+          restoreStorage() // Delete the user data
         }
 
       })
@@ -147,8 +142,39 @@ const AuthProvider = ({ children }) => {
         showToast("dismiss") // Dismiss the previous toast if it exists
         showToast("error", error.response.data.message) // Show the error message
         console.error(error) // Log the error to the console
-        deleteStorage() // Delete the user data
+        restoreStorage() // Delete the user data
       })
+  }
+
+  const walletSignMessage = async (message) => {
+    message = message || `Sign in to ${window.location.host}`;
+
+    // if wallet is not connected then show wallet modal
+    if (!wallet.connected) walletModal.setVisible(true)
+
+    // if wallet public key or signMessage is not available then return
+    if (!wallet.publicKey || !wallet.signMessage) return;
+
+    const pKey = localStorage.getItem(authConfig.publicKey) || null;
+    // if user already logged in do not then return 
+    if (user?.publicKey && pKey) return;
+
+    // create a new SigninMessage object
+    const signMessage = new SigninMessage({
+      domain: window.location.host,
+      publicKey: wallet.publicKey.toBase58(),
+      statement: message,
+    });
+
+    const data = new TextEncoder().encode(signMessage.prepare()); // encode the message
+    const signature = await wallet.signMessage(data); // sign the message
+    const serializedSignature = binary_to_base58(signature); // convert the signature to base58
+
+    return {
+      message: signMessage.statement, // message statement in plain text
+      publicKeyBase58: wallet.publicKey, // public key in base58
+      signatureBase58: serializedSignature, // signature in base58
+    }
   }
 
   /**
@@ -157,14 +183,13 @@ const AuthProvider = ({ children }) => {
    * @param {String} publicKeyBase58
    * @param {String} signatureBase58
    */
-  const handleWalletLogin = async (data) => {
+  const walletLogin = async (data) => {
     try {
       const response = await axios({
         url: authConfig.wallet,
         method: "POST",
         data: data,
       });
-
       if (response.status === 200) {
         const user = response?.data?.data;
         createSession(user);
@@ -176,43 +201,61 @@ const AuthProvider = ({ children }) => {
         showToast("error", response.data.message);
       }
     } catch (error) {
+      wallet.disconnect();
+      restoreStorage();
       showToast("dismiss");
-      showToast("error", t(error?.response?.data?.message));
+      showToast("error", "Something went wrong");
+    }
+  };
+
+  /**
+   * 
+   * @param {String} message
+   * @param {String} publicKeyBase58
+   * @param {String} signatureBase58
+   */
+  const walletConnect = async (data) => {
+    try {
+      const response = await axios({
+        url: authConfig.walletConnect,
+        method: "POST",
+        data: data,
+      });
+      if (response.status === 200) {
+        refreshAuth();
+
+        showToast("dismiss");
+        showToast("success", "Wallet connected successfully");
+      } else {
+        showToast("dismiss");
+        showToast("error", response.data.message);
+      }
+    } catch (error) {
+      wallet.disconnect();
+      restoreStorage();
+      showToast("dismiss");
+      showToast("error", "Something went wrong");
     }
   };
 
   const handleSignIn = async () => {
-    try {
-      // if wallet is not connected then show wallet modal
-      if (!wallet.connected) walletModal.setVisible(true)
+    const signMessage = await walletSignMessage();
 
-      // if wallet public key or signMessage is not available then return
-      if (!wallet.publicKey || !wallet.signMessage) return;
+    if (!signMessage) return;
 
-      const pKey = localStorage.getItem(authConfig.publicKey) || null;
-      // if user already logged in do not then return 
-      if (user?.publicKey && pKey) return;
+    walletLogin(signMessage);
+  }
 
-      // create a new SigninMessage object
-      const message = new SigninMessage({
-        domain: window.location.host,
-        publicKey: wallet.publicKey.toBase58(),
-        statement: `Sign in to ${window.location.host}`,
-      });
+  const handleConnectWallet = async () => {
+    if (!wallet.connected) walletModal.setVisible(true)
 
-      const data = new TextEncoder().encode(message.prepare()); // encode the message
-      const signature = await wallet.signMessage(data); // sign the message
-      const serializedSignature = binary_to_base58(signature); // convert the signature to base58
+    if (!wallet.publicKey) return;
 
-      // call the handleWalletLogin function with the message, public key and signature to communicate with the backend
-      handleWalletLogin({
-        message: message.statement, // message statement in plain text
-        publicKeyBase58: wallet.publicKey, // public key in base58
-        signatureBase58: serializedSignature, // signature in base58
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    const signMessage = await walletSignMessage();
+
+    if (!signMessage) return;
+
+    walletConnect(signMessage);
   }
 
   //** Handle User Logout Function
@@ -226,7 +269,7 @@ const AuthProvider = ({ children }) => {
           showToast("dismiss") // Dismiss the previous toast if it exists
           showToast("success", response.data?.message) // Show the success message
 
-          deleteStorage() // Delete the user data
+          restoreStorage() // Delete the user data
           router.push("/") // Redirect the user to the login page
         } else {
           // ** If the status code is not 200, It means the logout is not successful
@@ -234,7 +277,7 @@ const AuthProvider = ({ children }) => {
           showToast("dismiss") // Dismiss the previous toast if it exists
           showToast("error", response.data?.message) // Show the error message
 
-          deleteStorage() // Delete the user data
+          restoreStorage() // Delete the user data
           router.push("/") // Redirect the user to the login page
         }
       })
@@ -242,8 +285,8 @@ const AuthProvider = ({ children }) => {
         // ** If an error occurs, Send an error message to the user
         showToast("dismiss") // Dismiss the previous toast if it exists
         showToast("error", "An error occurred. Please try again") // Show the error message
-        console.error(error) // Log the error to the console
-        deleteStorage() // Delete the user data
+
+        restoreStorage() // Delete the user data
         router.push("/") // Redirect the user to the login page
       })
   }
@@ -272,7 +315,7 @@ const AuthProvider = ({ children }) => {
           showToast("dismiss") // Dismiss the previous toast if it exists
           showToast("success", response.data?.message) // Show the success message
 
-          // router.push("/login") // Redirect the user to the login page
+          router.push("/login") // Redirect the user to the login page
 
           setLoading(false) // Set loading to false
         } else {
@@ -281,7 +324,7 @@ const AuthProvider = ({ children }) => {
           showToast("dismiss") // Dismiss the previous toast if it exists
           showToast("error", response.data?.message) // Show the error message
 
-          deleteStorage() // Delete the user data
+          restoreStorage() // Delete the user data
         }
       })
       .catch(error => {
@@ -289,7 +332,7 @@ const AuthProvider = ({ children }) => {
         showToast("dismiss") // Dismiss the previous toast if it exists
         showToast("error", "An error occurred. Please try again") // Show the error message
         console.error(error) // Log the error to the console
-        deleteStorage() // Delete the user data
+        restoreStorage() // Delete the user data
       })
 
   }
@@ -301,8 +344,6 @@ const AuthProvider = ({ children }) => {
     // Send a GET request to the API
     axios.get(authConfig.refresh)
       .then(response => {
-        console.log("qweqweqe", response);
-
         // ** If the status code is 200, It means the user is authenticated
         if (response.data?.statusCode === 200) {
           createSession(response.data?.data) // Create a session for the user
@@ -328,10 +369,9 @@ const AuthProvider = ({ children }) => {
     //   handleLogout()
     //   return
     // }
-
-    if (wallet.connected) openSignIn()
+    if (wallet.connected) walletConnection()
     else refreshAuth();
-  }, [wallet]);
+  }, [wallet.connected]);
 
   const values = {
     user,
