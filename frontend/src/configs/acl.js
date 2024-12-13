@@ -18,17 +18,39 @@ const defineRulesFor = (role, permission, permissions) => {
     return rules
   }
 
+  const userPerms = [
+    'home',
+    'challenges',
+    'team',
+    'team-members',
+    'team-settings'
+  ]
+
+  /**
+   * Admin can manage everything
+   * @Usage of can function
+   * When you set the permission to a role like "can(['read'], 'wallet')", it means that the user with this role can only read the wallet permission. But wallet permission has to be setted to the pages like this:
+   * Home.acl = {
+   *  action: 'read',
+   *  permission: 'home'
+   * }
+   */
   switch (role) {
     case 'admin':
       can('manage', 'all')
       break
 
+    case 'wallet-user':
+      can(['read'], "wallet")
+      can(['read'], userPerms)
+      break
+
     case 'user':
+      can(['read'], userPerms)
+      break
+
+    case 'public':
       can(['read'], "home")
-      can(['read'], "challenges")
-      can(['read'], "team")
-      can(['read'], "team-members")
-      can(['read'], "team-settings")
       break
 
     default:

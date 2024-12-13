@@ -1,9 +1,7 @@
 // ** React Imports
 import { useEffect } from 'react'
-
 // ** Next Imports
 import { useRouter } from 'next/router'
-
 // ** Hooks Import
 import { useAuth } from '@/hooks/useAuth'
 import authConfig from '@/configs/auth'
@@ -18,8 +16,8 @@ const GuestGuard = props => {
       return
     }
 
-    if (window.localStorage.getItem(authConfig.session)) {
-      router.replace('/')
+    if (window.localStorage.getItem(authConfig.session) && auth.user.role != "public") {
+      router.replace("/")
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.route])

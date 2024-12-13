@@ -1,19 +1,14 @@
 // ** React Imports
 import { useState } from 'react'
-
 // ** Next Imports
 import { useRouter } from 'next/router'
-
 // ** Context Imports
 import { AbilityContext } from '@/layout/components/acl/Can'
-
 // ** Config Import
 import { buildAbilityFor } from '@/configs/acl'
-
 // ** Component Import
 import NotAuthorized from '@/pages/401'
 import BlankLayout from '@/layout/BlankLayout'
-
 // ** Hooks
 import { useAuth } from '@/hooks/useAuth'
 
@@ -27,7 +22,7 @@ const AclGuard = props => {
   const router = useRouter()
 
   // If guestGuard is true and user is not logged in or its an error page, render the page without checking access
-  if (guestGuard || router.route === '/404' || router.route === '/500' || router.route === '/') {
+  if (guestGuard || router.route === '/404' || router.route === '/500') {
     return <>{children}</>
   }
 
