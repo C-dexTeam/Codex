@@ -98,7 +98,6 @@ func (s *userProfileService) Update(
 
 	newProfile.SetName(name)
 	newProfile.SetSurname(surname)
-	newProfile.SetFirstLogin(true)
 
 	if err := s.userProfileRepository.Update(ctx, &newProfile); err != nil {
 		return err

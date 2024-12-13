@@ -1,8 +1,6 @@
 package private
 
 import (
-	"fmt"
-
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
@@ -184,8 +182,6 @@ func (h *PrivateHandler) UpdateCourse(c *fiber.Ctx) error {
 // @Router /private/admin/courses/{id} [delete]
 func (h *PrivateHandler) DeleteCourse(c *fiber.Ctx) error {
 	id := c.Params("id")
-
-	fmt.Println(id)
 
 	if err := h.services.CourseService().DeleteCourse(c.Context(), id); err != nil {
 		return err

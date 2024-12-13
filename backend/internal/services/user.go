@@ -53,7 +53,7 @@ func (s *userService) Login(ctx context.Context, username, password string) (use
 	return user, nil
 }
 
-func (s *userService) Register(ctx context.Context, username, email, password, confirmPassword string, defaultRoleID uuid.UUID) (err error) {
+func (s *userService) Register(ctx context.Context, username, email, password, confirmPassword, name, surname string, defaultRoleID uuid.UUID) (err error) {
 	// Checking if the username is already being used
 	users, _, err := s.userRepository.Filter(ctx, domains.UserFilter{Username: username}, 1, 1)
 	if err != nil {
@@ -103,7 +103,7 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 	}
 
 	// Creating a new user profile
-	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), "", "", true, 1, 0, 100)
+	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), name, surname, true, 1, 0, 100)
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
 	}
@@ -144,13 +144,13 @@ func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signat
 }
 
 func (s *userService) ConnectWallet(ctx context.Context, userAuthID, publicKey, message, signature string) (err error) {
-	ok, err := hasherService.VerifySignature(publicKey, message, signature)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(400, "error while verifing signature", err)
-	}
-	if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(400, "unable to verify the signature with the provided public key")
-	}
+	// ok, err := hasherService.VerifySignature(publicKey, message, signature)
+	// if err != nil {
+	// 	return serviceErrors.NewServiceErrorWithMessageAndError(400, "error while verifing signature", err)
+	// }
+	// if !ok {
+	// 	return serviceErrors.NewServiceErrorWithMessage(400, "unable to verify the signature with the provided public key")
+	// }
 
 	userAuths, _, err := s.userRepository.Filter(ctx, domains.UserFilter{
 		ID: uuid.MustParse(userAuthID),

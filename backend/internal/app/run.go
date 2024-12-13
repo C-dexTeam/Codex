@@ -100,6 +100,6 @@ func firstRun(db *sqlx.DB, roleService domains.IRoleService, userService domains
 	}
 	if count == 0 {
 		adminRole, _ := roleService.GetByName(context.Background(), domains.RoleAdmin)
-		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", adminRole.GetID())
+		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", "admin", "admin", adminRole.GetID())
 	}
 }

@@ -135,7 +135,7 @@ func (h *PublicHandler) Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := h.services.UserService().Register(c.Context(), register.Username, register.Email, register.Password, register.ConfirmPassword, firstLoginRole.GetID()); err != nil {
+	if err := h.services.UserService().Register(c.Context(), register.Username, register.Email, register.Password, register.ConfirmPassword, register.Name, register.Email, firstLoginRole.GetID()); err != nil {
 		return err
 	}
 	return response.Response(200, "Register successful", nil)

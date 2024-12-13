@@ -12,6 +12,10 @@ type ITestRepository interface {
 	FilterTest(ctx context.Context, filter TestFilter, limit, page int64) (tests []Test, dataCount int64, err error)
 	FilterInput(ctx context.Context, filter GeneralFilter, limit, page int64) (inputs []Input, dataCount int64, err error)
 	FilterOutput(ctx context.Context, filter GeneralFilter, limit, page int64) (outputs []Output, dataCount int64, err error)
+
+	AddTest(ctx context.Context, input *Test) (uuid.UUID, error)
+	AddInput(ctx context.Context, input *Input) (uuid.UUID, error)
+	AddOutput(ctx context.Context, output *Output) (uuid.UUID, error)
 }
 type ITestService interface {
 	GetTests(
@@ -214,6 +218,10 @@ func (i *Input) SetValue(value string) {
 }
 
 // FOR OUTPUT - Getter
+func (o *Output) GetID() uuid.UUID {
+	return o.id
+}
+
 func (o *Output) GetTestID() uuid.UUID {
 	return o.testID
 }

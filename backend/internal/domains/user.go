@@ -20,7 +20,7 @@ type IUserRepository interface {
 // IUserService is the interface that provides the methods for the user service.
 type IUserService interface {
 	Login(ctx context.Context, username, password string) (user *User, err error)
-	Register(ctx context.Context, username, email, password, confirmPassword string, defaultRoleID uuid.UUID) (err error)
+	Register(ctx context.Context, username, email, password, confirmPassword, name, surname string, defaultRoleID uuid.UUID) (err error)
 	AuthWallet(ctx context.Context, publicKey, message, signature string) (user *User, err error)
 	ConnectWallet(ctx context.Context, userAuthID, publicKey, message, signature string) (err error)
 }

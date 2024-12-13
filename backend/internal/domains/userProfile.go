@@ -39,7 +39,6 @@ type UserProfile struct {
 	roleID       uuid.UUID
 	name         string
 	surname      string
-	firstLogin   bool
 	level        int
 	experience   int
 	nextLevelExp int
@@ -74,8 +73,7 @@ func NewUserProfile(
 	}
 
 	userProfile.SetName(name)
-	userProfile.SetSurname(name)
-	userProfile.SetFirstLogin(firstLogin)
+	userProfile.SetSurname(surname)
 	userProfile.SetLevel(level)
 	userProfile.SetExperience(experience)
 
@@ -95,7 +93,6 @@ func (d *UserProfile) Unmarshal(
 	d.roleID = roleID
 	d.name = name
 	d.surname = surname
-	d.firstLogin = firstLogin
 	d.level = level
 	d.experience = experience
 	d.nextLevelExp = nextLevelExp
@@ -130,10 +127,6 @@ func (d *UserProfile) GetCreatedAt() time.Time {
 
 func (d *UserProfile) GetDeletedAt() time.Time {
 	return d.deletedAt
-}
-
-func (d *UserProfile) GetFirstLogin() bool {
-	return d.firstLogin
 }
 
 func (d *UserProfile) GetLevel() int {
@@ -175,10 +168,6 @@ func (d *UserProfile) SetName(name string) {
 
 func (d *UserProfile) SetSurname(surname string) {
 	d.surname = surname
-}
-
-func (d *UserProfile) SetFirstLogin(firstLogin bool) {
-	d.firstLogin = firstLogin
 }
 
 func (d *UserProfile) SetLevel(level int) {

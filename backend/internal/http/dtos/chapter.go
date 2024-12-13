@@ -28,11 +28,14 @@ type ChapterDTO struct {
 	CheckTmp         string     `json:"check_template"`
 	GrantsExperience bool       `json:"grantsExperience"`
 	Active           bool       `json:"active"`
+	Tests            []TestDTO  `json:"tests,omitempty"`
 	CreatedAt        time.Time  `json:"createdAt"`
 	DeletedAt        *time.Time `json:"deletedAt"`
 }
 
 func (d *ChapterDTOManager) ToChapterDTO(appModel domains.Chapter) ChapterDTO {
+	testManager := new(TestDTOManager)
+
 	return ChapterDTO{
 		ID:               appModel.GetID(),
 		CourseID:         appModel.GetCourseID(),
@@ -48,6 +51,7 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel domains.Chapter) ChapterDTO {
 		CheckTmp:         appModel.GetCheckTmp(),
 		GrantsExperience: appModel.GetGrantsExperience(),
 		Active:           appModel.GetActive(),
+		Tests:            testManager.ToTestDTOs(appModel.GetTests()),
 		CreatedAt:        appModel.GetCreatedAt(),
 		DeletedAt:        appModel.GetDeletedAt(),
 	}

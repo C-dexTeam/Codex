@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/C-dexTeam/codex/internal/domains"
@@ -45,7 +44,7 @@ func (s *testService) GetTests(
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
 		}
 	}
-	if id != "" {
+	if chapterID != "" {
 		chapterUUID, err = uuid.Parse(chapterID)
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
@@ -60,29 +59,46 @@ func (s *testService) GetTests(
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringTests, err)
 	}
 
-	for _, test := range tests {
+	for i := range tests {
 		inputs, _, err := s.testRepository.FilterInput(ctx, domains.GeneralFilter{
 			ID:     uuid.Nil,
-			TestID: test.GetID(),
+			TestID: tests[i].GetID(),
 		}, int64(limitNum), int64(pageNum))
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringInputs, err)
 		}
 
-		fmt.Println("inputs:", inputs)
-
 		outputs, _, err := s.testRepository.FilterOutput(ctx, domains.GeneralFilter{
 			ID:     uuid.Nil,
-			TestID: test.GetID(),
+			TestID: tests[i].GetID(),
 		}, int64(limitNum), int64(pageNum))
 		if err != nil {
 			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringOutputs, err)
 		}
-		fmt.Println("outputs:", outputs)
-
-		test.SetInputs(inputs)
-		test.SetOutputs(outputs)
+		tests[i].SetInputs(inputs)
+		tests[i].SetOutputs(outputs)
 	}
 
-	return
+	return tests, nil
+}
+
+func (s *testService) AddInput(
+	ctx context.Context,
+	testID, value string,
+) (uuid.UUID, error) {
+	newInput, err := domains.NewInput(
+		"",
+		testID,
+		value,
+	)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	id, err := s.testRepository.AddInput(ctx, newInput)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return id, nil
 }

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	"github.com/google/uuid"
@@ -125,7 +126,6 @@ func (r *TestRepository) dbModelToAppModelInput(dbModel dbModelInputs) (input do
 		uuid.MustParse(dbModel.TestID.String),
 		dbModel.Value.String,
 	)
-
 	return
 }
 
@@ -157,6 +157,8 @@ func (r *TestRepository) FilterTest(ctx context.Context, filter domains.TestFilt
 		($2::uuid IS NULL OR r.chapter_id = $2::uuid)
 	LIMIT $3 OFFSET $4
 	`
+
+	fmt.Println(dbFilter.ChapterID)
 
 	err = r.db.SelectContext(
 		ctx,
