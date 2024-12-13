@@ -733,6 +733,34 @@ paths:
       summary: Get All Chapters
       tags:
       - Chapters
+  /private/chapters/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves spesific chapters based on the provided query parameters.
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: id
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get One Chapter
+      tags:
+      - Chapters
   /private/courses/:
     get:
       consumes:

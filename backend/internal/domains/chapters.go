@@ -21,6 +21,10 @@ type IChapterService interface {
 		ctx context.Context,
 		chapterID, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
 	) (chapters []Chapter, err error)
+	GetChapter(
+		ctx context.Context,
+		id, page, limit string,
+	) (chapter *Chapter, err error)
 	AddChapter(
 		ctx context.Context,
 		courseID, languageID, rewardID, title, description, content, funcName string,
