@@ -90,7 +90,7 @@ func (h *PrivateHandler) AddProgrammingLanguage(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		languageID = defaultLanguage.GetID().String()
+		languageID = defaultLanguage.ID.String()
 	} else {
 		languageID = newPLanguage.LanguageID
 	}

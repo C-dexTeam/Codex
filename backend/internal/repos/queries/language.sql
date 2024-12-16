@@ -1,8 +1,25 @@
 -- name: GetLanguages :many
 SELECT
     l.id, l.value
-FROM t_languages as l
+FROM 
+    t_languages as l
 WHERE
-    (sqlc.narg(id)::text IS NULL OR us.id = sqlc.narg(id)) AND
-    (sqlc.narg(value)::text IS NULL OR value ILIKE '%' || sqlc.narg(value)::text || '%')
+    (sqlc.narg(id)::UUID IS NULL OR l.id = sqlc.narg(id)::UUID) AND
+    (sqlc.narg(value)::text IS NULL OR l.value = sqlc.narg(value)::TEXT)
 LIMIT @lim OFFSET @off;
+
+-- name: GetLanguageByID :one
+SELECT
+    l.id, l.value
+FROM 
+    t_languages as l
+WHERE
+    l.id = @language_id;
+
+-- name: GetLanguageByValue :one
+SELECT
+    l.id, l.value
+FROM 
+    t_languages as l
+WHERE
+    l.value = @language_value;

@@ -8,20 +8,55 @@ package repo
 import (
 	"context"
 	"database/sql"
+
+	"github.com/google/uuid"
 )
+
+const getLanguageByID = `-- name: GetLanguageByID :one
+SELECT
+    l.id, l.value
+FROM 
+    t_languages as l
+WHERE
+    l.id = $1
+`
+
+func (q *Queries) GetLanguageByID(ctx context.Context, languageID uuid.UUID) (TLanguage, error) {
+	row := q.db.QueryRowContext(ctx, getLanguageByID, languageID)
+	var i TLanguage
+	err := row.Scan(&i.ID, &i.Value)
+	return i, err
+}
+
+const getLanguageByValue = `-- name: GetLanguageByValue :one
+SELECT
+    l.id, l.value
+FROM 
+    t_languages as l
+WHERE
+    l.value = $1
+`
+
+func (q *Queries) GetLanguageByValue(ctx context.Context, languageValue string) (TLanguage, error) {
+	row := q.db.QueryRowContext(ctx, getLanguageByValue, languageValue)
+	var i TLanguage
+	err := row.Scan(&i.ID, &i.Value)
+	return i, err
+}
 
 const getLanguages = `-- name: GetLanguages :many
 SELECT
     l.id, l.value
-FROM t_languages as l
+FROM 
+    t_languages as l
 WHERE
-    ($1::text IS NULL OR us.id = $1) AND
-    ($2::text IS NULL OR value ILIKE '%' || $2::text || '%')
+    ($1::UUID IS NULL OR l.id = $1::UUID) AND
+    ($2::text IS NULL OR l.value = $2::TEXT)
 LIMIT $4 OFFSET $3
 `
 
 type GetLanguagesParams struct {
-	ID    sql.NullString
+	ID    uuid.NullUUID
 	Value sql.NullString
 	Off   int32
 	Lim   int32

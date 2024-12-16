@@ -97,7 +97,7 @@ func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		languageID = defaultLanguage.GetID().String()
+		languageID = defaultLanguage.ID.String()
 	} else {
 		languageID = newCourse.LanguageID
 	}

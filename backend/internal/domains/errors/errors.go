@@ -105,6 +105,7 @@ const (
 	ErrErrorWhileFilteringTests                = "ERROR_WHILE_FILTERING_TESTS"
 	ErrErrorWhileFilteringInputs               = "ERROR_WHILE_FILTERING_INPUTS"
 	ErrErrorWhileFilteringOutputs              = "ERROR_WHILE_FILTERING_OUTPUTS"
+	ErrErrorWhileFilteringLanguages            = "ERROR_WHILE_FILTERING_LANGUAGES"
 	ErrErrorWhileComparingPassword             = "ERROR_WHILE_COMPARING_PASSWORDS"
 	ErrErrorWhileHashing                       = "ERROR_WHILE_HASHING"
 	ErrTransactionError                        = "ERROR_WHILE_COMMITING"

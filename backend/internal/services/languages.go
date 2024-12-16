@@ -2,74 +2,90 @@ package services
 
 import (
 	"context"
+	"database/sql"
+	"strings"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
-	"github.com/google/uuid"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 )
 
 type languageService struct {
-	languageRepository domains.ILanguagesRepository
+	db          *sql.DB
+	queries     *repo.Queries
+	utilService IUtilService
 }
 
 func newLanguageService(
-	languageRepository domains.ILanguagesRepository,
-
-) domains.ILanguagesService {
+	db *sql.DB,
+	queries *repo.Queries,
+	utilService IUtilService,
+) *languageService {
 	return &languageService{
-		languageRepository: languageRepository,
+		db:          db,
+		queries:     queries,
+		utilService: utilService,
 	}
 }
 
 func (s *languageService) GetLanguages(
 	ctx context.Context,
 	id, value string,
-) (languages []domains.Language, err error) {
-	var languageUUID uuid.UUID
-	if id != "" {
-		languageUUID, err = uuid.Parse(id)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
+) ([]repo.TLanguage, error) {
+	if _, err := s.utilService.ParseUUID(id); err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
 	}
 
-	languages, _, err = s.languageRepository.Filter(ctx, domains.LanguageFilter{
-		ID:    languageUUID,
-		Value: value,
-	}, domains.DefaultLanguageLimit, 1)
-	return
+	languages, err := s.queries.GetLanguages(ctx, repo.GetLanguagesParams{
+		ID:    s.utilService.ParseNullUUID(id),
+		Value: s.utilService.ParseString(value),
+		Lim:   domains.DefaultLanguageLimit,
+		Off:   0,
+	})
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringLanguages, err)
+	}
+
+	return languages, nil
 }
 
 func (s *languageService) GetLanguage(
 	ctx context.Context,
 	id string,
-) (language *domains.Language, err error) {
-	languageUUID, err := uuid.Parse(id)
+) (*repo.TLanguage, error) {
+	languageID, err := s.utilService.ParseUUID(id)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
 	}
 
-	langauges, _, err := s.languageRepository.Filter(ctx, domains.LanguageFilter{
-		ID: languageUUID,
-	}, 1, 1)
-	if len(langauges) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrLanguageNotFound, err)
+	language, err := s.queries.GetLanguageByID(ctx, languageID)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
+		}
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
-	language = &langauges[0]
+	return &language, nil
+}
 
-	return
+func (s *languageService) GetByValue(
+	ctx context.Context,
+	value string,
+) (*repo.TLanguage, error) {
+	language, err := s.queries.GetLanguageByValue(ctx, value)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
+		}
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
+	}
+
+	return &language, nil
 }
 
 func (s *languageService) GetDefault(
 	ctx context.Context,
-) (language *domains.Language, err error) {
-	langauges, _, err := s.languageRepository.Filter(ctx, domains.LanguageFilter{
-		Value: domains.DefaultLanguage,
-	}, 1, 1)
-	if len(langauges) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrLanguageDefaultNotFound, err)
-	}
-	language = &langauges[0]
-	return
+) (*repo.TLanguage, error) {
+	return s.GetByValue(ctx, domains.DefaultLanguage)
 }

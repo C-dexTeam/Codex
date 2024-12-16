@@ -1,6 +1,8 @@
 package private
 
 import (
+	"fmt"
+
 	"github.com/C-dexTeam/codex/internal/http/response"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,6 +30,7 @@ func (h *PrivateHandler) GetLanguages(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(languages)
 	languageDTOs := h.dtoManager.LanguageManager().ToLanguageDTOs(languages)
 
 	return response.Response(200, "Status OK", languageDTOs)

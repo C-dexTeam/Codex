@@ -54,7 +54,7 @@ func (s *UserService) Register(ctx context.Context, username, email, password, c
 	users, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
 		Username: s.utilService.ParseString(username),
 		Lim:      1,
-		Off:      1,
+		Off:      0,
 	})
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
@@ -137,7 +137,7 @@ func (s *UserService) AuthWallet(ctx context.Context, publicKey, message, signat
 	users, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
 		PublicKey: s.utilService.ParseString(publicKey),
 		Lim:       1,
-		Off:       1,
+		Off:       0,
 	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
@@ -162,7 +162,7 @@ func (s *UserService) ConnectWallet(ctx context.Context, id, publicKey, message,
 	userAuths, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
 		ID:  s.utilService.ParseNullUUID(id),
 		Lim: 1,
-		Off: 1,
+		Off: 0,
 	})
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)

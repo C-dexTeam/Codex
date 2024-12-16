@@ -14,6 +14,7 @@ type IService interface {
 	UtilService() IUtilService
 	UserService() *UserService
 	UserProfileService() *userProfileService
+	LanguageService() *languageService
 	RoleService() *RoleService
 	AdminService() domains.IAdminService
 	RewardService() domains.IRewardService
@@ -21,17 +22,16 @@ type IService interface {
 	CourseService() domains.ICourseService
 	ChapterService() domains.IChapterService
 	AttributeService() domains.IAttributeService
-	LanguageService() domains.ILanguagesService
 	TestService() domains.ITestService
 }
 
 type Services struct {
 	utilService        IUtilService
 	userService        *UserService
-	adminService       domains.IAdminService
-	userProfileService *userProfileService
 	roleService        *RoleService
-	languageService    domains.ILanguagesService
+	userProfileService *userProfileService
+	languageService    *languageService
+	adminService       domains.IAdminService
 	rewardService      domains.IRewardService
 	pLanguageService   domains.IPLanguagesService
 	courseService      domains.ICourseService
@@ -49,8 +49,8 @@ func CreateNewServices(
 	userProfileService := newUserProfileService(db, queries, utilService)
 	userService := newUserService(db, queries, utilService)
 	roleService := newRoleService(db, queries, utilService)
+	languageService := newLanguageService(db, queries, utilService)
 	// adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
-	// languageService := newLanguageService(languageRepository)
 	// rewardService := newRewardService(rewardRepository, attributeRepository)
 	// pLanguageService := newPLanguageService(pLanguageRepository)
 	// courseService := newCourseService(courseRepository, chapterRepository)
@@ -63,6 +63,7 @@ func CreateNewServices(
 		userProfileService: userProfileService,
 		userService:        userService,
 		roleService:        roleService,
+		languageService:    languageService,
 	}
 }
 
@@ -86,7 +87,7 @@ func (s *Services) RoleService() *RoleService {
 	return s.roleService
 }
 
-func (s *Services) LanguageService() domains.ILanguagesService {
+func (s *Services) LanguageService() *languageService {
 	return s.languageService
 }
 
