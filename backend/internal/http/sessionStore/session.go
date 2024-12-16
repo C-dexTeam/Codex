@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/C-dexTeam/codex/internal/config/models"
-	"github.com/C-dexTeam/codex/internal/domains"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,19 +27,19 @@ type SessionData struct {
 	NextLevelExp  int
 }
 
-func (s *SessionData) ParseFromUser(user *repo.TUsersAuth, userProfile *domains.UserProfile, userRole *domains.Role) {
+func (s *SessionData) ParseFromUser(user *repo.TUsersAuth, userProfile *repo.TUsersProfile, userRole *repo.TRole) {
 	s.UserID = user.ID.String()
-	s.UserProfileID = userProfile.GetID().String()
+	s.UserProfileID = userProfile.ID.String()
 	s.PublicKey = user.PublicKey.String
-	s.RoleID = userProfile.GetRoleID().String()
-	s.Role = userRole.GetName()
+	s.RoleID = userProfile.RoleID.String()
+	s.Role = userRole.Name
 	s.Username = user.Username.String
 	s.Email = user.Email.String
-	s.Name = userProfile.GetName()
-	s.Surname = userProfile.GetSurname()
-	s.Level = userProfile.GetLevel()
-	s.Experience = userProfile.GetExperience()
-	s.NextLevelExp = userProfile.GetNextLevelExperience()
+	s.Name = userProfile.Name.String
+	s.Surname = userProfile.Surname.String
+	s.Level = int(userProfile.Level.Int32)
+	s.Experience = int(userProfile.Experience.Int32)
+	s.NextLevelExp = int(userProfile.NextLevelExp.Int32)
 }
 
 func (s *SessionData) SetPublicKey(publicKey string) {

@@ -100,7 +100,7 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 
 	// If the user in user Role. Change The Users role to wallet-user.
 	if userSession.Role != domains.RoleAdmin {
-		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, walletUser.GetID().String()); err != nil {
+		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, walletUser.ID.String()); err != nil {
 			return err
 		}
 	}

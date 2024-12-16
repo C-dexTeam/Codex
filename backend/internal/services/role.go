@@ -2,57 +2,52 @@ package services
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 
 	"github.com/google/uuid"
 )
 
 type roleService struct {
-	roleRepository domains.IRoleRepository
+	db          *sql.DB
+	queries     *repo.Queries
+	utilService IUtilService
 }
 
 func newRoleService(
-	roleRepository domains.IRoleRepository,
-) domains.IRoleService {
+	db *sql.DB,
+	queries *repo.Queries,
+	utilService IUtilService,
+) *roleService {
 	return &roleService{
-		roleRepository: roleRepository,
+		db:          db,
+		queries:     queries,
+		utilService: utilService,
 	}
 }
 
-func (s *roleService) GetDefault(ctx context.Context) (role *domains.Role, err error) {
-	roles, _, err := s.roleRepository.Filter(ctx, domains.RoleFilter{
-		Name: domains.RoleDefaultRole,
-	}, 1, 1)
-	if len(roles) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
-	}
-	role = &roles[0]
-	return
+func (s *roleService) GetDefault(ctx context.Context) (*repo.TRole, error) {
+	return s.GetByName(ctx, domains.RoleDefaultRole)
 }
 
-func (s *roleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (role *domains.Role, err error) {
-	roles, _, err := s.roleRepository.Filter(ctx, domains.RoleFilter{
-		ID: roleID,
-	}, 1, 1)
-	if len(roles) != 1 {
+func (s *roleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (*repo.TRole, error) {
+	role, err := s.queries.GetRoleByID(ctx, roleID)
+	if role.ID == uuid.Nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
 	}
-	role = &roles[0]
 
-	return
+	return &role, nil
 }
 
-func (s *roleService) GetByName(ctx context.Context, name string) (role *domains.Role, err error) {
-	roles, _, err := s.roleRepository.Filter(ctx, domains.RoleFilter{
-		Name: name,
-	}, 1, 1)
-	if len(roles) != 1 {
+func (s *roleService) GetByName(ctx context.Context, name string) (*repo.TRole, error) {
+	role, err := s.queries.GetRoleByName(ctx, name)
+	if role.ID == uuid.Nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
 	}
-	role = &roles[0]
 
-	return
+	return &role, nil
 }

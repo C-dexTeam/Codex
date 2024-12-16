@@ -8,12 +8,47 @@ package repo
 import (
 	"context"
 	"database/sql"
+
+	"github.com/google/uuid"
 )
+
+const getRoleByID = `-- name: GetRoleByID :one
+SELECT
+    r.id, r.name
+FROM 
+    t_roles as r
+WHERE
+    r.id = $1
+`
+
+func (q *Queries) GetRoleByID(ctx context.Context, roleID uuid.UUID) (TRole, error) {
+	row := q.db.QueryRowContext(ctx, getRoleByID, roleID)
+	var i TRole
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
+const getRoleByName = `-- name: GetRoleByName :one
+SELECT
+    r.id, r.name
+FROM 
+    t_roles as r
+WHERE
+    r.name = $1
+`
+
+func (q *Queries) GetRoleByName(ctx context.Context, roleName string) (TRole, error) {
+	row := q.db.QueryRowContext(ctx, getRoleByName, roleName)
+	var i TRole
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
 
 const getRoles = `-- name: GetRoles :many
 SELECT
     r.id, r.name
-FROM t_roles as r
+FROM 
+    t_roles as r
 WHERE
     ($1::text IS NULL OR us.id = $1) AND
     ($2::text IS NULL OR name ILIKE '%' || $2::text || '%')

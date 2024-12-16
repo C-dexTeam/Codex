@@ -14,7 +14,7 @@ type IService interface {
 	UtilService() IUtilService
 	UserService() *userService
 	UserProfileService() *userProfileService
-	RoleService() domains.IRoleService
+	RoleService() *roleService
 	AdminService() domains.IAdminService
 	RewardService() domains.IRewardService
 	ProgrammingService() domains.IPLanguagesService
@@ -30,7 +30,7 @@ type Services struct {
 	userService        *userService
 	adminService       domains.IAdminService
 	userProfileService *userProfileService
-	roleService        domains.IRoleService
+	roleService        *roleService
 	languageService    domains.ILanguagesService
 	rewardService      domains.IRewardService
 	pLanguageService   domains.IPLanguagesService
@@ -48,8 +48,8 @@ func CreateNewServices(
 	utilService := newUtilService(validatorService)
 	userProfileService := newUserProfileService(db, queries, utilService)
 	userService := newUserService(db, queries, utilService)
+	roleService := newRoleService(db, queries, utilService)
 	// adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
-	// roleService := newRoleService(roleRepository)
 	// languageService := newLanguageService(languageRepository)
 	// rewardService := newRewardService(rewardRepository, attributeRepository)
 	// pLanguageService := newPLanguageService(pLanguageRepository)
@@ -60,8 +60,9 @@ func CreateNewServices(
 
 	return &Services{
 		utilService:        utilService,
-		userService:        userService,
 		userProfileService: userProfileService,
+		userService:        userService,
+		roleService:        roleService,
 	}
 }
 
@@ -81,7 +82,7 @@ func (s *Services) UserProfileService() *userProfileService {
 	return s.userProfileService
 }
 
-func (s *Services) RoleService() domains.IRoleService {
+func (s *Services) RoleService() *roleService {
 	return s.roleService
 }
 
