@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -14,39 +15,43 @@ import (
 	"github.com/C-dexTeam/codex/internal/http/middlewares"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/server"
-	"github.com/C-dexTeam/codex/internal/repositories"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/C-dexTeam/codex/internal/services"
-	dbadapter "github.com/C-dexTeam/codex/pkg/db_adapters/core"
 	validatorService "github.com/C-dexTeam/codex/pkg/validator_service"
-
 	"github.com/jmoiron/sqlx"
+	"github.com/pressly/goose"
+
 	_ "github.com/lib/pq"
 )
 
 func Run(cfg *config.Config) {
 	// Postgres Client
 	connStr := fmt.Sprintf("user=%v password=%v dbname=%v port=%v sslmode=%v host=%v", cfg.DatabaseConfig.Managment.ManagmentUsername, cfg.DatabaseConfig.Managment.ManagmentPassword, cfg.DatabaseConfig.DBName, cfg.DatabaseConfig.Port, cfg.DatabaseConfig.SSLMode, cfg.DatabaseConfig.Host)
-	dbAdapter, err := dbadapter.Init(dbadapter.POSTGRESQL, cfg.DatabaseConfig.Driver, connStr, cfg.Application.MigrationsPath)
+	conn, err := sql.Open(cfg.DatabaseConfig.Driver, connStr)
 	if err != nil {
+		return
+	}
+	if err := conn.Ping(); err != nil && err.Error() != "pq: database system is starting up" {
 		panic(err)
 	}
-	conn, err := dbAdapter.ConnectAndMigrateGoose()
-	if err != nil {
+	if err := goose.Up(conn, cfg.Application.MigrationsPath); err != nil {
 		panic(err)
 	}
 
+	queries := repo.New(conn)
+
 	// Repository Initialize
-	userRepository := repositories.NewUserRepository(conn)
-	userProfileRepository := repositories.NewUserProfileRepository(conn)
-	transactionRepository := repositories.NewTransactionRepository(conn)
-	roleRepository := repositories.NewRoleRepository(conn)
-	languageRepository := repositories.NewLanguageRepository(conn)
-	rewardRepository := repositories.NewRewardsRepository(conn)
-	attributeRepository := repositories.NewAttributesRepository(conn)
-	pLanguageRepository := repositories.NewPLanguageRepository(conn)
-	courseRepository := repositories.NewCourseRepository(conn)
-	chapterRepository := repositories.NewChapterRepository(conn)
-	testRepository := repositories.NewTestRepository(conn)
+	// userRepository := repositories.NewUserRepository(conn)
+	// userProfileRepository := repositories.NewUserProfileRepository(conn)
+	// transactionRepository := repositories.NewTransactionRepository(conn)
+	// roleRepository := repositories.NewRoleRepository(conn)
+	// languageRepository := repositories.NewLanguageRepository(conn)
+	// rewardRepository := repositories.NewRewardsRepository(conn)
+	// attributeRepository := repositories.NewAttributesRepository(conn)
+	// pLanguageRepository := repositories.NewPLanguageRepository(conn)
+	// courseRepository := repositories.NewCourseRepository(conn)
+	// chapterRepository := repositories.NewChapterRepository(conn)
+	// testRepository := repositories.NewTestRepository(conn)
 
 	// Utilities Initialize
 	validatorService := validatorService.NewValidatorService()
@@ -54,21 +59,12 @@ func Run(cfg *config.Config) {
 	// Service Initialize
 	allServices := services.CreateNewServices(
 		validatorService,
-		userRepository,
-		userProfileRepository,
-		transactionRepository,
-		roleRepository,
-		languageRepository,
-		rewardRepository,
-		attributeRepository,
-		pLanguageRepository,
-		courseRepository,
-		chapterRepository,
-		testRepository,
+		queries,
+		conn,
 	)
 
 	// First Run & Creating Default Admin
-	firstRun(conn, allServices.RoleService(), allServices.UserService())
+	// firstRun(conn, allServices.RoleService(), allServices.UserService())
 
 	// Handler Initialize
 	handlers := http.NewHandler(allServices)

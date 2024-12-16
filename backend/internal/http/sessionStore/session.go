@@ -6,6 +6,7 @@ import (
 
 	"github.com/C-dexTeam/codex/internal/config/models"
 	"github.com/C-dexTeam/codex/internal/domains"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
@@ -27,14 +28,14 @@ type SessionData struct {
 	NextLevelExp  int
 }
 
-func (s *SessionData) ParseFromUser(user *domains.User, userProfile *domains.UserProfile, userRole *domains.Role) {
-	s.UserID = user.GetID().String()
+func (s *SessionData) ParseFromUser(user *repo.TUsersAuth, userProfile *domains.UserProfile, userRole *domains.Role) {
+	s.UserID = user.ID.String()
 	s.UserProfileID = userProfile.GetID().String()
-	s.PublicKey = user.GetPublicKey()
+	s.PublicKey = user.PublicKey.String
 	s.RoleID = userProfile.GetRoleID().String()
 	s.Role = userRole.GetName()
-	s.Username = user.GetUsername()
-	s.Email = user.GetEmail()
+	s.Username = user.Username.String
+	s.Email = user.Email.String
 	s.Name = userProfile.GetName()
 	s.Surname = userProfile.GetSurname()
 	s.Level = userProfile.GetLevel()

@@ -2,169 +2,176 @@ package services
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	hasherService "github.com/C-dexTeam/codex/pkg/hasher"
 
 	"github.com/google/uuid"
 )
 
 type userService struct {
-	userRepository        domains.IUserRepository
-	userProfileRepository domains.IUserProfileRepository
-	transactionRepository domains.ITransactionRepository
-	utilService           IUtilService
+	db      *sql.DB
+	queries *repo.Queries
 }
 
 func newUserService(
-	userRepository domains.IUserRepository,
-	userProfileRepository domains.IUserProfileRepository,
-	transactionRepository domains.ITransactionRepository,
-	utils IUtilService,
-) domains.IUserService {
+	db *sql.DB,
+	queries *repo.Queries,
+) *userService {
 	return &userService{
-		userRepository:        userRepository,
-		userProfileRepository: userProfileRepository,
-		transactionRepository: transactionRepository,
-		utilService:           utils,
+		db:      db,
+		queries: queries,
 	}
 }
 
-func (s *userService) Login(ctx context.Context, username, password string) (user *domains.User, err error) {
-	users, _, err := s.userRepository.Filter(ctx, domains.UserFilter{
-		Username: username,
-	}, 1, 1)
+func (s *userService) Login(ctx context.Context, username, password string) (*repo.TUsersAuth, error) {
+	users, err := s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+		Username: sql.NullString{String: username},
+		Lim:      1,
+		Off:      1,
+	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(users) == 0 {
-		return nil, serviceErrors.NewServiceErrorWithMessage(400, "username or password not match")
+		return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
 	}
-	user = &users[0]
-	ok, err := hasherService.CompareHashAndPassword(user.GetPassword(), password)
+	user := &users[0]
+	ok, err := hasherService.CompareHashAndPassword(user.Password.String, password)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while comparing password", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileComparingPassword, err)
 	}
 	if !ok {
-		return nil, serviceErrors.NewServiceErrorWithMessage(400, "username or password not match")
+		return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidAuth)
 	}
 	return user, nil
 }
 
 func (s *userService) Register(ctx context.Context, username, email, password, confirmPassword, name, surname string, defaultRoleID uuid.UUID) (err error) {
 	// Checking if the username is already being used
-	users, _, err := s.userRepository.Filter(ctx, domains.UserFilter{Username: username}, 1, 1)
+	users, err := s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+		Username: sql.NullString{String: username},
+		Lim:      1,
+		Off:      1,
+	})
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(users) != 0 {
-		return serviceErrors.NewServiceErrorWithMessageAndError(400, "username already being used", nil)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUsernameBeingUsed)
 	}
-
 	// Checking if the email is already being used
-	users, _, err = s.userRepository.Filter(ctx, domains.UserFilter{Email: email}, 1, 1)
+	users, err = s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+		Email: sql.NullString{String: email},
+		Lim:   1,
+		Off:   1,
+	})
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(users) != 0 {
-		return serviceErrors.NewServiceErrorWithMessageAndError(400, "email already being used", nil)
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrEmailBeingUsed)
 	}
 
 	// Checking if the password and confirmPassword are the same
 	if password != confirmPassword {
-		return serviceErrors.NewServiceErrorWithMessage(400, "passwords do not match")
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrPasswordsDoNotMatch)
 	}
 
 	// Begin a new transaction
-	tx, err := s.transactionRepository.Begin()
+	tx, err := s.db.Begin()
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while beginning transaction", err)
+		return err
 	}
-
-	// Rollback the transaction in case of any error
 	defer func() {
 		if err != nil {
 			tx.Rollback()
 		}
 	}()
-
-	// Creating a new user model
-	newUser, err := domains.NewUser("", username, email, password)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating user", err)
-	}
+	qtx := s.queries.WithTx(tx)
 
 	// Save the new user to the database within the transaction
-	authUserID, err := s.userRepository.AddTx(ctx, tx, newUser)
+	userAuthID, err := qtx.CreateUserAuth(ctx, repo.CreateUserAuthParams{
+		Username: sql.NullString{String: username},
+		Email:    sql.NullString{String: email},
+		Password: sql.NullString{String: password},
+	})
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while adding the user", err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileCreatingUserAuth, err)
 	}
 
-	// Creating a new user profile
-	newUserProfile, err := domains.NewUserProfile(authUserID.String(), defaultRoleID.String(), name, surname, true, 1, 0, 100)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
-	}
-
-	// Save the new user profile to the database within the transaction
-	if err := s.userProfileRepository.AddTx(ctx, tx, newUserProfile); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while creating the user profile", err)
+	if err := qtx.CreateUserProfile(ctx, repo.CreateUserProfileParams{
+		UserAuthID: userAuthID,
+		RoleID:     defaultRoleID,
+		Name:       sql.NullString{String: name},
+		Surname:    sql.NullString{String: surname},
+	}); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileCreatingUserProfile, err)
 	}
 
 	// Commit the transaction
-	if err = s.transactionRepository.Commit(tx); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, "error while committing transaction", err)
+	if err := tx.Commit(); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrTransactionError, err)
 	}
 
 	return nil
 }
 
-func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signature string) (user *domains.User, err error) {
+func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signature string) (*repo.TUsersAuth, error) {
 	ok, err := hasherService.VerifySignature(publicKey, message, signature)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(400, "error while verifing signature", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrWalletVerificationError, err)
 	}
 	if !ok {
-		return nil, serviceErrors.NewServiceErrorWithMessage(400, "unable to verify the signature with the provided public key")
+		return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidWalletConnection)
 	}
 
 	// Checking if the user already has an account
-	users, _, err := s.userRepository.Filter(ctx, domains.UserFilter{PublicKey: publicKey}, 1, 1)
+	users, err := s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+		PublicKey: sql.NullString{String: publicKey},
+		Lim:       1,
+		Off:       1,
+	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(users) == 0 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrUserProfileNotFound, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound, err)
 	}
-	user = &users[0]
+	user := &users[0]
 
-	return
+	return user, err
 }
 
 func (s *userService) ConnectWallet(ctx context.Context, userAuthID, publicKey, message, signature string) (err error) {
-	// ok, err := hasherService.VerifySignature(publicKey, message, signature)
-	// if err != nil {
-	// 	return serviceErrors.NewServiceErrorWithMessageAndError(400, "error while verifing signature", err)
-	// }
-	// if !ok {
-	// 	return serviceErrors.NewServiceErrorWithMessage(400, "unable to verify the signature with the provided public key")
-	// }
+	ok, err := hasherService.VerifySignature(publicKey, message, signature)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrWalletVerificationError, err)
+	}
+	if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidWalletConnection)
+	}
 
-	userAuths, _, err := s.userRepository.Filter(ctx, domains.UserFilter{
-		ID: uuid.MustParse(userAuthID),
-	}, 1, 1)
+	userAuths, err := s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+		ID:  sql.NullString{String: userAuthID},
+		Lim: 1,
+		Off: 1,
+	})
 	if err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 	if len(userAuths) == 0 {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrUserNotFound, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound, err)
 	}
 	user := &userAuths[0]
-	user.SetPublicKey(publicKey)
+	user.PublicKey = sql.NullString{String: publicKey}
 
-	if err := s.userRepository.Update(ctx, user); err != nil {
+	if err := s.queries.UpdateUserAuth(ctx, repo.UpdateUserAuthParams{
+		PublicKey: sql.NullString{String: publicKey},
+	}); err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileUpdatingUserAuth, err)
 	}
 

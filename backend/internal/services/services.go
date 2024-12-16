@@ -1,7 +1,10 @@
 package services
 
 import (
+	"database/sql"
+
 	"github.com/C-dexTeam/codex/internal/domains"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 )
 
 type IService interface {
@@ -21,7 +24,7 @@ type IService interface {
 
 type Services struct {
 	utilService        IUtilService
-	userService        domains.IUserService
+	userService        *userService
 	adminService       domains.IAdminService
 	userProfileService domains.IUserProfileService
 	roleService        domains.IRoleService
@@ -36,45 +39,25 @@ type Services struct {
 
 func CreateNewServices(
 	validatorService IValidatorService,
-	userRepository domains.IUserRepository,
-	userProfileRepository domains.IUserProfileRepository,
-	transactionRepository domains.ITransactionRepository,
-	roleRepository domains.IRoleRepository,
-	languageRepository domains.ILanguagesRepository,
-	rewardRepository domains.IRewardRepository,
-	attributeRepository domains.IAttributeRepository,
-	pLanguageRepository domains.IPLanguagesRepository,
-	courseRepository domains.ICourseRepository,
-	chapterRepository domains.IChapterRepository,
-	testRepository domains.ITestRepository,
-
+	queries *repo.Queries,
+	db *sql.DB,
 ) *Services {
 	utilsService := newUtilService(validatorService)
-	userProfileService := newUserProfileService(userProfileRepository, utilsService)
-	userService := newUserService(userRepository, userProfileRepository, transactionRepository, utilsService)
-	adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
-	roleService := newRoleService(roleRepository)
-	languageService := newLanguageService(languageRepository)
-	rewardService := newRewardService(rewardRepository, attributeRepository)
-	pLanguageService := newPLanguageService(pLanguageRepository)
-	courseService := newCourseService(courseRepository, chapterRepository)
-	chapterService := NewChapterService(chapterRepository)
-	attributeService := NewAttributeService(attributeRepository)
-	testService := newTestService(testRepository)
+	// userProfileService := newUserProfileService(userProfileRepository, utilsService)
+	userService := newUserService(db, queries)
+	// adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
+	// roleService := newRoleService(roleRepository)
+	// languageService := newLanguageService(languageRepository)
+	// rewardService := newRewardService(rewardRepository, attributeRepository)
+	// pLanguageService := newPLanguageService(pLanguageRepository)
+	// courseService := newCourseService(courseRepository, chapterRepository)
+	// chapterService := NewChapterService(chapterRepository)
+	// attributeService := NewAttributeService(attributeRepository)
+	// testService := newTestService(testRepository)
 
 	return &Services{
-		utilService:        utilsService,
-		userService:        userService,
-		adminService:       adminService,
-		userProfileService: userProfileService,
-		roleService:        roleService,
-		languageService:    languageService,
-		rewardService:      rewardService,
-		pLanguageService:   pLanguageService,
-		courseService:      courseService,
-		chapterService:     chapterService,
-		attributeService:   attributeService,
-		testService:        testService,
+		utilService: utilsService,
+		userService: userService,
 	}
 }
 
@@ -86,7 +69,7 @@ func (s *Services) AdminService() domains.IAdminService {
 	return s.adminService
 }
 
-func (s *Services) UserService() domains.IUserService {
+func (s *Services) UserService() *userService {
 	return s.userService
 }
 

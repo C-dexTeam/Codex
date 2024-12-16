@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS t_users_auth (
     public_key VARCHAR(128),
     username VARCHAR(30),
     email VARCHAR(40),
-    password VARCHAR(255)
+    password VARCHAR(255),
+    deleted_at TIMESTAMP
 );
 
 -- +goose StatementEnd

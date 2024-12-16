@@ -77,9 +77,15 @@ const (
 	ErrChapterFuncNameCannotBeEmpty = "CHAPTER_FUNCNAME_CANNOT_BE_EMPTY"
 	ErrChapterFuncNameTooLong       = "CHAPTER_FUNCNAME_IS_TOO_LONG"
 
+	ErrUsernameBeingUsed   = "USERNAME_ALREADY_BEING_USED"
+	ErrInvalidAuth         = "USERNAME_OR_PASSWORD_WRONG"
+	ErrEmailBeingUsed      = "EMAIL_ALREADY_BEING_USED"
+	ErrPasswordsDoNotMatch = "PASSWORDS_DO_NOT_MATCH"
+
 	// General
-	ErrInvalidID      = "INVALID_ID"
-	ErrInvalidBoolean = "INVALID_BOOLEAN"
+	ErrInvalidID               = "INVALID_ID"
+	ErrInvalidBoolean          = "INVALID_BOOLEAN"
+	ErrInvalidWalletConnection = "INVALID_WALLET_CONNECTION"
 )
 
 // 500
@@ -92,9 +98,14 @@ const (
 	ErrErrorWhileFilteringCourse               = "ERROR_WHILE_FILTERING_COURSES"
 	ErrErrorWhileFilteringChapter              = "ERROR_WHILE_FILTERING_CHAPTERS"
 	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"
+	ErrErrorWhileCreatingUserAuth              = "ERROR_WHILE_CREATING_USER_AUTH"
+	ErrErrorWhileCreatingUserProfile           = "ERROR_WHILE_CREATING_USER_PROFILE"
 	ErrErrorWhileFilteringUsers                = "ERROR_WHILE_FILTERING_USERS"
 	ErrErrorWhileUpdatingUserAuth              = "ERROR_WHILE_UPDATING_USERS"
 	ErrErrorWhileFilteringTests                = "ERROR_WHILE_FILTERING_TESTS"
 	ErrErrorWhileFilteringInputs               = "ERROR_WHILE_FILTERING_INPUTS"
 	ErrErrorWhileFilteringOutputs              = "ERROR_WHILE_FILTERING_OUTPUTS"
+	ErrErrorWhileComparingPassword             = "ERROR_WHILE_COMPARING_PASSWORDS"
+	ErrTransactionError                        = "ERROR_WHILE_COMMITING"
+	ErrWalletVerificationError                 = "ERROR_WHILE_VERIFICATON_WALLET"
 )
