@@ -1,0 +1,13 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "queries/*"
+    schema: "schemas/*"
+    gen:
+      go:
+        sql_package: "pgx/v5"
+        package: "repositories"
+        out: "./out"
+        overrides:
+          - go_type: "github.com/google/uuid.UUID"
+            db_type: "uuid"

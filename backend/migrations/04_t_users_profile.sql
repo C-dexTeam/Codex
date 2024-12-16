@@ -1,8 +1,8 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS t_user_profiles (
+CREATE TABLE IF NOT EXISTS t_users_profile (
     id UUID PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL,
+    user_auth_id UUID NOT NULL,
     role_id UUID NOT NULL,
     name varchar(30),
     surname varchar(30),
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS t_user_profiles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 
-    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES t_users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_auth_id FOREIGN KEY (user_auth_id) REFERENCES t_users_auth(id) ON DELETE CASCADE,
     CONSTRAINT fk_role_id FOREIGN KEY (role_id) REFERENCES t_roles(id)
 );
 
@@ -21,5 +21,5 @@ CREATE TABLE IF NOT EXISTS t_user_profiles (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS t_users;
+DROP TABLE IF EXISTS t_users_profile;
 -- +goose StatementEnd
