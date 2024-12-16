@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const changeLevel = `-- name: ChangeLevel :exec
+const changeUserLevel = `-- name: ChangeUserLevel :exec
 UPDATE
     t_users_profile
 SET
@@ -23,15 +23,15 @@ WHERE
     id = $4
 `
 
-type ChangeLevelParams struct {
+type ChangeUserLevelParams struct {
 	Level         sql.NullInt32
 	Experience    sql.NullInt32
 	NextLevelExp  sql.NullInt32
 	UserProfileID uuid.UUID
 }
 
-func (q *Queries) ChangeLevel(ctx context.Context, arg ChangeLevelParams) error {
-	_, err := q.db.ExecContext(ctx, changeLevel,
+func (q *Queries) ChangeUserLevel(ctx context.Context, arg ChangeUserLevelParams) error {
+	_, err := q.db.ExecContext(ctx, changeUserLevel,
 		arg.Level,
 		arg.Experience,
 		arg.NextLevelExp,
@@ -40,7 +40,7 @@ func (q *Queries) ChangeLevel(ctx context.Context, arg ChangeLevelParams) error 
 	return err
 }
 
-const changeRole = `-- name: ChangeRole :exec
+const changeUserRole = `-- name: ChangeUserRole :exec
 UPDATE
     t_users_profile
 SET
@@ -49,13 +49,13 @@ WHERE
     id = $2
 `
 
-type ChangeRoleParams struct {
+type ChangeUserRoleParams struct {
 	RoleID        uuid.UUID
 	UserProfileID uuid.UUID
 }
 
-func (q *Queries) ChangeRole(ctx context.Context, arg ChangeRoleParams) error {
-	_, err := q.db.ExecContext(ctx, changeRole, arg.RoleID, arg.UserProfileID)
+func (q *Queries) ChangeUserRole(ctx context.Context, arg ChangeUserRoleParams) error {
+	_, err := q.db.ExecContext(ctx, changeUserRole, arg.RoleID, arg.UserProfileID)
 	return err
 }
 
@@ -83,7 +83,7 @@ func (q *Queries) CreateUserProfile(ctx context.Context, arg CreateUserProfilePa
 	return err
 }
 
-const getProfileByID = `-- name: GetProfileByID :one
+const getUserProfileByID = `-- name: GetUserProfileByID :one
 SELECT 
     up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp, up.created_at, up.deleted_at 
 FROM t_users_profile as up
@@ -91,22 +91,9 @@ WHERE
     up.id = $1
 `
 
-type GetProfileByIDRow struct {
-	ID           uuid.UUID
-	UserAuthID   uuid.UUID
-	RoleID       uuid.UUID
-	Name         sql.NullString
-	Surname      sql.NullString
-	Level        sql.NullInt32
-	Experience   sql.NullInt32
-	NextLevelExp sql.NullInt32
-	CreatedAt    sql.NullTime
-	DeletedAt    sql.NullTime
-}
-
-func (q *Queries) GetProfileByID(ctx context.Context, id uuid.UUID) (GetProfileByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getProfileByID, id)
-	var i GetProfileByIDRow
+func (q *Queries) GetUserProfileByID(ctx context.Context, id uuid.UUID) (TUsersProfile, error) {
+	row := q.db.QueryRowContext(ctx, getUserProfileByID, id)
+	var i TUsersProfile
 	err := row.Scan(
 		&i.ID,
 		&i.UserAuthID,
@@ -122,24 +109,26 @@ func (q *Queries) GetProfileByID(ctx context.Context, id uuid.UUID) (GetProfileB
 	return i, err
 }
 
-const getProfiles = `-- name: GetProfiles :many
+const getUsersProfile = `-- name: GetUsersProfile :many
 SELECT up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp,
        up.created_at, up.deleted_at 
 FROM t_users_profile as up
 WHERE
-    ($1::text IS NULL OR us.id = $1) AND
-    ($2::text IS NULL OR us.user_auth_id = $2) AND
-    ($3::text IS NULL OR name ILIKE '%' || $3::text || '%') AND
-    ($4::text IS NULL OR surname ILIKE '%' || $4::text || '%') AND
-    ($5::integer IS NULL OR us.level = $5) AND
-    ($6::integer IS NULL OR us.experience = $6) AND
-    ($7::integer IS NULL OR us.next_level_exp = $7)
-LIMIT $9 OFFSET $8
+    ($1::text IS NULL OR us.id = $1::text) AND
+    ($2::text IS NULL OR us.user_auth_id = $2::text) AND
+    ($3::text IS NULL OR us.role_id = $3::text) AND
+    ($4::text IS NULL OR name ILIKE '%' || $4::text || '%') AND
+    ($5::text IS NULL OR surname ILIKE '%' || $5::text || '%') AND
+    ($6::integer IS NULL OR us.level = $6) AND
+    ($7::integer IS NULL OR us.experience = $7) AND
+    ($8::integer IS NULL OR us.next_level_exp = $8)
+LIMIT $10 OFFSET $9
 `
 
-type GetProfilesParams struct {
+type GetUsersProfileParams struct {
 	ID           sql.NullString
 	UserAuthID   sql.NullString
+	RoleID       sql.NullString
 	Name         sql.NullString
 	Surname      sql.NullString
 	Level        sql.NullInt32
@@ -149,23 +138,11 @@ type GetProfilesParams struct {
 	Lim          int32
 }
 
-type GetProfilesRow struct {
-	ID           uuid.UUID
-	UserAuthID   uuid.UUID
-	RoleID       uuid.UUID
-	Name         sql.NullString
-	Surname      sql.NullString
-	Level        sql.NullInt32
-	Experience   sql.NullInt32
-	NextLevelExp sql.NullInt32
-	CreatedAt    sql.NullTime
-	DeletedAt    sql.NullTime
-}
-
-func (q *Queries) GetProfiles(ctx context.Context, arg GetProfilesParams) ([]GetProfilesRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProfiles,
+func (q *Queries) GetUsersProfile(ctx context.Context, arg GetUsersProfileParams) ([]TUsersProfile, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersProfile,
 		arg.ID,
 		arg.UserAuthID,
+		arg.RoleID,
 		arg.Name,
 		arg.Surname,
 		arg.Level,
@@ -178,9 +155,9 @@ func (q *Queries) GetProfiles(ctx context.Context, arg GetProfilesParams) ([]Get
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetProfilesRow
+	var items []TUsersProfile
 	for rows.Next() {
-		var i GetProfilesRow
+		var i TUsersProfile
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserAuthID,

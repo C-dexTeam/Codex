@@ -4,13 +4,16 @@ import (
 	"database/sql"
 
 	"github.com/C-dexTeam/codex/internal/domains"
+	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
+	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
+	"github.com/google/uuid"
 )
 
 type IService interface {
 	UtilService() IUtilService
-	UserService() domains.IUserService
-	UserProfileService() domains.IUserProfileService
+	UserService() *userService
+	UserProfileService() *userProfileService
 	RoleService() domains.IRoleService
 	AdminService() domains.IAdminService
 	RewardService() domains.IRewardService
@@ -26,7 +29,7 @@ type Services struct {
 	utilService        IUtilService
 	userService        *userService
 	adminService       domains.IAdminService
-	userProfileService domains.IUserProfileService
+	userProfileService *userProfileService
 	roleService        domains.IRoleService
 	languageService    domains.ILanguagesService
 	rewardService      domains.IRewardService
@@ -42,9 +45,9 @@ func CreateNewServices(
 	queries *repo.Queries,
 	db *sql.DB,
 ) *Services {
-	utilsService := newUtilService(validatorService)
-	// userProfileService := newUserProfileService(userProfileRepository, utilsService)
-	userService := newUserService(db, queries)
+	utilService := newUtilService(validatorService)
+	userProfileService := newUserProfileService(db, queries, utilService)
+	userService := newUserService(db, queries, utilService)
 	// adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
 	// roleService := newRoleService(roleRepository)
 	// languageService := newLanguageService(languageRepository)
@@ -56,8 +59,9 @@ func CreateNewServices(
 	// testService := newTestService(testRepository)
 
 	return &Services{
-		utilService: utilsService,
-		userService: userService,
+		utilService:        utilService,
+		userService:        userService,
+		userProfileService: userProfileService,
 	}
 }
 
@@ -73,7 +77,7 @@ func (s *Services) UserService() *userService {
 	return s.userService
 }
 
-func (s *Services) UserProfileService() domains.IUserProfileService {
+func (s *Services) UserProfileService() *userProfileService {
 	return s.userProfileService
 }
 
@@ -117,6 +121,7 @@ type IValidatorService interface {
 
 type IUtilService interface {
 	Validator() IValidatorService
+	ParseUUID(id string) (uuid.UUID, error)
 }
 
 // -------------------
@@ -135,4 +140,19 @@ func newUtilService(
 
 func (s *utilService) Validator() IValidatorService {
 	return s.validatorService
+}
+
+func (s *utilService) ParseUUID(id string) (uuid.UUID, error) {
+	if id == "" {
+		return uuid.UUID{}, nil
+	}
+	parsedUUID, err := uuid.Parse(id)
+	if err != nil {
+		return uuid.UUID{}, serviceErrors.NewServiceErrorWithMessageAndError(
+			errorDomains.StatusBadRequest,
+			errorDomains.ErrInvalidID,
+			err,
+		)
+	}
+	return parsedUUID, nil
 }

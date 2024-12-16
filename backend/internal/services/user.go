@@ -13,22 +13,25 @@ import (
 )
 
 type userService struct {
-	db      *sql.DB
-	queries *repo.Queries
+	db          *sql.DB
+	queries     *repo.Queries
+	utilService IUtilService
 }
 
 func newUserService(
 	db *sql.DB,
 	queries *repo.Queries,
+	utilService IUtilService,
 ) *userService {
 	return &userService{
-		db:      db,
-		queries: queries,
+		db:          db,
+		queries:     queries,
+		utilService: utilService,
 	}
 }
 
 func (s *userService) Login(ctx context.Context, username, password string) (*repo.TUsersAuth, error) {
-	users, err := s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+	users, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
 		Username: sql.NullString{String: username},
 		Lim:      1,
 		Off:      1,
@@ -52,7 +55,7 @@ func (s *userService) Login(ctx context.Context, username, password string) (*re
 
 func (s *userService) Register(ctx context.Context, username, email, password, confirmPassword, name, surname string, defaultRoleID uuid.UUID) (err error) {
 	// Checking if the username is already being used
-	users, err := s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+	users, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
 		Username: sql.NullString{String: username},
 		Lim:      1,
 		Off:      1,
@@ -64,7 +67,7 @@ func (s *userService) Register(ctx context.Context, username, email, password, c
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUsernameBeingUsed)
 	}
 	// Checking if the email is already being used
-	users, err = s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+	users, err = s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
 		Email: sql.NullString{String: email},
 		Lim:   1,
 		Off:   1,
@@ -130,7 +133,7 @@ func (s *userService) AuthWallet(ctx context.Context, publicKey, message, signat
 	}
 
 	// Checking if the user already has an account
-	users, err := s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+	users, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
 		PublicKey: sql.NullString{String: publicKey},
 		Lim:       1,
 		Off:       1,
@@ -155,7 +158,7 @@ func (s *userService) ConnectWallet(ctx context.Context, userAuthID, publicKey, 
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidWalletConnection)
 	}
 
-	userAuths, err := s.queries.GetUserAuths(ctx, repo.GetUserAuthsParams{
+	userAuths, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
 		ID:  sql.NullString{String: userAuthID},
 		Lim: 1,
 		Off: 1,

@@ -1,4 +1,4 @@
--- name: GetUserAuths :many
+-- name: GetUsersAuth :many
 SELECT 
     us.id, us.public_key, us.username, us.email, us.password, us.deleted_at
 FROM 

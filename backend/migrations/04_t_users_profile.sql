@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS t_users_profile (
     role_id UUID NOT NULL,
     name varchar(30),
     surname varchar(30),
-    first_login BOOLEAN DEFAULT TRUE,
     level INT DEFAULT 1,
     experience INT DEFAULT 0,
     next_level_exp INT DEFAULT 100,

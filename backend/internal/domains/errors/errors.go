@@ -93,7 +93,7 @@ const (
 	ErrErrorWhileFilteringRewards              = "ERROR_WHILE_FILTERING_REWARDS"
 	ErrErrorWhileFilteringRewardsAttributes    = "ERROR_WHILE_FILTERING_REWARDS_ATTRIBUTES"
 	ErrErrorWhileFilteringProgrammingLanguages = "ERROR_WHILE_FILTERING_PROGRAMMING_LANGUAGES"
-	ErrErrorWhileFilteringUserPorfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
+	ErrErrorWhileFilteringUserProfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
 	ErrErrorWhileFilteringRole                 = "ERROR_WHILE_FILTERING_ROLES"
 	ErrErrorWhileFilteringCourse               = "ERROR_WHILE_FILTERING_COURSES"
 	ErrErrorWhileFilteringChapter              = "ERROR_WHILE_FILTERING_CHAPTERS"

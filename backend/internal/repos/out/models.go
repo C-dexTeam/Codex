@@ -129,7 +129,6 @@ type TUsersProfile struct {
 	RoleID       uuid.UUID
 	Name         sql.NullString
 	Surname      sql.NullString
-	FirstLogin   sql.NullBool
 	Level        sql.NullInt32
 	Experience   sql.NullInt32
 	NextLevelExp sql.NullInt32

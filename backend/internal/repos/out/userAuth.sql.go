@@ -67,7 +67,7 @@ func (q *Queries) GetUserAuthByID(ctx context.Context, userAuthID uuid.UUID) (Ge
 	return i, err
 }
 
-const getUserAuths = `-- name: GetUserAuths :many
+const getUsersAuth = `-- name: GetUsersAuth :many
 SELECT 
     us.id, us.public_key, us.username, us.email, us.password, us.deleted_at
 FROM 
@@ -81,7 +81,7 @@ WHERE
 LIMIT $6 OFFSET $5
 `
 
-type GetUserAuthsParams struct {
+type GetUsersAuthParams struct {
 	ID        sql.NullString
 	PublicKey sql.NullString
 	Username  sql.NullString
@@ -90,8 +90,8 @@ type GetUserAuthsParams struct {
 	Lim       int32
 }
 
-func (q *Queries) GetUserAuths(ctx context.Context, arg GetUserAuthsParams) ([]TUsersAuth, error) {
-	rows, err := q.db.QueryContext(ctx, getUserAuths,
+func (q *Queries) GetUsersAuth(ctx context.Context, arg GetUsersAuthParams) ([]TUsersAuth, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersAuth,
 		arg.ID,
 		arg.PublicKey,
 		arg.Username,
