@@ -4,8 +4,8 @@ SELECT
 FROM 
     t_users_auth as us
 WHERE
-    (sqlc.narg(id)::TEXT IS NULL OR us.id = sqlc.narg(id)::TEXT) AND
-    (sqlc.narg(public_key)::TEXT IS NULL OR us.public_key = sqlc.narg(public_key)) AND
+    (sqlc.narg(id)::UUID IS NULL OR us.id = sqlc.narg(id)::UUID) AND
+    (sqlc.narg(public_key)::TEXT IS NULL OR us.public_key = sqlc.narg(public_key)::TEXT) AND
     (sqlc.narg(username)::TEXT IS NULL OR username ILIKE '%' || sqlc.narg(username)::TEXT || '%') AND
     (sqlc.narg(email)::TEXT IS NULL OR email ILIKE '%' || sqlc.narg(email)::TEXT || '%') AND
     deleted_at IS NULL
@@ -13,11 +13,19 @@ LIMIT @lim OFFSET @off;
 
 -- name: GetUserAuthByID :one
 SELECT 
-    id, public_key, username, email 
+    id, public_key, username, email, password, deleted_at
 FROM 
     t_users_auth
 WHERE 
     id = @user_auth_id;
+
+-- name: GetUserAuthByUsername :one
+SELECT 
+    id, public_key, username, email, password, deleted_at
+FROM 
+    t_users_auth 
+WHERE 
+    username = @username;
 
 -- name: CreateUserAuth :one
 INSERT INTO t_users_auth 
@@ -43,3 +51,6 @@ SET
     deleted_at = @deleted_at
 WHERE
     id = @user_auth_id;
+
+-- name: CountUserByName :one
+SELECT COUNT(*) FROM t_users_auth WHERE username = @username;

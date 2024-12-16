@@ -12,6 +12,17 @@ import (
 	"github.com/google/uuid"
 )
 
+const countUserByName = `-- name: CountUserByName :one
+SELECT COUNT(*) FROM t_users_auth WHERE username = $1
+`
+
+func (q *Queries) CountUserByName(ctx context.Context, username sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countUserByName, username)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createUserAuth = `-- name: CreateUserAuth :one
 INSERT INTO t_users_auth 
     (public_key, username, email, password)
@@ -41,28 +52,46 @@ func (q *Queries) CreateUserAuth(ctx context.Context, arg CreateUserAuthParams) 
 
 const getUserAuthByID = `-- name: GetUserAuthByID :one
 SELECT 
-    id, public_key, username, email 
+    id, public_key, username, email, password, deleted_at
 FROM 
     t_users_auth
 WHERE 
     id = $1
 `
 
-type GetUserAuthByIDRow struct {
-	ID        uuid.UUID
-	PublicKey sql.NullString
-	Username  sql.NullString
-	Email     sql.NullString
-}
-
-func (q *Queries) GetUserAuthByID(ctx context.Context, userAuthID uuid.UUID) (GetUserAuthByIDRow, error) {
+func (q *Queries) GetUserAuthByID(ctx context.Context, userAuthID uuid.UUID) (TUsersAuth, error) {
 	row := q.db.QueryRowContext(ctx, getUserAuthByID, userAuthID)
-	var i GetUserAuthByIDRow
+	var i TUsersAuth
 	err := row.Scan(
 		&i.ID,
 		&i.PublicKey,
 		&i.Username,
 		&i.Email,
+		&i.Password,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getUserAuthByUsername = `-- name: GetUserAuthByUsername :one
+SELECT 
+    id, public_key, username, email, password, deleted_at
+FROM 
+    t_users_auth 
+WHERE 
+    username = $1
+`
+
+func (q *Queries) GetUserAuthByUsername(ctx context.Context, username sql.NullString) (TUsersAuth, error) {
+	row := q.db.QueryRowContext(ctx, getUserAuthByUsername, username)
+	var i TUsersAuth
+	err := row.Scan(
+		&i.ID,
+		&i.PublicKey,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.DeletedAt,
 	)
 	return i, err
 }
@@ -73,8 +102,8 @@ SELECT
 FROM 
     t_users_auth as us
 WHERE
-    ($1::TEXT IS NULL OR us.id = $1::TEXT) AND
-    ($2::TEXT IS NULL OR us.public_key = $2) AND
+    ($1::UUID IS NULL OR us.id = $1::UUID) AND
+    ($2::TEXT IS NULL OR us.public_key = $2::TEXT) AND
     ($3::TEXT IS NULL OR username ILIKE '%' || $3::TEXT || '%') AND
     ($4::TEXT IS NULL OR email ILIKE '%' || $4::TEXT || '%') AND
     deleted_at IS NULL
@@ -82,7 +111,7 @@ LIMIT $6 OFFSET $5
 `
 
 type GetUsersAuthParams struct {
-	ID        sql.NullString
+	ID        uuid.NullUUID
 	PublicKey sql.NullString
 	Username  sql.NullString
 	Email     sql.NullString

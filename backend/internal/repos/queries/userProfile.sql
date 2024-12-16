@@ -3,14 +3,14 @@ SELECT up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.exp
        up.created_at, up.deleted_at 
 FROM t_users_profile as up
 WHERE
-    (sqlc.narg(id)::text IS NULL OR us.id = sqlc.narg(id)::text) AND
-    (sqlc.narg(user_auth_id)::text IS NULL OR us.user_auth_id = sqlc.narg(user_auth_id)::text) AND
-    (sqlc.narg(role_id)::text IS NULL OR us.role_id = sqlc.narg(role_id)::text) AND
-    (sqlc.narg(name)::text IS NULL OR name ILIKE '%' || sqlc.narg(name)::text || '%') AND
-    (sqlc.narg(surname)::text IS NULL OR surname ILIKE '%' || sqlc.narg(surname)::text || '%') AND
-    (sqlc.narg(level)::integer IS NULL OR us.level = sqlc.narg(level)) AND
-    (sqlc.narg(experience)::integer IS NULL OR us.experience = sqlc.narg(experience)) AND
-    (sqlc.narg(next_level_exp)::integer IS NULL OR us.next_level_exp = sqlc.narg(next_level_exp))
+    (sqlc.narg(id)::UUID IS NULL OR up.id = sqlc.narg(id)::UUID) AND
+    (sqlc.narg(user_auth_id)::UUID IS NULL OR up.user_auth_id = sqlc.narg(user_auth_id)::UUID) AND
+    (sqlc.narg(role_id)::UUID IS NULL OR up.role_id = sqlc.narg(role_id)::UUID) AND
+    (sqlc.narg(name)::TEXT IS NULL OR up.name ILIKE '%' || sqlc.narg(name)::TEXT || '%') AND
+    (sqlc.narg(surname)::TEXT IS NULL OR up.surname ILIKE '%' || sqlc.narg(surname)::TEXT || '%') AND
+    (sqlc.narg(level)::INTEGER IS NULL OR up.level = sqlc.narg(level)::INTEGER) AND
+    (sqlc.narg(experience)::INTEGER IS NULL OR up.experience = sqlc.narg(experience)::INTEGER) AND
+    (sqlc.narg(next_level_exp)::INTEGER IS NULL OR up.next_level_exp = sqlc.narg(next_level_exp)::INTEGER)
 LIMIT @lim OFFSET @off;
 
 -- name: GetUserProfileByID :one

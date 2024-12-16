@@ -18,7 +18,6 @@ import (
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/C-dexTeam/codex/internal/services"
 	validatorService "github.com/C-dexTeam/codex/pkg/validator_service"
-	"github.com/jmoiron/sqlx"
 	"github.com/pressly/goose"
 
 	_ "github.com/lib/pq"
@@ -63,8 +62,10 @@ func Run(cfg *config.Config) {
 		conn,
 	)
 
+	allServices.RoleService()
+
 	// First Run & Creating Default Admin
-	// firstRun(conn, allServices.RoleService(), allServices.UserService())
+	firstRun(queries, allServices.RoleService(), allServices.UserService())
 
 	// Handler Initialize
 	handlers := http.NewHandler(allServices)
@@ -88,14 +89,18 @@ func Run(cfg *config.Config) {
 	fmt.Println("Fiber was successful shutdown.")
 }
 
-func firstRun(db *sqlx.DB, roleService domains.IRoleService, userService domains.IUserService) {
-	var count int
-	err := db.Get(&count, "SELECT COUNT(*) FROM t_users WHERE username = $1", "admin")
+func firstRun(repo *repo.Queries, roleService *services.RoleService, userService *services.UserService) {
+	// SQL sorgusunu sqlc ile çalıştırıyoruz
+
+	count, err := repo.CountUserByName(context.Background(), sql.NullString{String: "admin", Valid: true})
 	if err != nil {
 		log.Fatalf("Error checking for admin user: %v", err)
 	}
 	if count == 0 {
+		// Admin rolünü alıyoruz
 		adminRole, _ := roleService.GetByName(context.Background(), domains.RoleAdmin)
-		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", "admin", "admin", adminRole.GetID())
+
+		// Kullanıcıyı kaydediyoruz
+		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", "admin", "admin", adminRole.ID)
 	}
 }

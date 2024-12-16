@@ -57,11 +57,11 @@ func (s *userProfileService) GetUsers(
 	}
 
 	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
-		ID:         sql.NullString{String: id},
-		UserAuthID: sql.NullString{String: userAuthID},
-		RoleID:     sql.NullString{String: roleID},
-		Name:       sql.NullString{String: name},
-		Surname:    sql.NullString{String: surname},
+		ID:         s.utilService.ParseNullUUID(id),
+		UserAuthID: s.utilService.ParseNullUUID(userAuthID),
+		RoleID:     s.utilService.ParseNullUUID(roleID),
+		Name:       s.utilService.ParseString(name),
+		Surname:    s.utilService.ParseString(surname),
 		Lim:        int32(limitNum),
 		Off:        (int32(pageNum) - 1) * int32(limitNum),
 	})
@@ -81,7 +81,7 @@ func (s *userProfileService) Update(
 	}
 
 	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
-		ID:  sql.NullString{String: id},
+		ID:  uuid.NullUUID{UUID: uuid.MustParse(id), Valid: true},
 		Lim: 1,
 		Off: 1,
 	})
@@ -102,8 +102,8 @@ func (s *userProfileService) Update(
 
 	if err := s.queries.UpdateUserProfile(ctx, repo.UpdateUserProfileParams{
 		UserProfileID: newProfile.ID,
-		Name:          sql.NullString{String: newProfile.Name.String},
-		Surname:       sql.NullString{String: newProfile.Surname.String},
+		Name:          s.utilService.ParseString(name),
+		Surname:       s.utilService.ParseString(surname),
 	}); err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (s *userProfileService) ChangeUserRole(
 	}
 
 	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
-		ID:  sql.NullString{String: id},
+		ID:  s.utilService.ParseNullUUID(id),
 		Lim: 1,
 		Off: 1,
 	})
@@ -153,7 +153,7 @@ func (s *userProfileService) AddUserExp(ctx context.Context,
 	}
 
 	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
-		ID:  sql.NullString{String: id},
+		ID:  s.utilService.ParseNullUUID(id),
 		Lim: 1,
 		Off: 1,
 	})

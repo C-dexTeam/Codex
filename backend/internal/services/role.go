@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type roleService struct {
+type RoleService struct {
 	db          *sql.DB
 	queries     *repo.Queries
 	utilService IUtilService
@@ -22,19 +22,19 @@ func newRoleService(
 	db *sql.DB,
 	queries *repo.Queries,
 	utilService IUtilService,
-) *roleService {
-	return &roleService{
+) *RoleService {
+	return &RoleService{
 		db:          db,
 		queries:     queries,
 		utilService: utilService,
 	}
 }
 
-func (s *roleService) GetDefault(ctx context.Context) (*repo.TRole, error) {
+func (s *RoleService) GetDefault(ctx context.Context) (*repo.TRole, error) {
 	return s.GetByName(ctx, domains.RoleDefaultRole)
 }
 
-func (s *roleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (*repo.TRole, error) {
+func (s *RoleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (*repo.TRole, error) {
 	role, err := s.queries.GetRoleByID(ctx, roleID)
 	if role.ID == uuid.Nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
@@ -43,7 +43,7 @@ func (s *roleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (*repo.
 	return &role, nil
 }
 
-func (s *roleService) GetByName(ctx context.Context, name string) (*repo.TRole, error) {
+func (s *RoleService) GetByName(ctx context.Context, name string) (*repo.TRole, error) {
 	role, err := s.queries.GetRoleByName(ctx, name)
 	if role.ID == uuid.Nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)

@@ -12,9 +12,9 @@ import (
 
 type IService interface {
 	UtilService() IUtilService
-	UserService() *userService
+	UserService() *UserService
 	UserProfileService() *userProfileService
-	RoleService() *roleService
+	RoleService() *RoleService
 	AdminService() domains.IAdminService
 	RewardService() domains.IRewardService
 	ProgrammingService() domains.IPLanguagesService
@@ -27,10 +27,10 @@ type IService interface {
 
 type Services struct {
 	utilService        IUtilService
-	userService        *userService
+	userService        *UserService
 	adminService       domains.IAdminService
 	userProfileService *userProfileService
-	roleService        *roleService
+	roleService        *RoleService
 	languageService    domains.ILanguagesService
 	rewardService      domains.IRewardService
 	pLanguageService   domains.IPLanguagesService
@@ -74,7 +74,7 @@ func (s *Services) AdminService() domains.IAdminService {
 	return s.adminService
 }
 
-func (s *Services) UserService() *userService {
+func (s *Services) UserService() *UserService {
 	return s.userService
 }
 
@@ -82,7 +82,7 @@ func (s *Services) UserProfileService() *userProfileService {
 	return s.userProfileService
 }
 
-func (s *Services) RoleService() *roleService {
+func (s *Services) RoleService() *RoleService {
 	return s.roleService
 }
 
@@ -123,6 +123,8 @@ type IValidatorService interface {
 type IUtilService interface {
 	Validator() IValidatorService
 	ParseUUID(id string) (uuid.UUID, error)
+	ParseString(str string) sql.NullString
+	ParseNullUUID(str string) uuid.NullUUID
 }
 
 // -------------------
@@ -156,4 +158,38 @@ func (s *utilService) ParseUUID(id string) (uuid.UUID, error) {
 		)
 	}
 	return parsedUUID, nil
+}
+
+func (s *utilService) ParseString(str string) sql.NullString {
+	var value string
+	var valid bool
+
+	if str == "" {
+		value = ""
+		valid = false
+	} else {
+		value = str
+		valid = true
+	}
+
+	return sql.NullString{String: value, Valid: valid}
+}
+
+func (s *utilService) ParseNullUUID(str string) uuid.NullUUID {
+	var value uuid.UUID
+	var valid bool
+
+	if str == "" {
+		valid = false
+	} else {
+		parsedUUID, err := uuid.Parse(str)
+		if err != nil {
+			valid = false
+		} else {
+			value = parsedUUID
+			valid = true
+		}
+	}
+
+	return uuid.NullUUID{UUID: value, Valid: valid}
 }

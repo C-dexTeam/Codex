@@ -106,6 +106,7 @@ const (
 	ErrErrorWhileFilteringInputs               = "ERROR_WHILE_FILTERING_INPUTS"
 	ErrErrorWhileFilteringOutputs              = "ERROR_WHILE_FILTERING_OUTPUTS"
 	ErrErrorWhileComparingPassword             = "ERROR_WHILE_COMPARING_PASSWORDS"
+	ErrErrorWhileHashing                       = "ERROR_WHILE_HASHING"
 	ErrTransactionError                        = "ERROR_WHILE_COMMITING"
 	ErrWalletVerificationError                 = "ERROR_WHILE_VERIFICATON_WALLET"
 )

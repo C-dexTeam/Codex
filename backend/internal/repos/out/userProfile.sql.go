@@ -114,21 +114,21 @@ SELECT up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.exp
        up.created_at, up.deleted_at 
 FROM t_users_profile as up
 WHERE
-    ($1::text IS NULL OR us.id = $1::text) AND
-    ($2::text IS NULL OR us.user_auth_id = $2::text) AND
-    ($3::text IS NULL OR us.role_id = $3::text) AND
-    ($4::text IS NULL OR name ILIKE '%' || $4::text || '%') AND
-    ($5::text IS NULL OR surname ILIKE '%' || $5::text || '%') AND
-    ($6::integer IS NULL OR us.level = $6) AND
-    ($7::integer IS NULL OR us.experience = $7) AND
-    ($8::integer IS NULL OR us.next_level_exp = $8)
+    ($1::UUID IS NULL OR up.id = $1::UUID) AND
+    ($2::UUID IS NULL OR up.user_auth_id = $2::UUID) AND
+    ($3::UUID IS NULL OR up.role_id = $3::UUID) AND
+    ($4::TEXT IS NULL OR up.name ILIKE '%' || $4::TEXT || '%') AND
+    ($5::TEXT IS NULL OR up.surname ILIKE '%' || $5::TEXT || '%') AND
+    ($6::INTEGER IS NULL OR up.level = $6::INTEGER) AND
+    ($7::INTEGER IS NULL OR up.experience = $7::INTEGER) AND
+    ($8::INTEGER IS NULL OR up.next_level_exp = $8::INTEGER)
 LIMIT $10 OFFSET $9
 `
 
 type GetUsersProfileParams struct {
-	ID           sql.NullString
-	UserAuthID   sql.NullString
-	RoleID       sql.NullString
+	ID           uuid.NullUUID
+	UserAuthID   uuid.NullUUID
+	RoleID       uuid.NullUUID
 	Name         sql.NullString
 	Surname      sql.NullString
 	Level        sql.NullInt32
