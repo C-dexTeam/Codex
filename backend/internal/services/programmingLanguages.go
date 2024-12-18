@@ -2,29 +2,38 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"strconv"
+	"strings"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
 
 type pLanguageService struct {
-	pLanguageRepository domains.IPLanguagesRepository
+	db          *sql.DB
+	queries     *repo.Queries
+	utilService IUtilService
 }
 
 func newPLanguageService(
-	pLanguageRepository domains.IPLanguagesRepository,
-) domains.IPLanguagesService {
+	db *sql.DB,
+	queries *repo.Queries,
+	utilService IUtilService,
+) *pLanguageService {
 	return &pLanguageService{
-		pLanguageRepository: pLanguageRepository,
+		db:          db,
+		queries:     queries,
+		utilService: utilService,
 	}
 }
 
 func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
 	id, languageID, name, page, limit string,
-) (programmingLanguages []domains.ProgrammingLanguage, err error) {
+) ([]repo.TProgrammingLanguage, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -35,30 +44,19 @@ func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
 		limitNum = domains.DefaultProgrammingLanguageLimit
 	}
 
-	var (
-		pLanguageUUID uuid.UUID
-		languageUUID  uuid.UUID
-	)
-	if id != "" {
-		pLanguageUUID, err = uuid.Parse(id)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
-	}
-	if languageID != "" {
-		languageUUID, err = uuid.Parse(languageID)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
-	}
-
-	programmingLanguages, _, err = s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
-		ID:         pLanguageUUID,
-		LanguageID: languageUUID,
-		Name:       name,
-	}, int64(limitNum), int64(pageNum))
+	programmingLanguages, err := s.queries.GetPLanguages(ctx, repo.GetPLanguagesParams{
+		ID:         s.utilService.ParseNullUUID(id),
+		LanguageID: s.utilService.ParseNullUUID(languageID),
+		Name:       s.utilService.ParseString(name),
+		Lim:        int32(limitNum),
+		Off:        (int32(pageNum) - 1) * int32(limitNum),
+	})
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			errorDomains.StatusInternalServerError,
+			errorDomains.ErrErrorWhileFilteringProgrammingLanguages,
+			err,
+		)
 	}
 
 	return programmingLanguages, nil
@@ -67,46 +65,50 @@ func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
 func (s *pLanguageService) GetProgrammingLanguage(
 	ctx context.Context,
 	id string,
-) (programmingLanguage *domains.ProgrammingLanguage, err error) {
-	pLanguageUUID, err := uuid.Parse(id)
+) (*repo.TProgrammingLanguage, error) {
+
+	idUUID, err := s.utilService.ParseUUID(id)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return nil, err
 	}
 
-	programmingLanguages, _, err := s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
-		ID: pLanguageUUID,
-	}, 1, 1)
+	programmingLanguage, err := s.queries.GetPLanguageByID(ctx, idUUID)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages, err)
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, serviceErrors.NewServiceErrorWithMessage(
+				errorDomains.StatusBadRequest,
+				errorDomains.ErrProgrammingLanguageNotFound,
+			)
+		}
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			errorDomains.StatusInternalServerError,
+			errorDomains.ErrErrorWhileFilteringProgrammingLanguages,
+			err,
+		)
 	}
-	if len(programmingLanguages) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrProgrammingLanguageNotFound, err)
-	}
-	programmingLanguage = &programmingLanguages[0]
 
-	return programmingLanguage, nil
+	return &programmingLanguage, nil
 }
 
 func (s *pLanguageService) AddProgrammingLanguage(
 	ctx context.Context,
 	languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
 ) (uuid.UUID, error) {
-	newProgrammingLanguage, err := domains.NewProgrammingLanguage(
-		"",
-		languageID,
-		name,
-		description,
-		downloadCMD,
-		compileCMD,
-		imagePath,
-		fileExtention,
-		monacoEditor,
-	)
+	languageUUID, err := s.utilService.ParseUUID(languageID)
 	if err != nil {
 		return uuid.Nil, err
 	}
 
-	id, err := s.pLanguageRepository.Add(ctx, newProgrammingLanguage)
+	id, err := s.queries.CreatePLanguage(ctx, repo.CreatePLanguageParams{
+		LanguageID:    languageUUID,
+		Name:          name,
+		Description:   description,
+		DownloadCmd:   downloadCMD,
+		CompileCmd:    compileCMD,
+		ImagePath:     imagePath,
+		FileExtention: fileExtention,
+		MonacoEditor:  monacoEditor,
+	})
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -118,56 +120,41 @@ func (s *pLanguageService) UpdateProgrammingLanguage(
 	ctx context.Context,
 	id, languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
 ) error {
-	var (
-		idUUID       uuid.UUID
-		languageUUID uuid.UUID
-	)
-	idUUID, err := uuid.Parse(id)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-	}
-	pLanguages, _, err := s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
-		ID: idUUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages, err)
-	}
-	if len(pLanguages) != 1 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrProgrammingLanguageNotFound)
-	}
-
-	if languageID != "" {
-		languageUUID, err = uuid.Parse(languageID)
-		if err != nil {
-			return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
-		languages, _, err := s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
-			ID: languageUUID,
-		}, 1, 1)
-		if err != nil {
-			return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages, err)
-		}
-		if len(languages) != 1 {
-			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrLanguageNotFound)
-		}
-	}
-
-	updateProgrammingLanguage, err := domains.NewProgrammingLanguage(
-		id,
-		languageID,
-		name,
-		description,
-		downloadCMD,
-		compileCMD,
-		imagePath,
-		fileExtention,
-		monacoEditor,
-	)
+	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
 		return err
 	}
 
-	if err := s.pLanguageRepository.Update(ctx, updateProgrammingLanguage); err != nil {
+	languageUUID, err := s.utilService.ParseUUID(languageID)
+	if err != nil {
+		return err
+	}
+
+	if ok, err := s.queries.CheckPLanguageByID(ctx, idUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrProgrammingLanguageNotFound)
+	}
+
+	if languageID != "" {
+		if ok, err := s.queries.CheckLanguageByID(ctx, languageUUID); err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringLanguages)
+		} else if !ok {
+			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrLanguageNotFound)
+		}
+	}
+
+	if err := s.queries.UpdatePLanguage(ctx, repo.UpdatePLanguageParams{
+		ProgrammingLanguageID: idUUID,
+		LanguageID:            s.utilService.ParseNullUUID(languageID),
+		Name:                  s.utilService.ParseString(name),
+		Description:           s.utilService.ParseString(description),
+		DownloadCmd:           s.utilService.ParseString(downloadCMD),
+		CompileCmd:            s.utilService.ParseString(compileCMD),
+		FileExtention:         s.utilService.ParseString(fileExtention),
+		MonacoEditor:          s.utilService.ParseString(monacoEditor),
+		ImagePath:             s.utilService.ParseString(imagePath),
+	}); err != nil {
 		return err
 	}
 
@@ -178,23 +165,18 @@ func (s *pLanguageService) DeleteProgrammingLanguage(
 	ctx context.Context,
 	id string,
 ) (err error) {
-	var idUUID uuid.UUID
-	idUUID, err = uuid.Parse(id)
+	idUUID, err := s.utilService.ParseUUID(id)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return err
 	}
 
-	pLanguages, _, err := s.pLanguageRepository.Filter(ctx, domains.ProgrammingLanguageFilter{
-		ID: idUUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewards, err)
-	}
-	if len(pLanguages) != 1 {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrProgrammingLanguageNotFound, err)
+	if ok, err := s.queries.CheckPLanguageByID(ctx, idUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrProgrammingLanguageNotFound)
 	}
 
-	if err := s.pLanguageRepository.Delete(ctx, idUUID); err != nil {
+	if err := s.queries.DeletePLanguage(ctx, idUUID); err != nil {
 		return err
 	}
 

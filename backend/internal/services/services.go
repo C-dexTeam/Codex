@@ -18,7 +18,7 @@ type IService interface {
 	RoleService() *RoleService
 	AdminService() domains.IAdminService
 	RewardService() *rewardService
-	ProgrammingService() domains.IPLanguagesService
+	ProgrammingService() *pLanguageService
 	CourseService() domains.ICourseService
 	ChapterService() domains.IChapterService
 	AttributeService() *attributeService
@@ -34,7 +34,7 @@ type Services struct {
 	rewardService      *rewardService
 	attributeService   *attributeService
 	adminService       domains.IAdminService
-	pLanguageService   domains.IPLanguagesService
+	pLanguageService   *pLanguageService
 	courseService      domains.ICourseService
 	chapterService     domains.IChapterService
 	testService        domains.ITestService
@@ -52,8 +52,8 @@ func CreateNewServices(
 	languageService := newLanguageService(db, queries, utilService)
 	rewardService := newRewardService(db, queries, utilService)
 	attributeService := NewAttributeService(db, queries, utilService)
+	pLanguageService := newPLanguageService(db, queries, utilService)
 	// adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
-	// pLanguageService := newPLanguageService(pLanguageRepository)
 	// courseService := newCourseService(courseRepository, chapterRepository)
 	// chapterService := NewChapterService(chapterRepository)
 	// testService := newTestService(testRepository)
@@ -66,6 +66,7 @@ func CreateNewServices(
 		languageService:    languageService,
 		rewardService:      rewardService,
 		attributeService:   attributeService,
+		pLanguageService:   pLanguageService,
 	}
 }
 
@@ -97,7 +98,7 @@ func (s *Services) RewardService() *rewardService {
 	return s.rewardService
 }
 
-func (s *Services) ProgrammingService() domains.IPLanguagesService {
+func (s *Services) ProgrammingService() *pLanguageService {
 	return s.pLanguageService
 }
 
@@ -125,8 +126,8 @@ type IValidatorService interface {
 
 type IUtilService interface {
 	Validator() IValidatorService
-	ParseUUID(id string) (uuid.UUID, error)
-	NParseUUID(id string) (uuid.UUID, error)
+	ParseUUID(id string) (uuid.UUID, error)  // ID can be null
+	NParseUUID(id string) (uuid.UUID, error) // ID cannot be null
 	ParseString(str string) sql.NullString
 	ParseNullUUID(str string) uuid.NullUUID
 }

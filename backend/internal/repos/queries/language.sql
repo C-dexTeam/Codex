@@ -23,3 +23,14 @@ FROM
     t_languages as l
 WHERE
     l.value = @language_value;
+
+-- name: CheckLanguageByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_languages AS l
+        WHERE l.id = @language_id
+    ) THEN true
+    ELSE false
+END AS exists;

@@ -77,7 +77,7 @@ func (s *userProfileService) Update(
 	id, name, surname string,
 ) (err error) {
 	if _, err := s.utilService.ParseUUID(id); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return err
 	}
 
 	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
@@ -116,7 +116,7 @@ func (s *userProfileService) ChangeUserRole(
 	id, newRoleID string,
 ) (err error) {
 	if _, err := s.utilService.ParseUUID(id); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return err
 	}
 
 	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{

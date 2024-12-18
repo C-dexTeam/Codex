@@ -6,6 +6,7 @@ package repo
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -76,7 +77,7 @@ type TProgrammingLanguage struct {
 	ImagePath     string
 	FileExtention string
 	MonacoEditor  string
-	CreatedAt     sql.NullTime
+	CreatedAt     time.Time
 }
 
 type TReward struct {

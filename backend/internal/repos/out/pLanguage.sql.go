@@ -12,11 +12,31 @@ import (
 	"github.com/google/uuid"
 )
 
-const createPLanguage = `-- name: CreatePLanguage :exec
+const checkPLanguageByID = `-- name: CheckPLanguageByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_programming_languages AS l
+        WHERE l.id = $1
+    ) THEN true
+    ELSE false
+END AS exists
+`
+
+func (q *Queries) CheckPLanguageByID(ctx context.Context, programmingLanguageID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkPLanguageByID, programmingLanguageID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const createPLanguage = `-- name: CreatePLanguage :one
 INSERT INTO
     t_programming_languages (language_id, name, description, download_cmd, compile_cmd, image_path, file_extention, monaco_editor)
 VALUES
     ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING id
 `
 
 type CreatePLanguageParams struct {
@@ -30,8 +50,8 @@ type CreatePLanguageParams struct {
 	MonacoEditor  string
 }
 
-func (q *Queries) CreatePLanguage(ctx context.Context, arg CreatePLanguageParams) error {
-	_, err := q.db.ExecContext(ctx, createPLanguage,
+func (q *Queries) CreatePLanguage(ctx context.Context, arg CreatePLanguageParams) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, createPLanguage,
 		arg.LanguageID,
 		arg.Name,
 		arg.Description,
@@ -41,7 +61,9 @@ func (q *Queries) CreatePLanguage(ctx context.Context, arg CreatePLanguageParams
 		arg.FileExtention,
 		arg.MonacoEditor,
 	)
-	return err
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const deletePLanguage = `-- name: DeletePLanguage :exec
@@ -56,7 +78,7 @@ func (q *Queries) DeletePLanguage(ctx context.Context, programmingLanguageID uui
 	return err
 }
 
-const getPLanguage = `-- name: GetPLanguage :one
+const getPLanguageByID = `-- name: GetPLanguageByID :one
 SELECT 
     pl.id, pl.language_id, pl.name, pl.description, pl.download_cmd, pl.compile_cmd, pl.image_path,
     pl.file_extention, pl.monaco_editor, pl.created_at
@@ -66,8 +88,8 @@ WHERE
     pl.id = $1
 `
 
-func (q *Queries) GetPLanguage(ctx context.Context, programmingLanguageID uuid.UUID) (TProgrammingLanguage, error) {
-	row := q.db.QueryRowContext(ctx, getPLanguage, programmingLanguageID)
+func (q *Queries) GetPLanguageByID(ctx context.Context, programmingLanguageID uuid.UUID) (TProgrammingLanguage, error) {
+	row := q.db.QueryRowContext(ctx, getPLanguageByID, programmingLanguageID)
 	var i TProgrammingLanguage
 	err := row.Scan(
 		&i.ID,
@@ -91,16 +113,16 @@ SELECT
 FROM 
     t_programming_languages as pl
 WHERE
-    ($1::text IS NULL OR us.id = $1) AND
-    ($2::text IS NULL OR us.language_id = $2) AND
-    ($3::text IS NULL OR name ILIKE '%' || $3::text || '%') AND
-    ($4::text IS NULL OR description ILIKE '%' || $4::text || '%')
+    ($1::UUID IS NULL OR pl.id = $1::UUID) AND
+    ($2::UUID IS NULL OR pl.language_id = $2::UUID) AND
+    ($3::text IS NULL OR pl.name ILIKE '%' || $3::text || '%') AND
+    ($4::text IS NULL OR pl.description ILIKE '%' || $4::text || '%')
 LIMIT $6 OFFSET $5
 `
 
 type GetPLanguagesParams struct {
-	ID          sql.NullString
-	LanguageID  sql.NullString
+	ID          uuid.NullUUID
+	LanguageID  uuid.NullUUID
 	Name        sql.NullString
 	Description sql.NullString
 	Off         int32
@@ -152,7 +174,7 @@ const updatePLanguage = `-- name: UpdatePLanguage :exec
 UPDATE
     t_programming_languages
 SET
-    language_id =  COALESCE($1::TEXT, language_id),
+    language_id =  COALESCE($1::UUID, language_id),
     name =  COALESCE($2::TEXT, name),
     description =  COALESCE($3::TEXT, description),
     download_cmd =  COALESCE($4::TEXT, download_cmd),
@@ -165,7 +187,7 @@ WHERE
 `
 
 type UpdatePLanguageParams struct {
-	LanguageID            sql.NullString
+	LanguageID            uuid.NullUUID
 	Name                  sql.NullString
 	Description           sql.NullString
 	DownloadCmd           sql.NullString

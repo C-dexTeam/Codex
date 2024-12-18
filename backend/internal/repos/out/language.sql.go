@@ -12,6 +12,25 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkLanguageByID = `-- name: CheckLanguageByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_languages AS l
+        WHERE l.id = $1
+    ) THEN true
+    ELSE false
+END AS exists
+`
+
+func (q *Queries) CheckLanguageByID(ctx context.Context, languageID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkLanguageByID, languageID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const getLanguageByID = `-- name: GetLanguageByID :one
 SELECT
     l.id, l.value
