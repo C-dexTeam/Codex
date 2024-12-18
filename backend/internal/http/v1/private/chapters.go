@@ -116,7 +116,7 @@ func (h *PrivateHandler) AddChapter(c *fiber.Ctx) error {
 	}
 
 	if newChapter.RewardID != "" {
-		if _, err := h.services.RewardService().GetReward(c.Context(), newChapter.RewardID, "1", "1"); err != nil {
+		if _, _, err := h.services.RewardService().GetReward(c.Context(), newChapter.RewardID, "1", "1"); err != nil {
 			return err
 		}
 	}

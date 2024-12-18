@@ -2,33 +2,40 @@ package services
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
 
 type rewardService struct {
-	rewardRepository    domains.IRewardRepository
-	attributeRepository domains.IAttributeRepository
+	db          *sql.DB
+	queries     *repo.Queries
+	utilService IUtilService
 }
 
 func newRewardService(
-	rewardRepository domains.IRewardRepository,
-	attributeRepository domains.IAttributeRepository,
-) domains.IRewardService {
+	db *sql.DB,
+	queries *repo.Queries,
+	utilService IUtilService,
+) *rewardService {
 	return &rewardService{
-		rewardRepository:    rewardRepository,
-		attributeRepository: attributeRepository,
+		db:          db,
+		queries:     queries,
+		utilService: utilService,
 	}
 }
 
 func (s *rewardService) GetRewards(
 	ctx context.Context,
 	id, name, symbol, rewardType, page, limit string,
-) (rewards []domains.Reward, err error) {
+) ([]repo.TReward, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -39,22 +46,26 @@ func (s *rewardService) GetRewards(
 		limitNum = domains.DefaultRewardLimit
 	}
 
-	var rewardUUID uuid.UUID
-	if id != "" {
-		rewardUUID, err = uuid.Parse(id)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
+	rewardUUID, err := s.utilService.ParseUUID(id)
+	if err != nil {
+		return nil, err
 	}
 
-	rewards, _, err = s.rewardRepository.Filter(ctx, domains.RewardFilter{
-		ID:         rewardUUID,
-		Name:       name,
-		Symbol:     symbol,
-		RewardType: id,
-	}, int64(limitNum), int64(pageNum))
+	fmt.Println(s.utilService.ParseNullUUID(rewardUUID.String()))
+	rewards, err := s.queries.GetRewards(ctx, repo.GetRewardsParams{
+		ID:         s.utilService.ParseNullUUID(id),
+		Name:       s.utilService.ParseString(name),
+		Symbol:     s.utilService.ParseString(symbol),
+		RewardType: s.utilService.ParseString(rewardType),
+		Lim:        int32(limitNum),
+		Off:        (int32(pageNum) - 1) * int32(limitNum),
+	})
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewards, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			errorDomains.StatusInternalServerError,
+			errorDomains.ErrErrorWhileFilteringRewards,
+			err,
+		)
 	}
 
 	return rewards, nil
@@ -63,7 +74,7 @@ func (s *rewardService) GetRewards(
 func (s *rewardService) GetReward(
 	ctx context.Context,
 	id, page, limit string,
-) (reward *domains.Reward, err error) {
+) (*repo.TReward, []repo.TAttribute, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -74,53 +85,47 @@ func (s *rewardService) GetReward(
 		limitNum = domains.DefaultAttributeLimit
 	}
 
-	var rewardUUID uuid.UUID
-	rewardUUID, err = uuid.Parse(id)
+	rewardUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return nil, nil, err
 	}
 
-	rewards, _, err := s.rewardRepository.Filter(ctx, domains.RewardFilter{
-		ID: rewardUUID,
-	}, 1, 1)
+	reward, err := s.queries.GetReward(ctx, rewardUUID)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewards, err)
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, nil, serviceErrors.NewServiceErrorWithMessage(
+				errorDomains.StatusBadRequest,
+				errorDomains.ErrRewardNotFound,
+			)
+		}
+		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
-	if len(rewards) != 1 {
-		return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrRewardNotFound)
-	}
-	reward = &rewards[0]
 
-	rewardAttributes, _, err := s.attributeRepository.Filter(ctx, domains.AttributeFilter{
-		RewardID: reward.GetID(),
-	}, int64(limitNum), int64(pageNum))
+	rewardAttbitures, err := s.queries.GetAttributes(ctx, repo.GetAttributesParams{
+		RewardID: s.utilService.ParseNullUUID(id),
+		Lim:      int32(limitNum),
+		Off:      (int32(pageNum) - 1) * int32(limitNum),
+	})
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewardsAttributes, err)
+		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewardsAttributes, err)
 	}
-	reward.SetAttribute(rewardAttributes)
 
-	return
+	return &reward, rewardAttbitures, nil
 }
 
 func (s *rewardService) AddReward(
 	ctx context.Context,
 	rewardType, symbol, name, description, imagePath, URI string,
 ) (uuid.UUID, error) {
-	newReward, err := domains.NewReward(
-		"",
-		rewardType,
-		symbol,
-		name,
-		description,
-		imagePath,
-		URI,
-		nil,
-	)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	id, err := s.rewardRepository.Add(ctx, newReward)
+	// TODO: Gelen verilerin kontrolü lazım. Len > 30 gibi normalde domainde yapıyorsun
+	id, err := s.queries.CreateReward(ctx, repo.CreateRewardParams{
+		RewardType:  rewardType,
+		Symbol:      symbol,
+		Name:        name,
+		Description: description,
+		ImagePath:   imagePath,
+		Uri:         URI,
+	})
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -132,37 +137,35 @@ func (s *rewardService) UpdateReward(
 	ctx context.Context,
 	id, rewardType, symbol, name, description, imagePath, URI string,
 ) error {
-	var idUUID uuid.UUID
-	idUUID, err := uuid.Parse(id)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-	}
-
-	rewards, _, err := s.rewardRepository.Filter(ctx, domains.RewardFilter{
-		ID: idUUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewards, err)
-	}
-	if len(rewards) != 1 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrRewardNotFound)
-	}
-
-	updateReward, err := domains.NewReward(
-		id,
-		rewardType,
-		symbol,
-		name,
-		description,
-		imagePath,
-		URI,
-		nil,
-	)
+	idUUID, err := s.utilService.ParseUUID(id)
 	if err != nil {
 		return err
 	}
 
-	if err := s.rewardRepository.Update(ctx, updateReward); err != nil {
+	_, err = s.queries.GetReward(ctx, idUUID)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return serviceErrors.NewServiceErrorWithMessage(
+				errorDomains.StatusBadRequest,
+				errorDomains.ErrRewardNotFound,
+			)
+		}
+		return serviceErrors.NewServiceErrorWithMessageAndError(
+			errorDomains.StatusInternalServerError,
+			errorDomains.ErrErrorWhileFilteringRewards,
+			err,
+		)
+	}
+
+	if err := s.queries.UpdateReward(ctx, repo.UpdateRewardParams{
+		RewardID:    idUUID,
+		RewardType:  s.utilService.ParseString(rewardType),
+		Symbol:      s.utilService.ParseString(symbol),
+		Name:        s.utilService.ParseString(name),
+		Description: s.utilService.ParseString(description),
+		ImagePath:   s.utilService.ParseString(imagePath),
+		Uri:         s.utilService.ParseString(URI),
+	}); err != nil {
 		return err
 	}
 
@@ -173,24 +176,28 @@ func (s *rewardService) DeleteReward(
 	ctx context.Context,
 	id string,
 ) (err error) {
-	var idUUID uuid.UUID
-	idUUID, err = uuid.Parse(id)
+	idUUID, err := s.utilService.ParseUUID(id)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return err
 	}
 
-	rewards, _, err := s.rewardRepository.Filter(ctx, domains.RewardFilter{
-		ID: idUUID,
-	}, 1, 1)
+	_, err = s.queries.GetReward(ctx, idUUID)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewards, err)
-	}
-	if len(rewards) != 1 {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrRewardNotFound, err)
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return serviceErrors.NewServiceErrorWithMessage(
+				errorDomains.StatusBadRequest,
+				errorDomains.ErrRewardNotFound,
+			)
+		}
+		return serviceErrors.NewServiceErrorWithMessageAndError(
+			errorDomains.StatusInternalServerError,
+			errorDomains.ErrErrorWhileFilteringRewards,
+			err,
+		)
 	}
 
-	if err = s.rewardRepository.Delete(ctx, idUUID); err != nil {
-		return
+	if err := s.queries.DeleteReward(ctx, idUUID); err != nil {
+		return err
 	}
 	return
 }

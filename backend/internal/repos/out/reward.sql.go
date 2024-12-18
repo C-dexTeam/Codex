@@ -12,11 +12,12 @@ import (
 	"github.com/google/uuid"
 )
 
-const createReward = `-- name: CreateReward :exec
+const createReward = `-- name: CreateReward :one
 INSERT INTO
     t_rewards (reward_type, symbol, name, description, image_path, uri)
 VALUES
     ($1, $2, $3, $4, $5, $6)
+RETURNING id
 `
 
 type CreateRewardParams struct {
@@ -28,8 +29,8 @@ type CreateRewardParams struct {
 	Uri         string
 }
 
-func (q *Queries) CreateReward(ctx context.Context, arg CreateRewardParams) error {
-	_, err := q.db.ExecContext(ctx, createReward,
+func (q *Queries) CreateReward(ctx context.Context, arg CreateRewardParams) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, createReward,
 		arg.RewardType,
 		arg.Symbol,
 		arg.Name,
@@ -37,7 +38,9 @@ func (q *Queries) CreateReward(ctx context.Context, arg CreateRewardParams) erro
 		arg.ImagePath,
 		arg.Uri,
 	)
-	return err
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const deleteReward = `-- name: DeleteReward :exec
@@ -54,34 +57,16 @@ func (q *Queries) DeleteReward(ctx context.Context, rewardID uuid.UUID) error {
 
 const getReward = `-- name: GetReward :one
 SELECT 
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri,
-    (SELECT id, reward_id, trait_type, value FROM t_attributes LIMIT $2 OFFSET $1) AS attributes
+    r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri
 FROM 
     t_rewards as r
 WHERE
-    r.id = $3
+    r.id = $1
 `
 
-type GetRewardParams struct {
-	Off      int32
-	Lim      int32
-	RewardID uuid.UUID
-}
-
-type GetRewardRow struct {
-	ID          uuid.UUID
-	RewardType  string
-	Symbol      string
-	Name        string
-	Description string
-	ImagePath   string
-	Uri         string
-	Attributes  uuid.UUID
-}
-
-func (q *Queries) GetReward(ctx context.Context, arg GetRewardParams) (GetRewardRow, error) {
-	row := q.db.QueryRowContext(ctx, getReward, arg.Off, arg.Lim, arg.RewardID)
-	var i GetRewardRow
+func (q *Queries) GetReward(ctx context.Context, rewardID uuid.UUID) (TReward, error) {
+	row := q.db.QueryRowContext(ctx, getReward, rewardID)
+	var i TReward
 	err := row.Scan(
 		&i.ID,
 		&i.RewardType,
@@ -90,7 +75,6 @@ func (q *Queries) GetReward(ctx context.Context, arg GetRewardParams) (GetReward
 		&i.Description,
 		&i.ImagePath,
 		&i.Uri,
-		&i.Attributes,
 	)
 	return i, err
 }
@@ -101,16 +85,16 @@ SELECT
 FROM 
     t_rewards as r
 WHERE
-    ($1::text IS NULL OR us.id = $1) AND
-    ($2::text IS NULL OR us.reward_type = $2) AND
-    ($3::text IS NULL OR symbol ILIKE '%' || $3::text || '%') AND
-    ($4::text IS NULL OR name ILIKE '%' || $4::text || '%') AND
-    ($5::text IS NULL OR description ILIKE '%' || $5::text || '%')
+    ($1::UUID IS NULL OR r.id = $1::UUID) AND
+    ($2::text IS NULL OR r.reward_type = $2) AND
+    ($3::text IS NULL OR r.symbol ILIKE '%' || $3::text || '%') AND
+    ($4::text IS NULL OR r.name ILIKE '%' || $4::text || '%') AND
+    ($5::text IS NULL OR r.description ILIKE '%' || $5::text || '%')
 LIMIT $7 OFFSET $6
 `
 
 type GetRewardsParams struct {
-	ID          sql.NullString
+	ID          uuid.NullUUID
 	RewardType  sql.NullString
 	Symbol      sql.NullString
 	Name        sql.NullString

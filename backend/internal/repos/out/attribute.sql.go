@@ -51,16 +51,16 @@ SELECT
 FROM 
     t_attributes as a
 WHERE
-    ($1::text IS NULL OR us.id = $1) AND
-    ($2::text IS NULL OR us.reward_id = $2) AND
-    ($3::text IS NULL OR trait_type ILIKE '%' || $3::text || '%') AND
-    ($4::text IS NULL OR value ILIKE '%' || $4::text || '%')
+    ($1::UUID IS NULL OR a.id = $1::UUID) AND
+    ($2::UUID IS NULL OR a.reward_id = $2::UUID) AND
+    ($3::text IS NULL OR a.trait_type ILIKE '%' || $3::text || '%') AND
+    ($4::text IS NULL OR a.value ILIKE '%' || $4::text || '%')
 LIMIT $6 OFFSET $5
 `
 
 type GetAttributesParams struct {
-	ID        sql.NullString
-	RewardID  sql.NullString
+	ID        uuid.NullUUID
+	RewardID  uuid.NullUUID
 	TraitType sql.NullString
 	Value     sql.NullString
 	Off       int32

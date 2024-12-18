@@ -63,11 +63,11 @@ func (h *PrivateHandler) GetReward(c *fiber.Ctx) error {
 	page := c.Query("page")
 	limit := c.Query("limit")
 
-	reward, err := h.services.RewardService().GetReward(c.Context(), id, page, limit)
+	reward, attribute, err := h.services.RewardService().GetReward(c.Context(), id, page, limit)
 	if err != nil {
 		return err
 	}
-	rewardDTO := h.dtoManager.RewardManager().ToRewardDTO(reward)
+	rewardDTO := h.dtoManager.RewardManager().ToRewardDTO(reward, attribute)
 
 	return response.Response(200, "Status OK", rewardDTO)
 }

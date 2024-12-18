@@ -40,9 +40,9 @@ func (h *PrivateHandler) GetAttributes(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	attributeDTOs := h.dtoManager.RewardManager().ToAttributeDTOs(attributes)
+	// attributeDTOs := h.dtoManager.RewardManager().ToAttributeDTOs(attributes)
 
-	return response.Response(200, "Status OK", attributeDTOs)
+	return response.Response(200, "Status OK", attributes)
 }
 
 // @Tags Attributes

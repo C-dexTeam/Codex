@@ -17,7 +17,7 @@ type IService interface {
 	LanguageService() *languageService
 	RoleService() *RoleService
 	AdminService() domains.IAdminService
-	RewardService() domains.IRewardService
+	RewardService() *rewardService
 	ProgrammingService() domains.IPLanguagesService
 	CourseService() domains.ICourseService
 	ChapterService() domains.IChapterService
@@ -31,8 +31,8 @@ type Services struct {
 	roleService        *RoleService
 	userProfileService *userProfileService
 	languageService    *languageService
+	rewardService      *rewardService
 	adminService       domains.IAdminService
-	rewardService      domains.IRewardService
 	pLanguageService   domains.IPLanguagesService
 	courseService      domains.ICourseService
 	chapterService     domains.IChapterService
@@ -50,8 +50,8 @@ func CreateNewServices(
 	userService := newUserService(db, queries, utilService)
 	roleService := newRoleService(db, queries, utilService)
 	languageService := newLanguageService(db, queries, utilService)
+	rewardService := newRewardService(db, queries, utilService)
 	// adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
-	// rewardService := newRewardService(rewardRepository, attributeRepository)
 	// pLanguageService := newPLanguageService(pLanguageRepository)
 	// courseService := newCourseService(courseRepository, chapterRepository)
 	// chapterService := NewChapterService(chapterRepository)
@@ -64,6 +64,7 @@ func CreateNewServices(
 		userService:        userService,
 		roleService:        roleService,
 		languageService:    languageService,
+		rewardService:      rewardService,
 	}
 }
 
@@ -91,7 +92,7 @@ func (s *Services) LanguageService() *languageService {
 	return s.languageService
 }
 
-func (s *Services) RewardService() domains.IRewardService {
+func (s *Services) RewardService() *rewardService {
 	return s.rewardService
 }
 
@@ -124,6 +125,7 @@ type IValidatorService interface {
 type IUtilService interface {
 	Validator() IValidatorService
 	ParseUUID(id string) (uuid.UUID, error)
+	NParseUUID(id string) (uuid.UUID, error)
 	ParseString(str string) sql.NullString
 	ParseNullUUID(str string) uuid.NullUUID
 }
@@ -150,6 +152,18 @@ func (s *utilService) ParseUUID(id string) (uuid.UUID, error) {
 	if id == "" {
 		return uuid.UUID{}, nil
 	}
+	parsedUUID, err := uuid.Parse(id)
+	if err != nil {
+		return uuid.UUID{}, serviceErrors.NewServiceErrorWithMessageAndError(
+			errorDomains.StatusBadRequest,
+			errorDomains.ErrInvalidID,
+			err,
+		)
+	}
+	return parsedUUID, nil
+}
+
+func (s *utilService) NParseUUID(id string) (uuid.UUID, error) {
 	parsedUUID, err := uuid.Parse(id)
 	if err != nil {
 		return uuid.UUID{}, serviceErrors.NewServiceErrorWithMessageAndError(
