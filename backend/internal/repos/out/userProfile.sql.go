@@ -59,11 +59,12 @@ func (q *Queries) ChangeUserRole(ctx context.Context, arg ChangeUserRoleParams) 
 	return err
 }
 
-const createUserProfile = `-- name: CreateUserProfile :exec
+const createUserProfile = `-- name: CreateUserProfile :one
 INSERT INTO
     t_users_profile (user_auth_id, role_id, name, surname)
 VALUES
     ($1, $2, $3, $4)
+RETURNING id
 `
 
 type CreateUserProfileParams struct {
@@ -73,14 +74,16 @@ type CreateUserProfileParams struct {
 	Surname    sql.NullString
 }
 
-func (q *Queries) CreateUserProfile(ctx context.Context, arg CreateUserProfileParams) error {
-	_, err := q.db.ExecContext(ctx, createUserProfile,
+func (q *Queries) CreateUserProfile(ctx context.Context, arg CreateUserProfileParams) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, createUserProfile,
 		arg.UserAuthID,
 		arg.RoleID,
 		arg.Name,
 		arg.Surname,
 	)
-	return err
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const getUserProfileByID = `-- name: GetUserProfileByID :one

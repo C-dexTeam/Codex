@@ -20,11 +20,12 @@ FROM t_users_profile as up
 WHERE
     up.id = @id;
 
--- name: CreateUserProfile :exec
+-- name: CreateUserProfile :one
 INSERT INTO
     t_users_profile (user_auth_id, role_id, name, surname)
 VALUES
-    (@user_auth_id, @role_id, @name, @surname);
+    (@user_auth_id, @role_id, @name, @surname)
+RETURNING id;
 
 -- name: ChangeUserRole :exec
 UPDATE

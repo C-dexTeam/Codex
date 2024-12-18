@@ -107,7 +107,7 @@ func (s *UserService) Register(ctx context.Context, username, email, password, c
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileCreatingUserAuth, err)
 	}
 
-	if err := qtx.CreateUserProfile(ctx, repo.CreateUserProfileParams{
+	if _, err := qtx.CreateUserProfile(ctx, repo.CreateUserProfileParams{
 		UserAuthID: userAuthID,
 		RoleID:     defaultRoleID,
 		Name:       s.utilService.ParseString(name),
