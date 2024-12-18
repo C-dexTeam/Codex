@@ -71,10 +71,17 @@ type AttributeDTO struct {
 }
 
 func (m *RewardDTOManager) ToAttributeDTO(appModel *repo.TAttribute) AttributeDTO {
-	r := uuid.MustParse(appModel.RewardID.UUID.String())
+	var rewardID *uuid.UUID
+	if appModel.RewardID.Valid {
+		r := uuid.MustParse(appModel.RewardID.UUID.String())
+		rewardID = &r
+	} else {
+		rewardID = nil
+	}
+
 	return AttributeDTO{
 		ID:        appModel.ID,
-		RewardID:  &r,
+		RewardID:  rewardID,
 		TraitType: appModel.TraitType,
 		Value:     appModel.Value,
 	}

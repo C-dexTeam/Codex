@@ -18,11 +18,18 @@ FROM
 WHERE
     id = @attribute_id;
 
+-- name: CreateAttribute :one
+INSERT INTO 
+    t_attributes (reward_id, trait_type, value)
+VALUES
+    (@reward_id, @trait_type, @value)
+RETURNING id;
+
 -- name: UpdateAttribute :exec
 UPDATE
     t_attributes
 SET
-    reward_id = COALESCE(sqlc.narg(reward_id)::TEXT, reward_id),
+    reward_id = COALESCE(sqlc.narg(reward_id)::UUID, reward_id),
     trait_type = COALESCE(sqlc.narg(trait_type)::TEXT, trait_type),
     value = COALESCE(sqlc.narg(value)::TEXT, value)
 WHERE

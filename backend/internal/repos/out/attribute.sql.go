@@ -12,6 +12,27 @@ import (
 	"github.com/google/uuid"
 )
 
+const createAttribute = `-- name: CreateAttribute :one
+INSERT INTO 
+    t_attributes (reward_id, trait_type, value)
+VALUES
+    ($1, $2, $3)
+RETURNING id
+`
+
+type CreateAttributeParams struct {
+	RewardID  uuid.NullUUID
+	TraitType string
+	Value     string
+}
+
+func (q *Queries) CreateAttribute(ctx context.Context, arg CreateAttributeParams) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, createAttribute, arg.RewardID, arg.TraitType, arg.Value)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const deleteAttribute = `-- name: DeleteAttribute :exec
 DELETE FROM
     t_attributes
@@ -106,7 +127,7 @@ const updateAttribute = `-- name: UpdateAttribute :exec
 UPDATE
     t_attributes
 SET
-    reward_id = COALESCE($1::TEXT, reward_id),
+    reward_id = COALESCE($1::UUID, reward_id),
     trait_type = COALESCE($2::TEXT, trait_type),
     value = COALESCE($3::TEXT, value)
 WHERE
@@ -114,7 +135,7 @@ WHERE
 `
 
 type UpdateAttributeParams struct {
-	RewardID    sql.NullString
+	RewardID    uuid.NullUUID
 	TraitType   sql.NullString
 	Value       sql.NullString
 	AttributeID uuid.UUID
