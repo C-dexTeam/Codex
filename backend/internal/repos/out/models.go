@@ -43,9 +43,9 @@ type TCourse struct {
 	ProgrammingLanguageID uuid.UUID
 	RewardID              uuid.NullUUID
 	RewardAmount          int32
-	Title                 sql.NullString
-	Description           sql.NullString
-	ImagePath             sql.NullString
+	Title                 string
+	Description           string
+	ImagePath             string
 	CreatedAt             sql.NullTime
 	DeletedAt             sql.NullTime
 }

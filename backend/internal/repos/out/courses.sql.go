@@ -8,16 +8,35 @@ package repo
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 
 	"github.com/google/uuid"
 )
 
-const createCourse = `-- name: CreateCourse :exec
+const checkCourseByID = `-- name: CheckCourseByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_courses AS l
+        WHERE l.id = $1
+    ) THEN true
+    ELSE false
+END AS exists
+`
+
+func (q *Queries) CheckCourseByID(ctx context.Context, courseID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkCourseByID, courseID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const createCourse = `-- name: CreateCourse :one
 INSERT INTO
     t_courses (language_id, programming_language_id, reward_id, reward_amount, title, description, image_path)
 VALUES
     ($1, $2, $3, $4, $5, $6, $7)
+RETURNING id
 `
 
 type CreateCourseParams struct {
@@ -25,13 +44,13 @@ type CreateCourseParams struct {
 	ProgrammingLanguageID uuid.UUID
 	RewardID              uuid.NullUUID
 	RewardAmount          int32
-	Title                 sql.NullString
-	Description           sql.NullString
-	ImagePath             sql.NullString
+	Title                 string
+	Description           string
+	ImagePath             string
 }
 
-func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) error {
-	_, err := q.db.ExecContext(ctx, createCourse,
+func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, createCourse,
 		arg.LanguageID,
 		arg.ProgrammingLanguageID,
 		arg.RewardID,
@@ -40,104 +59,37 @@ func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) erro
 		arg.Description,
 		arg.ImagePath,
 	)
-	return err
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
-const getCourseByID = `-- name: GetCourseByID :many
+const getCourseByID = `-- name: GetCourseByID :one
 SELECT 
-    c.id, 
-    c.language_id, 
-    c.programming_language_id, 
-    c.reward_id, 
-    c.reward_amount, 
-    c.title,
-    c.description, 
-    c.created_at, 
-    c.deleted_at,
-    (
-        SELECT 
-            json_agg(
-                json_build_object(
-                    'id', ch.id,
-                    'language_id', ch.language_id,
-                    'reward_id', ch.reward_id,
-                    'reward_amount', ch.reward_amount,
-                    'title', ch.title,
-                    'description', ch.description,
-                    'content', ch.content,
-                    'func_name', ch.func_name,
-                    'frontend_template', ch.frontend_template,
-                    'docker_template', ch.docker_template,
-                    'check_template', ch.check_template,
-                    'grants_experience', ch.grants_experience,
-                    'active', ch.active,
-                    'created_at', ch.created_at,
-                    'deleted_at', ch.deleted_at
-                )
-            )
-        FROM 
-            t_chapters as ch
-        WHERE 
-            ch.course_id = c.id
-        LIMIT $2 OFFSET $1
-    ) AS chapters
+    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
+    c.description, c.image_path, c.created_at, c.deleted_at
 FROM 
     t_courses as c
 WHERE
-    c.id = $3
+    c.id = $1
 `
 
-type GetCourseByIDParams struct {
-	Off      int32
-	Lim      int32
-	CourseID uuid.UUID
-}
-
-type GetCourseByIDRow struct {
-	ID                    uuid.UUID
-	LanguageID            uuid.UUID
-	ProgrammingLanguageID uuid.UUID
-	RewardID              uuid.NullUUID
-	RewardAmount          int32
-	Title                 sql.NullString
-	Description           sql.NullString
-	CreatedAt             sql.NullTime
-	DeletedAt             sql.NullTime
-	Chapters              json.RawMessage
-}
-
-func (q *Queries) GetCourseByID(ctx context.Context, arg GetCourseByIDParams) ([]GetCourseByIDRow, error) {
-	rows, err := q.db.QueryContext(ctx, getCourseByID, arg.Off, arg.Lim, arg.CourseID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetCourseByIDRow
-	for rows.Next() {
-		var i GetCourseByIDRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.LanguageID,
-			&i.ProgrammingLanguageID,
-			&i.RewardID,
-			&i.RewardAmount,
-			&i.Title,
-			&i.Description,
-			&i.CreatedAt,
-			&i.DeletedAt,
-			&i.Chapters,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetCourseByID(ctx context.Context, courseID uuid.UUID) (TCourse, error) {
+	row := q.db.QueryRowContext(ctx, getCourseByID, courseID)
+	var i TCourse
+	err := row.Scan(
+		&i.ID,
+		&i.LanguageID,
+		&i.ProgrammingLanguageID,
+		&i.RewardID,
+		&i.RewardAmount,
+		&i.Title,
+		&i.Description,
+		&i.ImagePath,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
 }
 
 const getCourses = `-- name: GetCourses :many
@@ -147,23 +99,21 @@ SELECT
 FROM 
     t_courses as c
 WHERE
-    ($1::text IS NULL OR c.id = $1) AND
-    ($2::text IS NULL OR c.language_id = $2) AND
-    ($3::text IS NULL OR c.programming_language_id = $3) AND
+    ($1::UUID IS NULL OR c.id = $1::UUID) AND
+    ($2::UUID IS NULL OR c.language_id = $2::UUID) AND
+    ($3::UUID IS NULL OR c.programming_language_id = $3::UUID) AND
     ($4::text IS NULL OR c.reward_id = $4) AND
-    ($5::text IS NULL OR title ILIKE '%' || $5::text || '%') AND
-    ($6::text IS NULL OR description ILIKE '%' || $6::text || '%') AND
+    ($5::text IS NULL OR c.title ILIKE '%' || $5::text || '%') AND
     deleted_at IS NULL
-LIMIT $8 OFFSET $7
+LIMIT $7 OFFSET $6
 `
 
 type GetCoursesParams struct {
-	ID                    sql.NullString
-	LanguageID            sql.NullString
-	ProgrammingLanguageID sql.NullString
+	ID                    uuid.NullUUID
+	LanguageID            uuid.NullUUID
+	ProgrammingLanguageID uuid.NullUUID
 	RewardID              sql.NullString
 	Title                 sql.NullString
-	Description           sql.NullString
 	Off                   int32
 	Lim                   int32
 }
@@ -175,7 +125,6 @@ func (q *Queries) GetCourses(ctx context.Context, arg GetCoursesParams) ([]TCour
 		arg.ProgrammingLanguageID,
 		arg.RewardID,
 		arg.Title,
-		arg.Description,
 		arg.Off,
 		arg.Lim,
 	)
@@ -215,18 +164,13 @@ const softDeleteCourse = `-- name: SoftDeleteCourse :exec
 UPDATE
     t_courses
 SET
-    deleted_at = $1
+    deleted_at = CURRENT_TIMESTAMP
 WHERE  
-    id = $2
+    id = $1
 `
 
-type SoftDeleteCourseParams struct {
-	DeletedAt sql.NullTime
-	CourseID  uuid.UUID
-}
-
-func (q *Queries) SoftDeleteCourse(ctx context.Context, arg SoftDeleteCourseParams) error {
-	_, err := q.db.ExecContext(ctx, softDeleteCourse, arg.DeletedAt, arg.CourseID)
+func (q *Queries) SoftDeleteCourse(ctx context.Context, courseID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, softDeleteCourse, courseID)
 	return err
 }
 
@@ -234,9 +178,9 @@ const updateCourse = `-- name: UpdateCourse :exec
 UPDATE
     t_courses
 SET
-    language_id =  COALESCE($1::TEXT, language_id),
-    programming_language_id =  COALESCE($2::TEXT, programming_language_id),
-    reward_id =  COALESCE($3::TEXT, reward_id),
+    language_id =  COALESCE($1::UUID, language_id),
+    programming_language_id =  COALESCE($2::UUID, programming_language_id),
+    reward_id =  COALESCE($3::UUID, reward_id),
     reward_amount =  COALESCE($4::INTEGER, reward_amount),
     title =  COALESCE($5::TEXT, title),
     description =  COALESCE($6::TEXT, description),
@@ -246,9 +190,9 @@ WHERE
 `
 
 type UpdateCourseParams struct {
-	LanguageID            sql.NullString
-	ProgrammingLanguageID sql.NullString
-	RewardID              sql.NullString
+	LanguageID            uuid.NullUUID
+	ProgrammingLanguageID uuid.NullUUID
+	RewardID              uuid.NullUUID
 	RewardAmount          sql.NullInt32
 	Title                 sql.NullString
 	Description           sql.NullString

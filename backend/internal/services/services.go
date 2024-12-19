@@ -18,7 +18,7 @@ type IService interface {
 	RoleService() *RoleService
 	RewardService() *rewardService
 	ProgrammingService() *pLanguageService
-	CourseService() domains.ICourseService
+	CourseService() *courseService
 	ChapterService() domains.IChapterService
 	AttributeService() *attributeService
 	TestService() domains.ITestService
@@ -33,7 +33,7 @@ type Services struct {
 	rewardService      *rewardService
 	attributeService   *attributeService
 	pLanguageService   *pLanguageService
-	courseService      domains.ICourseService
+	courseService      *courseService
 	chapterService     domains.IChapterService
 	testService        domains.ITestService
 }
@@ -51,7 +51,7 @@ func CreateNewServices(
 	rewardService := newRewardService(db, queries, utilService)
 	attributeService := NewAttributeService(db, queries, utilService)
 	pLanguageService := newPLanguageService(db, queries, utilService)
-	// courseService := newCourseService(courseRepository, chapterRepository)
+	courseService := newCourseService(db, queries, utilService)
 	// chapterService := NewChapterService(chapterRepository)
 	// testService := newTestService(testRepository)
 
@@ -64,6 +64,7 @@ func CreateNewServices(
 		rewardService:      rewardService,
 		attributeService:   attributeService,
 		pLanguageService:   pLanguageService,
+		courseService:      courseService,
 	}
 }
 
@@ -95,7 +96,7 @@ func (s *Services) ProgrammingService() *pLanguageService {
 	return s.pLanguageService
 }
 
-func (s *Services) CourseService() domains.ICourseService {
+func (s *Services) CourseService() *courseService {
 	return s.courseService
 }
 

@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS t_courses (
     programming_language_id UUID NOT NULL,
     reward_id UUID DEFAULT NULL,
     reward_amount INT NOT NULL DEFAULT 1,
-    title VARCHAR(30),
-    description TEXT,
-    image_path varchar(60),
+    title VARCHAR(30) NOT NULL,
+    description TEXT NOT NULL,
+    image_path varchar(60) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 
