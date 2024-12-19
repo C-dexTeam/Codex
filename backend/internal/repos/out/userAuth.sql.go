@@ -12,6 +12,25 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkUserAuthByID = `-- name: CheckUserAuthByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_users_auth AS l
+        WHERE l.id = $1
+    ) THEN true
+    ELSE false
+END AS exists
+`
+
+func (q *Queries) CheckUserAuthByID(ctx context.Context, userAuthID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkUserAuthByID, userAuthID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const countUserByName = `-- name: CountUserByName :one
 SELECT COUNT(*) FROM t_users_auth WHERE username = $1
 `

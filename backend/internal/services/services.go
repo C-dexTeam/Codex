@@ -16,7 +16,6 @@ type IService interface {
 	UserProfileService() *userProfileService
 	LanguageService() *languageService
 	RoleService() *RoleService
-	AdminService() domains.IAdminService
 	RewardService() *rewardService
 	ProgrammingService() *pLanguageService
 	CourseService() domains.ICourseService
@@ -33,7 +32,6 @@ type Services struct {
 	languageService    *languageService
 	rewardService      *rewardService
 	attributeService   *attributeService
-	adminService       domains.IAdminService
 	pLanguageService   *pLanguageService
 	courseService      domains.ICourseService
 	chapterService     domains.IChapterService
@@ -53,7 +51,6 @@ func CreateNewServices(
 	rewardService := newRewardService(db, queries, utilService)
 	attributeService := NewAttributeService(db, queries, utilService)
 	pLanguageService := newPLanguageService(db, queries, utilService)
-	// adminService := newAdminService(userRepository, userProfileRepository, transactionRepository, utilsService)
 	// courseService := newCourseService(courseRepository, chapterRepository)
 	// chapterService := NewChapterService(chapterRepository)
 	// testService := newTestService(testRepository)
@@ -72,10 +69,6 @@ func CreateNewServices(
 
 func (s *Services) UtilService() IUtilService {
 	return s.utilService
-}
-
-func (s *Services) AdminService() domains.IAdminService {
-	return s.adminService
 }
 
 func (s *Services) UserService() *UserService {

@@ -1,6 +1,10 @@
 package dto
 
-import "github.com/C-dexTeam/codex/internal/http/sessionStore"
+import (
+	"github.com/C-dexTeam/codex/internal/http/sessionStore"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
+	"github.com/google/uuid"
+)
 
 // UserDTOManager handles the conversion of domain users to DTOs
 type UserDTOManager struct{}
@@ -39,6 +43,29 @@ type UserAuthWallet struct {
 	PublicKeyBase58 string `json:"publicKeyBase58"`
 	Message         string `json:"message"`
 	Signature       string `json:"signatureBase58"`
+}
+type UserAuthDTO struct {
+	ID       uuid.UUID `json:"id"`
+	Username string    `json:"username"`
+	Email    string    `json:"email"`
+	Password string    `json:"password"`
+}
+
+func (m *UserDTOManager) ToUserAuthDTO(user *repo.TUsersAuth) UserAuthDTO {
+	return UserAuthDTO{
+		ID:       user.ID,
+		Username: user.Username.String,
+		Email:    user.Email.String,
+		Password: "*********",
+	}
+}
+
+func (m *UserDTOManager) ToUserAuthDTOs(users []repo.TUsersAuth) []UserAuthDTO {
+	var userAuthDTOS []UserAuthDTO
+	for _, user := range users {
+		userAuthDTOS = append(userAuthDTOS, m.ToUserAuthDTO(&user))
+	}
+	return userAuthDTOS
 }
 
 type UserProfileDTO struct {

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"strconv"
 	"strings"
 
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
@@ -159,19 +160,16 @@ func (s *UserService) ConnectWallet(ctx context.Context, id, publicKey, message,
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidWalletConnection)
 	}
 
-	userAuths, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
-		ID:  s.utilService.ParseNullUUID(id),
-		Lim: 1,
-		Off: 0,
-	})
+	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
+		return err
+	}
+
+	if ok, err := s.queries.CheckUserAuthByID(ctx, idUUID); err != nil {
 		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
 	}
-	if len(userAuths) == 0 {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound, err)
-	}
-	user := &userAuths[0]
-	user.PublicKey = s.utilService.ParseString(publicKey)
 
 	if err := s.queries.UpdateUserAuth(ctx, repo.UpdateUserAuthParams{
 		PublicKey: s.utilService.ParseString(publicKey),
@@ -180,4 +178,38 @@ func (s *UserService) ConnectWallet(ctx context.Context, id, publicKey, message,
 	}
 
 	return
+}
+
+func (s *UserService) GetUsers(ctx context.Context, id, username, email, page, limit string) ([]repo.TUsersAuth, error) {
+	// Default Values
+	pageNum, err := strconv.Atoi(page)
+	if err != nil || page == "" {
+		pageNum = 1
+	}
+
+	limitNum, err := strconv.Atoi(limit)
+	if err != nil || limit == "" {
+		limitNum = 10
+	}
+
+	if _, err := s.utilService.ParseUUID(id); err != nil {
+		return nil, err
+	}
+
+	users, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
+		ID:       s.utilService.ParseNullUUID(id),
+		Username: s.utilService.ParseString(username),
+		Email:    s.utilService.ParseString(email),
+		Lim:      int32(limitNum),
+		Off:      (int32(pageNum) - 1) * int32(limitNum),
+	})
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			errorDomains.StatusInternalServerError,
+			errorDomains.ErrErrorWhileFilteringUsers,
+			err,
+		)
+	}
+
+	return users, nil
 }
