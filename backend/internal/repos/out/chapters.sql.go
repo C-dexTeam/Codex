@@ -8,10 +8,28 @@ package repo
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 
 	"github.com/google/uuid"
 )
+
+const checkChapterByID = `-- name: CheckChapterByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_chapters AS l
+        WHERE l.id = $1
+    ) THEN true
+    ELSE false
+END AS exists
+`
+
+func (q *Queries) CheckChapterByID(ctx context.Context, chapterID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkChapterByID, chapterID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
 
 const createChapter = `-- name: CreateChapter :one
 INSERT INTO
@@ -24,8 +42,8 @@ RETURNING id
 `
 
 type CreateChapterParams struct {
-	CourseID         uuid.NullUUID
-	LanguageID       uuid.NullUUID
+	CourseID         uuid.UUID
+	LanguageID       uuid.UUID
 	RewardID         uuid.NullUUID
 	RewardAmount     int32
 	Title            string
@@ -35,8 +53,8 @@ type CreateChapterParams struct {
 	FrontendTemplate string
 	DockerTemplate   string
 	CheckTemplate    string
-	GrantsExperience sql.NullBool
-	Active           sql.NullBool
+	GrantsExperience bool
+	Active           bool
 }
 
 func (q *Queries) CreateChapter(ctx context.Context, arg CreateChapterParams) (uuid.UUID, error) {
@@ -62,67 +80,18 @@ func (q *Queries) CreateChapter(ctx context.Context, arg CreateChapterParams) (u
 
 const getChapterByID = `-- name: GetChapterByID :one
 SELECT
-    c.id, 
-    c.course_id, 
-    c.language_id, 
-    c.reward_id, 
-    c.reward_amount, 
-    c.title, 
-    c.description, 
-    c.content,
-    c.func_name, 
-    c.frontend_template, 
-    c.docker_template, 
-    c.check_template, 
-    c.grants_experience, 
-    c.active,
-    c.created_at, 
-    c.deleted_at,
-    json_agg(
-        json_build_object(
-            'input_id', i.id,
-            'input_value', i.value,
-            'output_id', o.id,
-            'output_value', o.value
-        )
-    ) AS tests
-FROM 
+    c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
+    c.func_name, c.frontend_template, c.docker_template, c.check_template, c.grants_experience, c.active,
+    c.created_at, c.deleted_at
+FROM
     t_chapters as c
-LEFT JOIN 
-    t_tests as t ON t.chapter_id = c.id
-LEFT JOIN 
-    t_inputs as i ON i.test_id = t.id
-LEFT JOIN 
-    t_outputs as o ON o.test_id = t.id
 WHERE
     c.id = $1
-GROUP BY 
-    c.id
 `
 
-type GetChapterByIDRow struct {
-	ID               uuid.UUID
-	CourseID         uuid.NullUUID
-	LanguageID       uuid.NullUUID
-	RewardID         uuid.NullUUID
-	RewardAmount     int32
-	Title            string
-	Description      string
-	Content          string
-	FuncName         string
-	FrontendTemplate string
-	DockerTemplate   string
-	CheckTemplate    string
-	GrantsExperience sql.NullBool
-	Active           sql.NullBool
-	CreatedAt        sql.NullTime
-	DeletedAt        sql.NullTime
-	Tests            json.RawMessage
-}
-
-func (q *Queries) GetChapterByID(ctx context.Context, chapterID uuid.UUID) (GetChapterByIDRow, error) {
+func (q *Queries) GetChapterByID(ctx context.Context, chapterID uuid.UUID) (TChapter, error) {
 	row := q.db.QueryRowContext(ctx, getChapterByID, chapterID)
-	var i GetChapterByIDRow
+	var i TChapter
 	err := row.Scan(
 		&i.ID,
 		&i.CourseID,
@@ -140,7 +109,6 @@ func (q *Queries) GetChapterByID(ctx context.Context, chapterID uuid.UUID) (GetC
 		&i.Active,
 		&i.CreatedAt,
 		&i.DeletedAt,
-		&i.Tests,
 	)
 	return i, err
 }
@@ -153,20 +121,20 @@ SELECT
 FROM 
     t_chapters as c
 WHERE
-    ($1::text IS NULL OR c.id = $1) AND
-    ($2::text IS NULL OR c.course_id = $2) AND
-    ($3::text IS NULL OR c.language_id = $3) AND
-    ($4::text IS NULL OR c.reward_id = $4) AND
-    ($5::text IS NULL OR title ILIKE '%' || $5::text || '%') AND
+    ($1::UUID IS NULL OR c.id = $1::UUID) AND
+    ($2::UUID IS NULL OR c.course_id = $2::UUID) AND
+    ($3::UUID IS NULL OR c.language_id = $3::UUID) AND
+    ($4::UUID IS NULL OR c.reward_id = $4::UUID) AND
+    ($5::text IS NULL OR c.title ILIKE '%' || $5::text || '%') AND
     deleted_at IS NULL
 LIMIT $7 OFFSET $6
 `
 
 type GetChaptersParams struct {
-	ID         sql.NullString
-	CourseID   sql.NullString
-	LanguageID sql.NullString
-	RewardID   sql.NullString
+	ID         uuid.NullUUID
+	CourseID   uuid.NullUUID
+	LanguageID uuid.NullUUID
+	RewardID   uuid.NullUUID
 	Title      sql.NullString
 	Off        int32
 	Lim        int32
@@ -224,18 +192,13 @@ const softDeleteChapter = `-- name: SoftDeleteChapter :exec
 UPDATE
     t_chapters
 SET
-    deleted_at = $1
+    deleted_at = CURRENT_TIMESTAMP
 WHERE  
-    id = $2
+    id = $1
 `
 
-type SoftDeleteChapterParams struct {
-	DeletedAt sql.NullTime
-	ChapterID uuid.UUID
-}
-
-func (q *Queries) SoftDeleteChapter(ctx context.Context, arg SoftDeleteChapterParams) error {
-	_, err := q.db.ExecContext(ctx, softDeleteChapter, arg.DeletedAt, arg.ChapterID)
+func (q *Queries) SoftDeleteChapter(ctx context.Context, chapterID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, softDeleteChapter, chapterID)
 	return err
 }
 

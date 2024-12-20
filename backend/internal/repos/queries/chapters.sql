@@ -6,52 +6,23 @@ SELECT
 FROM 
     t_chapters as c
 WHERE
-    (sqlc.narg(id)::text IS NULL OR c.id = sqlc.narg(id)) AND
-    (sqlc.narg(course_id)::text IS NULL OR c.course_id = sqlc.narg(course_id)) AND
-    (sqlc.narg(language_id)::text IS NULL OR c.language_id = sqlc.narg(language_id)) AND
-    (sqlc.narg(reward_id)::text IS NULL OR c.reward_id = sqlc.narg(reward_id)) AND
-    (sqlc.narg(title)::text IS NULL OR title ILIKE '%' || sqlc.narg(title)::text || '%') AND
+    (sqlc.narg(id)::UUID IS NULL OR c.id = sqlc.narg(id)::UUID) AND
+    (sqlc.narg(course_id)::UUID IS NULL OR c.course_id = sqlc.narg(course_id)::UUID) AND
+    (sqlc.narg(language_id)::UUID IS NULL OR c.language_id = sqlc.narg(language_id)::UUID) AND
+    (sqlc.narg(reward_id)::UUID IS NULL OR c.reward_id = sqlc.narg(reward_id)::UUID) AND
+    (sqlc.narg(title)::text IS NULL OR c.title ILIKE '%' || sqlc.narg(title)::text || '%') AND
     deleted_at IS NULL
 LIMIT @lim OFFSET @off;
 
 -- name: GetChapterByID :one
 SELECT
-    c.id, 
-    c.course_id, 
-    c.language_id, 
-    c.reward_id, 
-    c.reward_amount, 
-    c.title, 
-    c.description, 
-    c.content,
-    c.func_name, 
-    c.frontend_template, 
-    c.docker_template, 
-    c.check_template, 
-    c.grants_experience, 
-    c.active,
-    c.created_at, 
-    c.deleted_at,
-    json_agg(
-        json_build_object(
-            'input_id', i.id,
-            'input_value', i.value,
-            'output_id', o.id,
-            'output_value', o.value
-        )
-    ) AS tests
-FROM 
+    c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
+    c.func_name, c.frontend_template, c.docker_template, c.check_template, c.grants_experience, c.active,
+    c.created_at, c.deleted_at
+FROM
     t_chapters as c
-LEFT JOIN 
-    t_tests as t ON t.chapter_id = c.id
-LEFT JOIN 
-    t_inputs as i ON i.test_id = t.id
-LEFT JOIN 
-    t_outputs as o ON o.test_id = t.id
 WHERE
-    c.id = @chapter_id
-GROUP BY 
-    c.id;
+    c.id = @chapter_id;
 
 
 -- name: CreateChapter :one
@@ -88,6 +59,17 @@ WHERE
 UPDATE
     t_chapters
 SET
-    deleted_at = @deleted_at
+    deleted_at = CURRENT_TIMESTAMP
 WHERE  
     id = @chapter_id;
+
+-- name: CheckChapterByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_chapters AS l
+        WHERE l.id = @chapter_id
+    ) THEN true
+    ELSE false
+END AS exists;

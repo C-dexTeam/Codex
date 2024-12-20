@@ -3,7 +3,6 @@ package services
 import (
 	"database/sql"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -19,9 +18,8 @@ type IService interface {
 	RewardService() *rewardService
 	ProgrammingService() *pLanguageService
 	CourseService() *courseService
-	ChapterService() domains.IChapterService
+	ChapterService() *chapterService
 	AttributeService() *attributeService
-	TestService() domains.ITestService
 }
 
 type Services struct {
@@ -34,8 +32,7 @@ type Services struct {
 	attributeService   *attributeService
 	pLanguageService   *pLanguageService
 	courseService      *courseService
-	chapterService     domains.IChapterService
-	testService        domains.ITestService
+	chapterService     *chapterService
 }
 
 func CreateNewServices(
@@ -52,8 +49,7 @@ func CreateNewServices(
 	attributeService := NewAttributeService(db, queries, utilService)
 	pLanguageService := newPLanguageService(db, queries, utilService)
 	courseService := newCourseService(db, queries, utilService)
-	// chapterService := NewChapterService(chapterRepository)
-	// testService := newTestService(testRepository)
+	chapterService := NewChapterService(db, queries, utilService)
 
 	return &Services{
 		utilService:        utilService,
@@ -65,6 +61,7 @@ func CreateNewServices(
 		attributeService:   attributeService,
 		pLanguageService:   pLanguageService,
 		courseService:      courseService,
+		chapterService:     chapterService,
 	}
 }
 
@@ -100,16 +97,12 @@ func (s *Services) CourseService() *courseService {
 	return s.courseService
 }
 
-func (s *Services) ChapterService() domains.IChapterService {
+func (s *Services) ChapterService() *chapterService {
 	return s.chapterService
 }
 
 func (s *Services) AttributeService() *attributeService {
 	return s.attributeService
-}
-
-func (s *Services) TestService() domains.ITestService {
-	return s.testService
 }
 
 // ------------------------------------------------------

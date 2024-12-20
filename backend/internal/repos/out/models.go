@@ -20,8 +20,8 @@ type TAttribute struct {
 
 type TChapter struct {
 	ID               uuid.UUID
-	CourseID         uuid.NullUUID
-	LanguageID       uuid.NullUUID
+	CourseID         uuid.UUID
+	LanguageID       uuid.UUID
 	RewardID         uuid.NullUUID
 	RewardAmount     int32
 	Title            string
@@ -31,8 +31,8 @@ type TChapter struct {
 	FrontendTemplate string
 	DockerTemplate   string
 	CheckTemplate    string
-	GrantsExperience sql.NullBool
-	Active           sql.NullBool
+	GrantsExperience bool
+	Active           bool
 	CreatedAt        sql.NullTime
 	DeletedAt        sql.NullTime
 }
