@@ -1,73 +1,92 @@
+import themeConfig from "@/configs/themeConfig"
+
+const defaultStyle = {
+    fontFamily: themeConfig.fontFamily,
+    fontSize: "1rem",
+    lineHeight: "1.5rem",
+    fontWeight: 500,
+    cursor: "default",
+    letterSpacing: "-0.25px",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    width: "fit-content"
+}
+
 const typography = theme => {
     return {
-        lineHeight: "1.5rem",
-        fontWeight: 300,
+        ...defaultStyle,
         h1: {
-            fontSize: "3.815rem",
+            ...defaultStyle,
+            fontSize: "3rem",
+            lineHeight: "4rem",
         },
         h2: {
-            fontSize: "3.052rem",
+            ...defaultStyle,
+            fontSize: "2.5rem",
+            lineHeight: "3.5rem",
         },
         h3: {
-            fontSize: "2.441rem",
+            ...defaultStyle,
+            fontSize: "2rem",
+            lineHeight: "3rem",
         },
         h4: {
-            fontSize: "1.953rem",
+            ...defaultStyle,
+            fontSize: "1.5rem",
+            lineHeight: "2.5rem",
         },
         h5: {
-            fontSize: "1.563rem",
+            ...defaultStyle,
+            fontSize: "1.25rem",
         },
         h6: {
-            fontSize: "1.25rem",
+            ...defaultStyle,
+            fontSize: "1.125rem",
         },
-        body1: {
-            fontSize: "1rem",
+        subtitle: {
+            ...defaultStyle,
+            fontSize: "1.25rem",
+            lineHeight: "2rem",
+            fontWeight: 700
+        },
+        subtitle2: {
+            ...defaultStyle,
+            fontWeight: 700
+        },
+        body: {
+            ...defaultStyle,
         },
         body2: {
+            ...defaultStyle,
             fontSize: "1.25rem",
-        },
-        body3: {
-            fontSize: "1.563rem",
-        },
-        button1: {
-            fontSize: "1rem",
-        },
-        button2: {
-            fontSize: "1.25rem",
-        },
-        button3: {
-            fontSize: "1.563rem",
+            lineHeight: "2rem",
         },
         caption: {
-            fontSize: "1rem",
-            color: `${theme.palette.border.secondary} !important`,
+            ...defaultStyle,
+            lineHeight: "1.25rem",
+            fontWeight: 300,
+        },
+        caption2: {
+            ...defaultStyle,
+            fontSize: "0.875rem",
+            fontWeight: 300,
         },
         link: {
-            //
-            fontSize: "1rem",
-            fontWeight: 400,
-            color: "#121E35",
-            fontStyle: "italic",
+            ...defaultStyle,
+            fontSize: "1.25rem",
+            lineHeight: "2rem",
             cursor: "pointer",
             "&:hover": {
-                color: theme.palette.primary.main,
-            },
+                color: theme.palette.primary.main
+            }
         },
-        linklight: {
-            //
-            fontSize: "1rem",
-            fontWeight: 400,
-            color: "#F8F5EC",
-            fontStyle: "italic",
-            lineHeight: "1.875rem",
+        link2: {
+            ...defaultStyle,
             cursor: "pointer",
             "&:hover": {
-                color: "#fff",
-            },
-        },
-        infoText: {
-            color: theme.palette.primary.main,
-            fontSize: "1rem",
+                color: theme.palette.primary.main
+            }
         }
     }
 }

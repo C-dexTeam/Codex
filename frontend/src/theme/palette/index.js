@@ -1,13 +1,14 @@
 import { hexToRGBA } from "@/utils/hex-to-rgba";
 
 const text = {
-    primary: "#000",
+    primary: "#f0f0f0",
+    secondary: "#0F0F0F",
 };
 
 const border = {
-    main: "#7A828E",
-    light: "#525964",
-    secondary: "#BDC4CC"
+    main: "#A1A6B4",
+    light: "#DEE0E8",
+    secondary: "#35373F"
 }
 
 const palette = {
@@ -20,49 +21,49 @@ const palette = {
         selected: border.light,
     },
     common: {
-        black: "#0F0F0F",
-        white: text.primary,
+        black: text.primary,
+        white: text.secondary,
     },
     divider: border.main,
     primary: {
-        main: "#409EFF",
-        light: "#91CBFF",
-        dark: "#318BF8",
+        main: "#39D98A",
+        light: "#ABFFD8",
+        dark: "#01572F",
         contrastText: text.primary,
     },
     secondary: {
-        main: "#8997AC",
-        light: "#9AA8BC",
-        dark: "#647185",
+        main: "#A1A6B4",
+        light: "#DEE0E8",
+        dark: "#35373F",
         contrastText: text.primary,
     },
     success: {
-        main: "#72F088",
-        light: "#ACF7B6",
-        dark: "#007728",
+        main: "#39D98A",
+        light: "#ABFFD8",
+        dark: "#01572F",
         contrastText: text.primary,
     },
     warning: {
-        main: "#F0B72F",
-        light: "#F7C843",
-        dark: "#E09B13",
+        main: "#E3BE44",
+        light: "#FFF3AF",
+        dark: "#816B0E",
         contrastText: text.primary,
     },
     info: {
-        main: "#CB9CFF",
-        light: "#DBB7FF",
-        dark: "#6921D7",
+        main: "#1B3B6F",
+        light: "#AABBD8",
+        dark: "#00122F",
         contrastText: text.primary,
     },
     error: {
-        main: "#FF4445",
-        light: "#FF9492",
-        dark: "#CC1421",
+        main: "#D72638",
+        light: "#FFAAAD",
+        dark: "#570003",
         contrastText: text.primary,
     },
     background: {
-        default: "#0A0C10",
-        paper: "#272B33",
+        default: "#0B0C10",
+        paper: "#1D1F2B",
     },
     border: {
         main: border.main,
