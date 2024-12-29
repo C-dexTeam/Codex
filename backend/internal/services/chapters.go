@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -42,7 +41,7 @@ func (s *chapterService) GetChapters(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultChapterLimit
+		limitNum = s.utilService.D().Limits.DefaultChapterLimit
 	}
 
 	// Hata var ise dönsün diye
@@ -118,6 +117,8 @@ func (s *chapterService) GetChapter(
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
 	}
 
+	// TODO: Return tests with input and output by chapter id
+
 	return &chapter, nil
 }
 
@@ -179,28 +180,28 @@ func (s *chapterService) UpdateChapter(
 		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
 	}
 
-	var r sql.NullInt32
+	var rewAmountNullInt sql.NullInt32
 	if rewardAmount == 0 {
-		r.Valid = false
+		rewAmountNullInt.Valid = false
 	} else {
-		r.Valid = true
-		r.Int32 = int32(rewardAmount)
+		rewAmountNullInt.Valid = true
+		rewAmountNullInt.Int32 = int32(rewardAmount)
 	}
 
-	var g sql.NullBool
+	var grantsExpNullBool sql.NullBool
 	if grantsExperience {
-		g.Valid = true
-		g.Bool = true
+		grantsExpNullBool.Valid = true
+		grantsExpNullBool.Bool = true
 	} else {
-		g.Valid = false
+		grantsExpNullBool.Valid = false
 	}
 
-	var a sql.NullBool
+	var validNulBool sql.NullBool
 	if active {
-		a.Valid = true
-		a.Bool = true
+		validNulBool.Valid = true
+		validNulBool.Bool = true
 	} else {
-		a.Valid = false
+		validNulBool.Valid = false
 	}
 
 	if err := s.queries.UpdateChapter(ctx, repo.UpdateChapterParams{
@@ -215,9 +216,9 @@ func (s *chapterService) UpdateChapter(
 		FrontendTemplate: s.utilService.ParseString(frontendTmp),
 		DockerTemplate:   s.utilService.ParseString(dockerTmp),
 		CheckTemplate:    s.utilService.ParseString(checkTmp),
-		RewardAmount:     r,
-		GrantsExperience: g,
-		Active:           a,
+		RewardAmount:     rewAmountNullInt,
+		GrantsExperience: grantsExpNullBool,
+		Active:           validNulBool,
 	}); err != nil {
 		return err
 	}

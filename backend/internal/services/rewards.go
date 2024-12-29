@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -43,7 +42,7 @@ func (s *rewardService) GetRewards(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultRewardLimit
+		limitNum = s.utilService.D().Limits.DefaultRewardLimit
 	}
 
 	rewardUUID, err := s.utilService.ParseUUID(id)
@@ -82,7 +81,7 @@ func (s *rewardService) GetReward(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultAttributeLimit
+		limitNum = s.utilService.D().Limits.DefaultRewardLimit
 	}
 
 	rewardUUID, err := s.utilService.NParseUUID(id)

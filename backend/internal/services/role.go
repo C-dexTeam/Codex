@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -31,7 +30,7 @@ func newRoleService(
 }
 
 func (s *RoleService) GetDefault(ctx context.Context) (*repo.TRole, error) {
-	return s.GetByName(ctx, domains.RoleDefaultRole)
+	return s.GetByName(ctx, s.utilService.D().Roles.DefaultRole)
 }
 
 func (s *RoleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (*repo.TRole, error) {

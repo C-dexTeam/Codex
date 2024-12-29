@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -40,7 +39,7 @@ func (s *languageService) GetLanguages(
 	languages, err := s.queries.GetLanguages(ctx, repo.GetLanguagesParams{
 		ID:    s.utilService.ParseNullUUID(id),
 		Value: s.utilService.ParseString(value),
-		Lim:   domains.DefaultLanguageLimit,
+		Lim:   int32(s.utilService.D().Limits.DefaultLanguageLimit),
 		Off:   0,
 	})
 	if err != nil {
@@ -87,5 +86,5 @@ func (s *languageService) GetByValue(
 func (s *languageService) GetDefault(
 	ctx context.Context,
 ) (*repo.TLanguage, error) {
-	return s.GetByValue(ctx, domains.DefaultLanguage)
+	return s.GetByValue(ctx, s.utilService.D().Language.DefaultLanguage)
 }

@@ -189,7 +189,7 @@ func (s *UserService) GetUsers(ctx context.Context, id, username, email, page, l
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = 10
+		limitNum = s.utilService.D().Limits.DefaultUserLimit
 	}
 
 	if _, err := s.utilService.ParseUUID(id); err != nil {

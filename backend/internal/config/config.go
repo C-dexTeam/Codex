@@ -25,6 +25,7 @@ type Config struct {
 	DatabaseConfig models.DatabaseConfig `mapstructure:"database"`
 	RedisConfig    models.RedisConfig    `mapstructure:"redis"`
 	Application    models.Application    `mapstructure:"app"`
+	Defaults       models.Defaults
 }
 
 func Init(configsDir ...string) (cfg *Config, err error) {
@@ -56,6 +57,8 @@ func Init(configsDir ...string) (cfg *Config, err error) {
 	if err = viper.Unmarshal(&cfg); err != nil {
 		return
 	}
+
+	cfg.Defaults = models.NewDefaults()
 
 	return
 }

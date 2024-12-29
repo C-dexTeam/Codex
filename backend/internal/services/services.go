@@ -3,6 +3,7 @@ package services
 import (
 	"database/sql"
 
+	"github.com/C-dexTeam/codex/internal/config/models"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -39,8 +40,9 @@ func CreateNewServices(
 	validatorService IValidatorService,
 	queries *repo.Queries,
 	db *sql.DB,
+	defaults *models.Defaults,
 ) *Services {
-	utilService := newUtilService(validatorService)
+	utilService := newUtilService(validatorService, defaults)
 	userProfileService := newUserProfileService(db, queries, utilService)
 	userService := newUserService(db, queries, utilService)
 	roleService := newRoleService(db, queries, utilService)
@@ -113,6 +115,7 @@ type IValidatorService interface {
 
 type IUtilService interface {
 	Validator() IValidatorService
+	D() *models.Defaults
 	ParseUUID(id string) (uuid.UUID, error)  // ID can be null
 	NParseUUID(id string) (uuid.UUID, error) // ID cannot be null
 	ParseString(str string) sql.NullString
@@ -123,18 +126,25 @@ type IUtilService interface {
 
 type utilService struct {
 	validatorService IValidatorService
+	defaults         *models.Defaults
 }
 
 func newUtilService(
 	validatorService IValidatorService,
+	defaults *models.Defaults,
 ) IUtilService {
 	return &utilService{
 		validatorService: validatorService,
+		defaults:         defaults,
 	}
 }
 
 func (s *utilService) Validator() IValidatorService {
 	return s.validatorService
+}
+
+func (s *utilService) D() *models.Defaults {
+	return s.defaults
 }
 
 func (s *utilService) ParseUUID(id string) (uuid.UUID, error) {

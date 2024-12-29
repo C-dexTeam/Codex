@@ -43,7 +43,7 @@ func (s *userProfileService) GetUsers(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = 10
+		limitNum = s.utilService.D().Limits.DefaultUserLimit
 	}
 
 	if _, err = s.utilService.ParseUUID(id); err != nil {

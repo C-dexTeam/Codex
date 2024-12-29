@@ -1,6 +1,8 @@
 package dto
 
-import "github.com/C-dexTeam/codex/internal/domains"
+import (
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
+)
 
 type TestDTOManager struct{}
 
@@ -24,21 +26,21 @@ type OutputDTO struct {
 	Value string `json:"value"`
 }
 
-func (t *TestDTOManager) ToInputDTO(appModel domains.Input) InputDTO {
+func (t *TestDTOManager) ToInputDTO(appModel repo.TInput) InputDTO {
 	return InputDTO{
-		ID:    appModel.GetID().String(),
-		Value: appModel.GetValue(),
+		ID:    appModel.ID.String(),
+		Value: appModel.Value.String,
 	}
 }
 
-func (t *TestDTOManager) ToOutputDTO(appModel domains.Output) OutputDTO {
+func (t *TestDTOManager) ToOutputDTO(appModel repo.TOutput) OutputDTO {
 	return OutputDTO{
-		ID:    appModel.GetTestID().String(),
-		Value: appModel.GetValue(),
+		ID:    appModel.ID.String(),
+		Value: appModel.Value.String,
 	}
 }
 
-func (t *TestDTOManager) ToInputDTOs(appModels []domains.Input) []InputDTO {
+func (t *TestDTOManager) ToInputDTOs(appModels []repo.TInput) []InputDTO {
 	var inputDTOs []InputDTO
 	for _, model := range appModels {
 		inputDTOs = append(inputDTOs, t.ToInputDTO(model))
@@ -47,7 +49,7 @@ func (t *TestDTOManager) ToInputDTOs(appModels []domains.Input) []InputDTO {
 	return inputDTOs
 }
 
-func (t *TestDTOManager) ToOutputDTOs(appModels []domains.Output) []OutputDTO {
+func (t *TestDTOManager) ToOutputDTOs(appModels []repo.TOutput) []OutputDTO {
 	var outputDTOs []OutputDTO
 	for _, model := range appModels {
 		outputDTOs = append(outputDTOs, t.ToOutputDTO(model))
@@ -56,18 +58,18 @@ func (t *TestDTOManager) ToOutputDTOs(appModels []domains.Output) []OutputDTO {
 	return outputDTOs
 }
 
-func (t *TestDTOManager) ToTestDTO(appModel domains.Test) TestDTO {
+func (t *TestDTOManager) ToTestDTO(appModel repo.TTest, inputModels []repo.TInput, outputModels []repo.TOutput) TestDTO {
 	return TestDTO{
-		ID:      appModel.GetID().String(),
-		Inputs:  t.ToInputDTOs(appModel.GetInputs()),
-		Outputs: t.ToOutputDTOs(appModel.GetOutputs()),
+		ID:      appModel.ID.String(),
+		Inputs:  t.ToInputDTOs(inputModels),
+		Outputs: t.ToOutputDTOs(outputModels),
 	}
 }
 
-func (t *TestDTOManager) ToTestDTOs(appModels []domains.Test) []TestDTO {
+func (t *TestDTOManager) ToTestDTOs(appModels []repo.TTest) []TestDTO {
 	var testDTOs []TestDTO
 	for _, model := range appModels {
-		testDTOs = append(testDTOs, t.ToTestDTO(model))
+		testDTOs = append(testDTOs, t.ToTestDTO(model, nil, nil))
 	}
 
 	return testDTOs

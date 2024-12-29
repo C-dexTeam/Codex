@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -41,7 +40,7 @@ func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultProgrammingLanguageLimit
+		limitNum = s.utilService.D().Limits.DefaultProgrammingLanguageLimit
 	}
 
 	programmingLanguages, err := s.queries.GetPLanguages(ctx, repo.GetPLanguagesParams{

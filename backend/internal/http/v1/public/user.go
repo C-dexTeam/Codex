@@ -1,7 +1,6 @@
 package public
 
 import (
-	"github.com/C-dexTeam/codex/internal/domains"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
@@ -136,7 +135,7 @@ func (h *PublicHandler) Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	defaultRole, err := h.services.RoleService().GetByName(c.Context(), domains.RoleDefaultRole)
+	defaultRole, err := h.services.RoleService().GetByName(c.Context(), h.defaults.Roles.DefaultRole)
 	if err != nil {
 		return err
 	}

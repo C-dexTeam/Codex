@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -42,7 +41,7 @@ func (s *courseService) GetCourses(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultCourseLimit
+		limitNum = s.utilService.D().Limits.DefaultCourseLimit
 	}
 
 	// Check if the uuid is wrong. If it's wrong return an error
@@ -87,7 +86,7 @@ func (s *courseService) GetCourse(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultChapterLimit
+		limitNum = s.utilService.D().Limits.DefaultCourseLimit
 	}
 
 	idUUID, err := s.utilService.NParseUUID(id)

@@ -1,7 +1,6 @@
 package private
 
 import (
-	"github.com/C-dexTeam/codex/internal/domains"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
@@ -93,13 +92,13 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 	}
 
 	// Get First Login Role
-	walletUser, err := h.services.RoleService().GetByName(c.Context(), domains.RoleWalletUser)
+	walletUser, err := h.services.RoleService().GetByName(c.Context(), h.defaults.Roles.RoleWalletUser)
 	if err != nil {
 		return err
 	}
 
 	// If the user in user Role. Change The Users role to wallet-user.
-	if userSession.Role != domains.RoleAdmin {
+	if userSession.Role != h.defaults.Roles.RoleAdmin {
 		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, walletUser.ID.String()); err != nil {
 			return err
 		}

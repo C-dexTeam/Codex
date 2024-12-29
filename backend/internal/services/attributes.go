@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
 	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -42,7 +41,7 @@ func (s *attributeService) GetAttributes(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultAttributeLimit
+		limitNum = s.utilService.D().Limits.DefaultAttributeLimit
 	}
 
 	if _, err := s.utilService.ParseUUID(id); err != nil {

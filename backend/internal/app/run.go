@@ -10,7 +10,6 @@ import (
 	"syscall"
 
 	"github.com/C-dexTeam/codex/internal/config"
-	"github.com/C-dexTeam/codex/internal/domains"
 	"github.com/C-dexTeam/codex/internal/http"
 	"github.com/C-dexTeam/codex/internal/http/middlewares"
 	"github.com/C-dexTeam/codex/internal/http/response"
@@ -37,20 +36,8 @@ func Run(cfg *config.Config) {
 		panic(err)
 	}
 
+	// Repos
 	queries := repo.New(conn)
-
-	// Repository Initialize
-	// userRepository := repositories.NewUserRepository(conn)
-	// userProfileRepository := repositories.NewUserProfileRepository(conn)
-	// transactionRepository := repositories.NewTransactionRepository(conn)
-	// roleRepository := repositories.NewRoleRepository(conn)
-	// languageRepository := repositories.NewLanguageRepository(conn)
-	// rewardRepository := repositories.NewRewardsRepository(conn)
-	// attributeRepository := repositories.NewAttributesRepository(conn)
-	// pLanguageRepository := repositories.NewPLanguageRepository(conn)
-	// courseRepository := repositories.NewCourseRepository(conn)
-	// chapterRepository := repositories.NewChapterRepository(conn)
-	// testRepository := repositories.NewTestRepository(conn)
 
 	// Utilities Initialize
 	validatorService := validatorService.NewValidatorService()
@@ -60,15 +47,16 @@ func Run(cfg *config.Config) {
 		validatorService,
 		queries,
 		conn,
+		&cfg.Defaults,
 	)
 
 	allServices.RoleService()
 
 	// First Run & Creating Default Admin
-	firstRun(queries, allServices.RoleService(), allServices.UserService())
+	firstRun(queries, allServices.RoleService(), allServices.UserService(), cfg.Defaults.Roles.RoleAdmin)
 
 	// Handler Initialize
-	handlers := http.NewHandler(allServices)
+	handlers := http.NewHandler(allServices, &cfg.Defaults)
 
 	// Fiber İnitialize
 	fiberServer := server.NewServer(cfg, response.ResponseHandler)
@@ -89,7 +77,7 @@ func Run(cfg *config.Config) {
 	fmt.Println("Fiber was successful shutdown.")
 }
 
-func firstRun(repo *repo.Queries, roleService *services.RoleService, userService *services.UserService) {
+func firstRun(repo *repo.Queries, roleService *services.RoleService, userService *services.UserService, roleAdmin string) {
 	// SQL sorgusunu sqlc ile çalıştırıyoruz
 
 	count, err := repo.CountUserByName(context.Background(), sql.NullString{String: "admin", Valid: true})
@@ -98,7 +86,7 @@ func firstRun(repo *repo.Queries, roleService *services.RoleService, userService
 	}
 	if count == 0 {
 		// Admin rolünü alıyoruz
-		adminRole, _ := roleService.GetByName(context.Background(), domains.RoleAdmin)
+		adminRole, _ := roleService.GetByName(context.Background(), roleAdmin)
 
 		// Kullanıcıyı kaydediyoruz
 		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", "admin", "admin", adminRole.ID)
