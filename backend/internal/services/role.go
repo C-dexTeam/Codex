@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 
@@ -36,7 +35,7 @@ func (s *RoleService) GetDefault(ctx context.Context) (*repo.TRole, error) {
 func (s *RoleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (*repo.TRole, error) {
 	role, err := s.queries.GetRoleByID(ctx, roleID)
 	if role.ID == uuid.Nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusNotFound, serviceErrors.ErrRoleNotFound, err)
 	}
 
 	return &role, nil
@@ -45,7 +44,7 @@ func (s *RoleService) GetRoleByID(ctx context.Context, roleID uuid.UUID) (*repo.
 func (s *RoleService) GetByName(ctx context.Context, name string) (*repo.TRole, error) {
 	role, err := s.queries.GetRoleByName(ctx, name)
 	if role.ID == uuid.Nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusNotFound, errorDomains.ErrRoleNotFound, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusNotFound, serviceErrors.ErrRoleNotFound, err)
 	}
 
 	return &role, nil

@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -60,8 +59,8 @@ func (s *attributeService) GetAttributes(
 	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringRewardsAttributes,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewardsAttributes,
 			err,
 		)
 	}
@@ -105,13 +104,13 @@ func (s *attributeService) UpdateAttribute(
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return serviceErrors.NewServiceErrorWithMessage(
-				errorDomains.StatusBadRequest,
-				errorDomains.ErrRewardAttributeNotFound,
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrRewardAttributeNotFound,
 			)
 		}
 		return serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringRewardsAttributes,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewardsAttributes,
 			err,
 		)
 	}
@@ -139,13 +138,13 @@ func (s *attributeService) DeleteAttribute(ctx context.Context, id string) (err 
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return serviceErrors.NewServiceErrorWithMessage(
-				errorDomains.StatusBadRequest,
-				errorDomains.ErrRewardAttributeNotFound,
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrRewardAttributeNotFound,
 			)
 		}
 		return serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringRewardsAttributes,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewardsAttributes,
 			err,
 		)
 	}

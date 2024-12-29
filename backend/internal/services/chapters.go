@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -61,8 +60,8 @@ func (s *chapterService) GetChapters(
 	// 	grantsExpBoolValue, err := strconv.ParseBool(grantsExperience)
 	// 	if err != nil {
 	// 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-	// 			errorDomains.StatusBadRequest,
-	// 			errorDomains.ErrInvalidBoolean,
+	// 			serviceErrors.StatusBadRequest,
+	// 			serviceErrors.ErrInvalidBoolean,
 	// 			err,
 	// 		)
 	// 	}
@@ -72,8 +71,8 @@ func (s *chapterService) GetChapters(
 	// 	activeBoolValue, err := strconv.ParseBool(active)
 	// 	if err != nil {
 	// 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-	// 			errorDomains.StatusBadRequest,
-	// 			errorDomains.ErrInvalidBoolean,
+	// 			serviceErrors.StatusBadRequest,
+	// 			serviceErrors.ErrInvalidBoolean,
 	// 			err,
 	// 		)
 	// 	}
@@ -91,8 +90,8 @@ func (s *chapterService) GetChapters(
 	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringChapter,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringChapter,
 			err,
 		)
 	}
@@ -112,9 +111,9 @@ func (s *chapterService) GetChapter(
 	chapter, err := s.queries.GetChapterByID(ctx, idUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
 		}
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
 	}
 
 	// TODO: Return tests with input and output by chapter id
@@ -175,9 +174,9 @@ func (s *chapterService) UpdateChapter(
 	}
 
 	if ok, err := s.queries.CheckChapterByID(ctx, idUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
 	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
 	}
 
 	var rewAmountNullInt sql.NullInt32
@@ -236,9 +235,9 @@ func (s *chapterService) DeleteChapter(
 	}
 
 	if ok, err := s.queries.CheckChapterByID(ctx, idUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
 	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
 	}
 
 	if err = s.queries.SoftDeleteChapter(ctx, idUUID); err != nil {

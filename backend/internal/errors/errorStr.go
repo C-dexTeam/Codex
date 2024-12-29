@@ -1,4 +1,4 @@
-package errorDomains
+package serviceErrors
 
 // HTTP Status Codes
 const (

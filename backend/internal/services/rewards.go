@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -61,8 +60,8 @@ func (s *rewardService) GetRewards(
 	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringRewards,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewards,
 			err,
 		)
 	}
@@ -93,11 +92,11 @@ func (s *rewardService) GetReward(
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return nil, nil, serviceErrors.NewServiceErrorWithMessage(
-				errorDomains.StatusBadRequest,
-				errorDomains.ErrRewardNotFound,
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrRewardNotFound,
 			)
 		}
-		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
+		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
 	}
 
 	rewardAttbitures, err := s.queries.GetAttributes(ctx, repo.GetAttributesParams{
@@ -106,7 +105,7 @@ func (s *rewardService) GetReward(
 		Off:      (int32(pageNum) - 1) * int32(limitNum),
 	})
 	if err != nil {
-		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewardsAttributes, err)
+		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringRewardsAttributes, err)
 	}
 
 	return &reward, rewardAttbitures, nil
@@ -145,13 +144,13 @@ func (s *rewardService) UpdateReward(
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return serviceErrors.NewServiceErrorWithMessage(
-				errorDomains.StatusBadRequest,
-				errorDomains.ErrRewardNotFound,
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrRewardNotFound,
 			)
 		}
 		return serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringRewards,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewards,
 			err,
 		)
 	}
@@ -184,13 +183,13 @@ func (s *rewardService) DeleteReward(
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return serviceErrors.NewServiceErrorWithMessage(
-				errorDomains.StatusBadRequest,
-				errorDomains.ErrRewardNotFound,
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrRewardNotFound,
 			)
 		}
 		return serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringRewards,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewards,
 			err,
 		)
 	}

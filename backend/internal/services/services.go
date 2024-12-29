@@ -4,7 +4,6 @@ import (
 	"database/sql"
 
 	"github.com/C-dexTeam/codex/internal/config/models"
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -154,8 +153,8 @@ func (s *utilService) ParseUUID(id string) (uuid.UUID, error) {
 	parsedUUID, err := uuid.Parse(id)
 	if err != nil {
 		return uuid.UUID{}, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusBadRequest,
-			errorDomains.ErrInvalidID,
+			serviceErrors.StatusBadRequest,
+			serviceErrors.ErrInvalidID,
 			err,
 		)
 	}
@@ -166,8 +165,8 @@ func (s *utilService) NParseUUID(id string) (uuid.UUID, error) {
 	parsedUUID, err := uuid.Parse(id)
 	if err != nil {
 		return uuid.UUID{}, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusBadRequest,
-			errorDomains.ErrInvalidID,
+			serviceErrors.StatusBadRequest,
+			serviceErrors.ErrInvalidID,
 			err,
 		)
 	}

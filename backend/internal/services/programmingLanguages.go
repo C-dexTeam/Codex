@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -52,8 +51,8 @@ func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
 	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringProgrammingLanguages,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringProgrammingLanguages,
 			err,
 		)
 	}
@@ -75,13 +74,13 @@ func (s *pLanguageService) GetProgrammingLanguage(
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return nil, serviceErrors.NewServiceErrorWithMessage(
-				errorDomains.StatusBadRequest,
-				errorDomains.ErrProgrammingLanguageNotFound,
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrProgrammingLanguageNotFound,
 			)
 		}
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringProgrammingLanguages,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringProgrammingLanguages,
 			err,
 		)
 	}
@@ -130,16 +129,16 @@ func (s *pLanguageService) UpdateProgrammingLanguage(
 	}
 
 	if ok, err := s.queries.CheckPLanguageByID(ctx, idUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringProgrammingLanguages)
 	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrProgrammingLanguageNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrProgrammingLanguageNotFound)
 	}
 
 	if languageID != "" {
 		if ok, err := s.queries.CheckLanguageByID(ctx, languageUUID); err != nil {
-			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringLanguages)
+			return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringLanguages)
 		} else if !ok {
-			return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrLanguageNotFound)
+			return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrLanguageNotFound)
 		}
 	}
 
@@ -170,9 +169,9 @@ func (s *pLanguageService) DeleteProgrammingLanguage(
 	}
 
 	if ok, err := s.queries.CheckPLanguageByID(ctx, idUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringProgrammingLanguages)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringProgrammingLanguages)
 	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrProgrammingLanguageNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrProgrammingLanguageNotFound)
 	}
 
 	if err := s.queries.DeletePLanguage(ctx, idUUID); err != nil {

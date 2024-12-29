@@ -6,7 +6,6 @@ import (
 	"math"
 	"strconv"
 
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 
@@ -66,7 +65,7 @@ func (s *userProfileService) GetUsers(
 		Off:        (int32(pageNum) - 1) * int32(limitNum),
 	})
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserProfile, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
 	}
 
 	return usersProfile, nil
@@ -86,10 +85,10 @@ func (s *userProfileService) Update(
 		Off: 1,
 	})
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserProfile, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
 	}
 	if len(usersProfile) == 0 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusNotFound, serviceErrors.ErrUserProfileNotFound)
 	}
 	newProfile := usersProfile[0]
 
@@ -125,10 +124,10 @@ func (s *userProfileService) ChangeUserRole(
 		Off: 1,
 	})
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserProfile, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
 	}
 	if len(usersProfile) == 0 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusNotFound, serviceErrors.ErrUserProfileNotFound)
 	}
 	newProfile := usersProfile[0]
 	if newRoleID != "" {
@@ -149,7 +148,7 @@ func (s *userProfileService) AddUserExp(ctx context.Context,
 	id string, experience int,
 ) (err error) {
 	if _, err := s.utilService.ParseUUID(id); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusBadRequest, serviceErrors.ErrInvalidID, err)
 	}
 
 	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
@@ -158,10 +157,10 @@ func (s *userProfileService) AddUserExp(ctx context.Context,
 		Off: 1,
 	})
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserProfile, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
 	}
 	if len(usersProfile) == 0 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusNotFound, serviceErrors.ErrUserProfileNotFound)
 	}
 	profile := usersProfile[0]
 
@@ -182,7 +181,7 @@ func (s *userProfileService) AddUserExp(ctx context.Context,
 		NextLevelExp:  profile.NextLevelExp,
 		Experience:    profile.Experience,
 	}); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileAddingExperience, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileAddingExperience, err)
 	}
 
 	return nil

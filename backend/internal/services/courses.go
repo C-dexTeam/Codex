@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -66,8 +65,8 @@ func (s *courseService) GetCourses(
 	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringCourse,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringCourse,
 			err,
 		)
 	}
@@ -98,13 +97,13 @@ func (s *courseService) GetCourse(
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return nil, nil, serviceErrors.NewServiceErrorWithMessage(
-				errorDomains.StatusBadRequest,
-				errorDomains.ErrCourseNotFound,
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrCourseNotFound,
 			)
 		}
 		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringCourse,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringCourse,
 			err,
 		)
 	}
@@ -115,8 +114,8 @@ func (s *courseService) GetCourse(
 	})
 	if err != nil {
 		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(
-			errorDomains.StatusInternalServerError,
-			errorDomains.ErrErrorWhileFilteringChapter,
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringChapter,
 			err,
 		)
 	}
@@ -168,9 +167,9 @@ func (s *courseService) UpdateCourse(
 	}
 
 	if ok, err := s.queries.CheckCourseByID(ctx, idUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringCourse, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourse, err)
 	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
 	}
 
 	var r sql.NullInt32
@@ -207,9 +206,9 @@ func (s *courseService) DeleteCourse(
 	}
 
 	if ok, err := s.queries.CheckCourseByID(ctx, idUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringCourse, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourse, err)
 	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrCourseNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
 	}
 
 	if err := s.queries.SoftDeleteCourse(ctx, idUUID); err != nil {

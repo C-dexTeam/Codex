@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"strings"
 
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 )
@@ -33,7 +32,7 @@ func (s *languageService) GetLanguages(
 	id, value string,
 ) ([]repo.TLanguage, error) {
 	if _, err := s.utilService.ParseUUID(id); err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrInvalidID)
 	}
 
 	languages, err := s.queries.GetLanguages(ctx, repo.GetLanguagesParams{
@@ -43,7 +42,7 @@ func (s *languageService) GetLanguages(
 		Off:   0,
 	})
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringLanguages, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringLanguages, err)
 	}
 
 	return languages, nil
@@ -55,15 +54,15 @@ func (s *languageService) GetLanguage(
 ) (*repo.TLanguage, error) {
 	languageID, err := s.utilService.ParseUUID(id)
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID)
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrInvalidID)
 	}
 
 	language, err := s.queries.GetLanguageByID(ctx, languageID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrLanguageNotFound)
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrLanguageNotFound)
 		}
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringLanguages, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringLanguages, err)
 	}
 	return &language, nil
 }
@@ -75,9 +74,9 @@ func (s *languageService) GetByValue(
 	language, err := s.queries.GetLanguageByValue(ctx, value)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
 		}
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
 	}
 
 	return &language, nil
