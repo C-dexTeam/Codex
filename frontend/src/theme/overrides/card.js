@@ -48,16 +48,46 @@ const card = theme => {
                 }
                 : ownerState.variant == "gradient"
                   ? {
+                    position: "relative",
                     borderRadius: "1rem",
-                    background: `linear-gradient(to right top, ${theme.palette[ownerState.color || "primary"].main} 0%, ${theme.palette.background.default} 75%)`,
-                    padding: "1px",
-                    clipPath: "polygon(0 0, 100% 0, 100% 80%, 70% 80%, 70% 100%, 0 100%)",
+                    border: "double 1px transparent",
+                    background: `linear-gradient(${theme.palette.background.default}, ${theme.palette.background.default}), linear-gradient(to right top, ${theme.palette[ownerState.color || "primary"].main} 0%, ${theme.palette.background.default} 75%)`,
+                    backgroundOrigin: "border-box",
+                    backgroundClip: "content-box, border-box",
+                    overflow: "visible",
 
-                    "& .MuiCardContent-root": {
-                      borderRadius: "1rem",
-                      background: theme.palette.background.default,
-                      clipPath: "polygon(0 0, 100% 0, 100% 80%, 70% 80%, 70% 100%, 0 100%)",
-                    }
+                    "&::before": {
+                      content: '""',
+                      display: "block",
+                      borderRadius: "1.5rem 0 0 0 ",
+                      width: `calc(${ownerState.btnWidth || 96}px + 4px)`,
+                      height: `calc(${ownerState.btnHeight || 48}px + 4px)`,
+                      position: "absolute",
+                      bottom: "0px",
+                      right: "0px",
+                      border: "double 1px transparent",
+                      background: `linear-gradient(${theme.palette.background.default}, ${theme.palette.background.default}), linear-gradient(to right top, ${theme.palette[ownerState.color || "primary"].main} -50%, ${theme.palette.background.default} 100%)`,
+                      backgroundOrigin: "border-box",
+                      backgroundClip: "content-box, border-box",
+                      borderBottom: "none",
+                      borderRight: "none",
+                    },
+                    "&::after": {
+                      content: '""',
+                      display: "block",
+                      borderRadius: "calc(1.5rem - 1px) 0 calc(1.5rem - 1px) 0",
+                      width: `calc(${ownerState.btnWidth || 96}px + 1px + 4px)`,
+                      height: `calc(${ownerState.btnHeight || 48}px + 1px + 4px)`,
+                      position: "absolute",
+                      bottom: "-1px",
+                      right: "-1px",
+                      border: "none",
+                      background: "inherit",
+                    },
+                    // "& .MuiCardContent-root": {
+                    //   borderRadius: "1rem",
+                    //   background: theme.palette.background.default,
+                    // }
                   }
                   : {
                     borderRadius: "0.5rem",

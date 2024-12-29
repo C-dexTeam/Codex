@@ -1,3 +1,4 @@
+import GradientCard from "@/components/card/GradientCard";
 import WalletConnectionButton from "@/layout/auth/Wallet/WalletConnectionButton"
 import Can from "@/layout/components/acl/Can"
 import { Box, Button, Card, CardContent, Typography } from "@mui/material"
@@ -46,7 +47,7 @@ const Home = () => {
 
             <Box sx={{ maxWidth: "300px" }}>
 
-                <Card variant="gradient">
+                <GradientCard>
                     <CardContent>
                         asdsadsad
                         <br />
@@ -54,9 +55,7 @@ const Home = () => {
                         <br />
                         asdsadsad
                     </CardContent>
-
-                    <div className="cardd-button"></div>
-                </Card>
+                </GradientCard>
             </Box>
             <br />
             <br />
@@ -70,8 +69,6 @@ const Home = () => {
                         <br />
                         asdsadsad
                     </CardContent>
-
-                    <div className="cardd-button"></div>
                 </Card>
             </Box>
 
@@ -87,8 +84,6 @@ const Home = () => {
                         <br />
                         asdsadsad
                     </CardContent>
-
-                    <div className="cardd-button"></div>
                 </Card>
             </Box>
 
@@ -104,8 +99,6 @@ const Home = () => {
                         <br />
                         asdsadsad
                     </CardContent>
-
-                    <div className="cardd-button"></div>
                 </Card>
             </Box>
 
