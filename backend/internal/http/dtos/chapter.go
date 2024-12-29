@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/C-dexTeam/codex/internal/domains"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
 
@@ -18,7 +18,7 @@ type ChapterDTO struct {
 	CourseID         uuid.UUID  `json:"courseID"`
 	LanguageID       uuid.UUID  `json:"languageID"`
 	RewardID         *uuid.UUID `json:"rewardID"`
-	RewardAmount     int        `json:"rewardAmount"`
+	RewardAmount     int32      `json:"rewardAmount"`
 	Title            string     `json:"title"`
 	Description      string     `json:"description"`
 	Content          string     `json:"content"`
@@ -33,31 +33,39 @@ type ChapterDTO struct {
 	DeletedAt        *time.Time `json:"deletedAt"`
 }
 
-func (d *ChapterDTOManager) ToChapterDTO(appModel domains.Chapter) ChapterDTO {
-	testManager := new(TestDTOManager)
+func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter) ChapterDTO {
+	// testManager := new(TestDTOManager)
+
+	var rewardID *uuid.UUID
+	if appModel.RewardID.Valid {
+		r := uuid.MustParse(appModel.RewardID.UUID.String())
+		rewardID = &r
+	} else {
+		rewardID = nil
+	}
 
 	return ChapterDTO{
-		ID:               appModel.GetID(),
-		CourseID:         appModel.GetCourseID(),
-		LanguageID:       appModel.GetLanguageID(),
-		RewardID:         appModel.GetRewardID(),
-		RewardAmount:     appModel.GetRewardAmount(),
-		Title:            appModel.GetTitle(),
-		Description:      appModel.GetDescription(),
-		Content:          appModel.GetContent(),
-		FuncName:         appModel.GetFuncName(),
-		FrontendTmp:      appModel.GetFrontendTmp(),
-		DockerTmp:        appModel.GetDockerTmp(),
-		CheckTmp:         appModel.GetCheckTmp(),
-		GrantsExperience: appModel.GetGrantsExperience(),
-		Active:           appModel.GetActive(),
-		Tests:            testManager.ToTestDTOs(appModel.GetTests()),
-		CreatedAt:        appModel.GetCreatedAt(),
-		DeletedAt:        appModel.GetDeletedAt(),
+		ID:               appModel.ID,
+		CourseID:         appModel.CourseID,
+		LanguageID:       appModel.LanguageID,
+		RewardID:         rewardID,
+		RewardAmount:     appModel.RewardAmount,
+		Title:            appModel.Title,
+		Description:      appModel.Description,
+		Content:          appModel.Content,
+		FuncName:         appModel.FuncName,
+		FrontendTmp:      appModel.FrontendTemplate,
+		DockerTmp:        appModel.DockerTemplate,
+		CheckTmp:         appModel.CheckTemplate,
+		GrantsExperience: appModel.GrantsExperience,
+		Active:           appModel.Active,
+		// Tests:            testManager.ToTestDTOs(appModel.GetTests()),
+		CreatedAt: appModel.CreatedAt.Time,
+		DeletedAt: &appModel.DeletedAt.Time,
 	}
 }
 
-func (d *ChapterDTOManager) ToChapterDTOs(appModels []domains.Chapter) []ChapterDTO {
+func (d *ChapterDTOManager) ToChapterDTOs(appModels []repo.TChapter) []ChapterDTO {
 	var chapterDTOs []ChapterDTO
 	for _, model := range appModels {
 		chapterDTOs = append(chapterDTOs, d.ToChapterDTO(model))

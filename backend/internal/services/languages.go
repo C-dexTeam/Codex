@@ -62,9 +62,9 @@ func (s *languageService) GetLanguage(
 	language, err := s.queries.GetLanguageByID(ctx, languageID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrUserNotFound)
+			return nil, serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusBadRequest, errorDomains.ErrLanguageNotFound)
 		}
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUsers, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringLanguages, err)
 	}
 	return &language, nil
 }
