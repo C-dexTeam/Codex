@@ -74,9 +74,9 @@ func (s *languageService) GetByValue(
 	language, err := s.queries.GetLanguageByValue(ctx, value)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrLanguageNotFound)
 		}
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringLanguages, err)
 	}
 
 	return &language, nil
@@ -85,5 +85,13 @@ func (s *languageService) GetByValue(
 func (s *languageService) GetDefault(
 	ctx context.Context,
 ) (*repo.TLanguage, error) {
-	return s.GetByValue(ctx, s.utilService.D().Language.DefaultLanguage)
+	defaultLanguage, err := s.queries.GetDefaultLanguage(ctx)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrLanguageNotFound)
+		}
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringLanguages, err)
+	}
+
+	return &defaultLanguage, nil
 }

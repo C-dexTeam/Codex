@@ -57,8 +57,9 @@ type TInput struct {
 }
 
 type TLanguage struct {
-	ID    uuid.UUID
-	Value string
+	ID        uuid.UUID
+	Value     string
+	IsDefault bool
 }
 
 type TOutput struct {

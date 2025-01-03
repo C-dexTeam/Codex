@@ -1,6 +1,6 @@
 -- name: GetLanguages :many
 SELECT
-    l.id, l.value
+    l.id, l.value, l.is_default
 FROM 
     t_languages as l
 WHERE
@@ -10,15 +10,23 @@ LIMIT @lim OFFSET @off;
 
 -- name: GetLanguageByID :one
 SELECT
-    l.id, l.value
+    l.id, l.value, l.is_default
 FROM 
     t_languages as l
 WHERE
     l.id = @language_id;
 
+-- name: GetDefaultLanguage :one
+SELECT
+    id, value, is_default
+FROM
+    t_languages
+WHERE 
+    is_default = True;
+
 -- name: GetLanguageByValue :one
 SELECT
-    l.id, l.value
+    l.id, l.value, l.is_default
 FROM 
     t_languages as l
 WHERE

@@ -31,9 +31,25 @@ func (q *Queries) CheckLanguageByID(ctx context.Context, languageID uuid.UUID) (
 	return exists, err
 }
 
+const getDefaultLanguage = `-- name: GetDefaultLanguage :one
+SELECT
+    id, value, is_default
+FROM
+    t_languages
+WHERE 
+    is_default = True
+`
+
+func (q *Queries) GetDefaultLanguage(ctx context.Context) (TLanguage, error) {
+	row := q.db.QueryRowContext(ctx, getDefaultLanguage)
+	var i TLanguage
+	err := row.Scan(&i.ID, &i.Value, &i.IsDefault)
+	return i, err
+}
+
 const getLanguageByID = `-- name: GetLanguageByID :one
 SELECT
-    l.id, l.value
+    l.id, l.value, l.is_default
 FROM 
     t_languages as l
 WHERE
@@ -43,13 +59,13 @@ WHERE
 func (q *Queries) GetLanguageByID(ctx context.Context, languageID uuid.UUID) (TLanguage, error) {
 	row := q.db.QueryRowContext(ctx, getLanguageByID, languageID)
 	var i TLanguage
-	err := row.Scan(&i.ID, &i.Value)
+	err := row.Scan(&i.ID, &i.Value, &i.IsDefault)
 	return i, err
 }
 
 const getLanguageByValue = `-- name: GetLanguageByValue :one
 SELECT
-    l.id, l.value
+    l.id, l.value, l.is_default
 FROM 
     t_languages as l
 WHERE
@@ -59,13 +75,13 @@ WHERE
 func (q *Queries) GetLanguageByValue(ctx context.Context, languageValue string) (TLanguage, error) {
 	row := q.db.QueryRowContext(ctx, getLanguageByValue, languageValue)
 	var i TLanguage
-	err := row.Scan(&i.ID, &i.Value)
+	err := row.Scan(&i.ID, &i.Value, &i.IsDefault)
 	return i, err
 }
 
 const getLanguages = `-- name: GetLanguages :many
 SELECT
-    l.id, l.value
+    l.id, l.value, l.is_default
 FROM 
     t_languages as l
 WHERE
@@ -95,7 +111,7 @@ func (q *Queries) GetLanguages(ctx context.Context, arg GetLanguagesParams) ([]T
 	var items []TLanguage
 	for rows.Next() {
 		var i TLanguage
-		if err := rows.Scan(&i.ID, &i.Value); err != nil {
+		if err := rows.Scan(&i.ID, &i.Value, &i.IsDefault); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
