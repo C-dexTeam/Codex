@@ -102,7 +102,7 @@ WHERE
     ($1::UUID IS NULL OR c.id = $1::UUID) AND
     ($2::UUID IS NULL OR c.language_id = $2::UUID) AND
     ($3::UUID IS NULL OR c.programming_language_id = $3::UUID) AND
-    ($4::text IS NULL OR c.reward_id = $4) AND
+    ($4::UUID IS NULL OR c.reward_id = $4:: UUID) AND
     ($5::text IS NULL OR c.title ILIKE '%' || $5::text || '%') AND
     deleted_at IS NULL
 LIMIT $7 OFFSET $6
@@ -112,7 +112,7 @@ type GetCoursesParams struct {
 	ID                    uuid.NullUUID
 	LanguageID            uuid.NullUUID
 	ProgrammingLanguageID uuid.NullUUID
-	RewardID              sql.NullString
+	RewardID              uuid.NullUUID
 	Title                 sql.NullString
 	Off                   int32
 	Lim                   int32

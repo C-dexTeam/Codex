@@ -8,7 +8,7 @@ WHERE
     (sqlc.narg(id)::UUID IS NULL OR c.id = sqlc.narg(id)::UUID) AND
     (sqlc.narg(language_id)::UUID IS NULL OR c.language_id = sqlc.narg(language_id)::UUID) AND
     (sqlc.narg(programming_language_id)::UUID IS NULL OR c.programming_language_id = sqlc.narg(programming_language_id)::UUID) AND
-    (sqlc.narg(reward_id)::text IS NULL OR c.reward_id = sqlc.narg(reward_id)) AND
+    (sqlc.narg(reward_id)::UUID IS NULL OR c.reward_id = sqlc.narg(reward_id):: UUID) AND
     (sqlc.narg(title)::text IS NULL OR c.title ILIKE '%' || sqlc.narg(title)::text || '%') AND
     deleted_at IS NULL
 LIMIT @lim OFFSET @off;

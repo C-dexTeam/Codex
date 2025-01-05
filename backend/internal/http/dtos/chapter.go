@@ -43,6 +43,12 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter) ChapterDTO {
 	} else {
 		rewardID = nil
 	}
+	var deletedAt *time.Time
+	if appModel.DeletedAt.Valid {
+		deletedAt = &appModel.DeletedAt.Time
+	} else {
+		deletedAt = nil
+	}
 
 	return ChapterDTO{
 		ID:               appModel.ID,
@@ -61,7 +67,7 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter) ChapterDTO {
 		Active:           appModel.Active,
 		// Tests:            testManager.ToTestDTOs(appModel.GetTests()),
 		CreatedAt: appModel.CreatedAt.Time,
-		DeletedAt: &appModel.DeletedAt.Time,
+		DeletedAt: deletedAt,
 	}
 }
 

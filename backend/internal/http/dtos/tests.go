@@ -29,14 +29,14 @@ type OutputDTO struct {
 func (t *TestDTOManager) ToInputDTO(appModel repo.TInput) InputDTO {
 	return InputDTO{
 		ID:    appModel.ID.String(),
-		Value: appModel.Value.String,
+		Value: appModel.Value,
 	}
 }
 
 func (t *TestDTOManager) ToOutputDTO(appModel repo.TOutput) OutputDTO {
 	return OutputDTO{
 		ID:    appModel.ID.String(),
-		Value: appModel.Value.String,
+		Value: appModel.Value,
 	}
 }
 

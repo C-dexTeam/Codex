@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -85,7 +86,7 @@ func (s *courseService) GetCourse(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = s.utilService.D().Limits.DefaultCourseLimit
+		limitNum = s.utilService.D().Limits.DefaultChapterLimit
 	}
 
 	idUUID, err := s.utilService.NParseUUID(id)
@@ -109,8 +110,9 @@ func (s *courseService) GetCourse(
 	}
 
 	courseChapters, err := s.queries.GetChapters(ctx, repo.GetChaptersParams{
-		Lim: int32(limitNum),
-		Off: (int32(pageNum) + 1) * int32(limitNum),
+		CourseID: s.utilService.ParseNullUUID(course.ID.String()),
+		Lim:      int32(limitNum),
+		Off:      (int32(pageNum) - 1) * int32(limitNum),
 	})
 	if err != nil {
 		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(
@@ -119,6 +121,9 @@ func (s *courseService) GetCourse(
 			err,
 		)
 	}
+	fmt.Println(course.ID)
+
+	fmt.Println(courseChapters)
 
 	return &course, courseChapters, nil
 }
@@ -128,6 +133,7 @@ func (s *courseService) AddCourse(
 	languageID, pLanguageID, rewardID, title, description, imagePath string,
 	rewardAmount int,
 ) (uuid.UUID, error) {
+	fmt.Println(languageID, pLanguageID, rewardID)
 	languageUUID, err := s.utilService.NParseUUID(languageID)
 	if err != nil {
 		return uuid.Nil, err
@@ -136,7 +142,7 @@ func (s *courseService) AddCourse(
 	if err != nil {
 		return uuid.Nil, err
 	}
-	if _, err := s.utilService.NParseUUID(rewardID); err != nil {
+	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
 		return uuid.Nil, err
 	}
 

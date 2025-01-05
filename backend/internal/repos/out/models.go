@@ -53,7 +53,7 @@ type TCourse struct {
 type TInput struct {
 	ID     uuid.UUID
 	TestID uuid.UUID
-	Value  sql.NullString
+	Value  string
 }
 
 type TLanguage struct {
@@ -65,7 +65,7 @@ type TLanguage struct {
 type TOutput struct {
 	ID     uuid.UUID
 	TestID uuid.UUID
-	Value  sql.NullString
+	Value  string
 }
 
 type TProgrammingLanguage struct {

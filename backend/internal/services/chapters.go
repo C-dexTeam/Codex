@@ -56,28 +56,6 @@ func (s *chapterService) GetChapters(
 	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
 		return nil, err
 	}
-	// if grantsExperience != "" {
-	// 	grantsExpBoolValue, err := strconv.ParseBool(grantsExperience)
-	// 	if err != nil {
-	// 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-	// 			serviceErrors.StatusBadRequest,
-	// 			serviceErrors.ErrInvalidBoolean,
-	// 			err,
-	// 		)
-	// 	}
-	// 	grantsExpBool = &grantsExpBoolValue
-	// }
-	// if active != "" {
-	// 	activeBoolValue, err := strconv.ParseBool(active)
-	// 	if err != nil {
-	// 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
-	// 			serviceErrors.StatusBadRequest,
-	// 			serviceErrors.ErrInvalidBoolean,
-	// 			err,
-	// 		)
-	// 	}
-	// 	activeBool = &activeBoolValue
-	// }
 
 	chapters, err := s.queries.GetChapters(ctx, repo.GetChaptersParams{
 		ID:         s.utilService.ParseNullUUID(id),
@@ -86,7 +64,7 @@ func (s *chapterService) GetChapters(
 		CourseID:   s.utilService.ParseNullUUID(courseID),
 		Title:      s.utilService.ParseString(title),
 		Lim:        int32(limitNum),
-		Off:        (int32(pageNum) - 1) + int32(limitNum),
+		Off:        (int32(pageNum) - 1) * int32(limitNum),
 	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(

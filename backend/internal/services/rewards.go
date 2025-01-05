@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -44,12 +43,10 @@ func (s *rewardService) GetRewards(
 		limitNum = s.utilService.D().Limits.DefaultRewardLimit
 	}
 
-	rewardUUID, err := s.utilService.ParseUUID(id)
-	if err != nil {
+	if _, err := s.utilService.ParseUUID(id); err != nil {
 		return nil, err
 	}
 
-	fmt.Println(s.utilService.ParseNullUUID(rewardUUID.String()))
 	rewards, err := s.queries.GetRewards(ctx, repo.GetRewardsParams{
 		ID:         s.utilService.ParseNullUUID(id),
 		Name:       s.utilService.ParseString(name),

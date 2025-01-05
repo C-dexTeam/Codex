@@ -23,7 +23,7 @@ type CourseDTO struct {
 	Description  string       `json:"description"`
 	ImagePath    string       `json:"imagePath"`
 	CreatedAt    time.Time    `json:"createdAt"`
-	DeletedAt    time.Time    `json:"deletedAt"`
+	DeletedAt    *time.Time   `json:"deletedAt"`
 	Chapters     []ChapterDTO `json:"chapters,omitempty"`
 }
 
@@ -36,6 +36,12 @@ func (d *CourseDTOManager) ToCourseDTO(courseModel *repo.TCourse, chapterModels 
 	} else {
 		rewardID = nil
 	}
+	var deletedAt *time.Time
+	if courseModel.DeletedAt.Valid {
+		deletedAt = &courseModel.DeletedAt.Time
+	} else {
+		deletedAt = nil
+	}
 
 	return CourseDTO{
 		ID:           courseModel.ID,
@@ -47,7 +53,7 @@ func (d *CourseDTOManager) ToCourseDTO(courseModel *repo.TCourse, chapterModels 
 		Description:  courseModel.Description,
 		ImagePath:    courseModel.ImagePath,
 		CreatedAt:    courseModel.CreatedAt.Time,
-		DeletedAt:    courseModel.DeletedAt.Time,
+		DeletedAt:    deletedAt,
 		Chapters:     chapterDTOManager.ToChapterDTOs(chapterModels),
 	}
 }
