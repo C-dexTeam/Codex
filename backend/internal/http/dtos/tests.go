@@ -58,7 +58,7 @@ func (t *TestDTOManager) ToOutputDTOs(appModels []repo.TOutput) []OutputDTO {
 	return outputDTOs
 }
 
-func (t *TestDTOManager) ToTestDTO(appModel repo.TTest, inputModels []repo.TInput, outputModels []repo.TOutput) TestDTO {
+func (t *TestDTOManager) ToTestDTO(appModel repo.GetTestsRow, inputModels []repo.TInput, outputModels []repo.TOutput) TestDTO {
 	return TestDTO{
 		ID:      appModel.ID.String(),
 		Inputs:  t.ToInputDTOs(inputModels),
@@ -66,7 +66,7 @@ func (t *TestDTOManager) ToTestDTO(appModel repo.TTest, inputModels []repo.TInpu
 	}
 }
 
-func (t *TestDTOManager) ToTestDTOs(appModels []repo.TTest) []TestDTO {
+func (t *TestDTOManager) ToTestDTOs(appModels []repo.GetTestsRow) []TestDTO {
 	var testDTOs []TestDTO
 	for _, model := range appModels {
 		testDTOs = append(testDTOs, t.ToTestDTO(model, nil, nil))

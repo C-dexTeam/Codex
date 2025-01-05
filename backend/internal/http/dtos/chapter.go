@@ -33,8 +33,8 @@ type ChapterDTO struct {
 	DeletedAt        *time.Time `json:"deletedAt"`
 }
 
-func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter) ChapterDTO {
-	// testManager := new(TestDTOManager)
+func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter, testModel []repo.GetTestsRow) ChapterDTO {
+	testManager := new(TestDTOManager)
 
 	var rewardID *uuid.UUID
 	if appModel.RewardID.Valid {
@@ -65,16 +65,16 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter) ChapterDTO {
 		CheckTmp:         appModel.CheckTemplate,
 		GrantsExperience: appModel.GrantsExperience,
 		Active:           appModel.Active,
-		// Tests:            testManager.ToTestDTOs(appModel.GetTests()),
-		CreatedAt: appModel.CreatedAt.Time,
-		DeletedAt: deletedAt,
+		Tests:            testManager.ToTestDTOs(testModel),
+		CreatedAt:        appModel.CreatedAt.Time,
+		DeletedAt:        deletedAt,
 	}
 }
 
 func (d *ChapterDTOManager) ToChapterDTOs(appModels []repo.TChapter) []ChapterDTO {
 	var chapterDTOs []ChapterDTO
 	for _, model := range appModels {
-		chapterDTOs = append(chapterDTOs, d.ToChapterDTO(model))
+		chapterDTOs = append(chapterDTOs, d.ToChapterDTO(model, nil))
 	}
 	return chapterDTOs
 }

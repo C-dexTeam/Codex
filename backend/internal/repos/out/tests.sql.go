@@ -72,14 +72,16 @@ INNER JOIN
     t_outputs o
 ON o.test_id = t.id
 WHERE
-    ($1::UUID IS NULL OR t.id = $1::UUID)
-LIMIT $3 OFFSET $2
+    ($1::UUID IS NULL OR t.id = $1::UUID) AND
+    ($2::UUID IS NULL OR t.chapter_id = $2::UUID)
+LIMIT $4 OFFSET $3
 `
 
 type GetTestsParams struct {
-	ID  uuid.NullUUID
-	Off int32
-	Lim int32
+	ID        uuid.NullUUID
+	ChapterID uuid.NullUUID
+	Off       int32
+	Lim       int32
 }
 
 type GetTestsRow struct {
@@ -89,7 +91,12 @@ type GetTestsRow struct {
 }
 
 func (q *Queries) GetTests(ctx context.Context, arg GetTestsParams) ([]GetTestsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getTests, arg.ID, arg.Off, arg.Lim)
+	rows, err := q.db.QueryContext(ctx, getTests,
+		arg.ID,
+		arg.ChapterID,
+		arg.Off,
+		arg.Lim,
+	)
 	if err != nil {
 		return nil, err
 	}

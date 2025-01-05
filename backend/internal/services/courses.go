@@ -121,9 +121,6 @@ func (s *courseService) GetCourse(
 			err,
 		)
 	}
-	fmt.Println(course.ID)
-
-	fmt.Println(courseChapters)
 
 	return &course, courseChapters, nil
 }

@@ -10,7 +10,8 @@ INNER JOIN
     t_outputs o
 ON o.test_id = t.id
 WHERE
-    (sqlc.narg(id)::UUID IS NULL OR t.id = sqlc.narg(id)::UUID)
+    (sqlc.narg(id)::UUID IS NULL OR t.id = sqlc.narg(id)::UUID) AND
+    (sqlc.narg(chapter_id)::UUID IS NULL OR t.chapter_id = sqlc.narg(chapter_id)::UUID)
 LIMIT @lim OFFSET @off;
 
 -- name: GetTestByID :one

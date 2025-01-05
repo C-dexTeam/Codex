@@ -80,23 +80,45 @@ func (s *chapterService) GetChapters(
 func (s *chapterService) GetChapter(
 	ctx context.Context,
 	id, page, limit string,
-) (*repo.TChapter, error) {
+) (*repo.TChapter, []repo.GetTestsRow, error) {
+	pageNum, err := strconv.Atoi(page)
+	if err != nil || page == "" {
+		pageNum = 1
+	}
+
+	limitNum, err := strconv.Atoi(limit)
+	if err != nil || limit == "" {
+		limitNum = s.utilService.D().Limits.DefaultTestLimit
+	}
+
 	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	chapter, err := s.queries.GetChapterByID(ctx, idUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
+			return nil, nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
 		}
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
+		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
 	}
 
 	// TODO: Return tests with input and output by chapter id
+	chapterTests, err := s.queries.GetTests(ctx, repo.GetTestsParams{
+		ChapterID: s.utilService.ParseNullUUID(id),
+		Lim:       int32(limitNum),
+		Off:       (int32(pageNum) - 1) * int32(limitNum),
+	})
+	if err != nil {
+		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringTests,
+			err,
+		)
+	}
 
-	return &chapter, nil
+	return &chapter, chapterTests, nil
 }
 
 func (s *chapterService) AddChapter(
