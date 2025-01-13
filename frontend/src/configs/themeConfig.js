@@ -13,7 +13,10 @@ const themeConfig = {
     acl: true /* true | false */,
 
     // ** Other Configs
-    toastPosition: 'top-right' /* top-left | top-center | top-right | bottom-left | bottom-center | bottom-right */
+    toastPosition: 'top-right' /* top-left | top-center | top-right | bottom-left | bottom-center | bottom-right */,
+
+    // ** Font Family
+    fontFamily: "Montserrat Alternates",
 }
 
 export default themeConfig
