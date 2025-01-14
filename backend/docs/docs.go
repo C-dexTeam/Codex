@@ -501,6 +501,103 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/admin/tests/": {
+            "post": {
+                "description": "Adds Test Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Add Test",
+                "parameters": [
+                    {
+                        "description": "New Test",
+                        "name": "newTest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddTestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates tests Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Update Test",
+                "parameters": [
+                    {
+                        "description": "Update Test",
+                        "name": "updateTest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateTestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/tests/{id}": {
+            "delete": {
+                "description": "Delete tests from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Delete Test",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Taest ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/admin/user": {
             "get": {
                 "description": "Retrieves all users based on the provided query parameters.",
@@ -1058,6 +1155,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/tests/": {
+            "get": {
+                "description": "Retrieves all tests based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Get All tests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Test ID",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "chapterID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/user/connect": {
             "post": {
                 "description": "Connects Wallet.",
@@ -1477,6 +1623,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AddTestDTO": {
+            "type": "object",
+            "required": [
+                "chapterID"
+            ],
+            "properties": {
+                "chapterID": {
+                    "type": "string"
+                },
+                "inputValue": {
+                    "type": "string"
+                },
+                "outputValue": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UpdateAttributeDTO": {
             "type": "object",
             "required": [
@@ -1640,6 +1803,23 @@ const docTemplate = `{
                 "uri": {
                     "type": "string",
                     "maxLength": 120
+                }
+            }
+        },
+        "dto.UpdateTestDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "inputValue": {
+                    "type": "string"
+                },
+                "outputValue": {
+                    "type": "string"
                 }
             }
         },

@@ -80,7 +80,7 @@ func (s *chapterService) GetChapters(
 func (s *chapterService) GetChapter(
 	ctx context.Context,
 	id, page, limit string,
-) (*repo.TChapter, []repo.GetTestsRow, error) {
+) (*repo.TChapter, []repo.TTest, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1

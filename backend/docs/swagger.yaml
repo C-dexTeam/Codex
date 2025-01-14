@@ -121,6 +121,17 @@ definitions:
     - symbol
     - uri
     type: object
+  dto.AddTestDTO:
+    properties:
+      chapterID:
+        type: string
+      inputValue:
+        type: string
+      outputValue:
+        type: string
+    required:
+    - chapterID
+    type: object
   dto.UpdateAttributeDTO:
     properties:
       id:
@@ -229,6 +240,17 @@ definitions:
         type: string
       uri:
         maxLength: 120
+        type: string
+    required:
+    - id
+    type: object
+  dto.UpdateTestDTO:
+    properties:
+      id:
+        type: string
+      inputValue:
+        type: string
+      outputValue:
         type: string
     required:
     - id
@@ -631,6 +653,69 @@ paths:
       summary: Delete Reward
       tags:
       - Reward
+  /private/admin/tests/:
+    patch:
+      consumes:
+      - application/json
+      description: Updates tests Into DB.
+      parameters:
+      - description: Update Test
+        in: body
+        name: updateTest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Test
+      tags:
+      - Test
+    post:
+      consumes:
+      - application/json
+      description: Adds Test Into DB.
+      parameters:
+      - description: New Test
+        in: body
+        name: newTest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddTestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Test
+      tags:
+      - Test
+  /private/admin/tests/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete tests from DB.
+      parameters:
+      - description: Taest ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Test
+      tags:
+      - Test
   /private/admin/user:
     get:
       consumes:
@@ -997,6 +1082,38 @@ paths:
       summary: Get Reward By ID
       tags:
       - Reward
+  /private/tests/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all tests based on the provided query parameters.
+      parameters:
+      - description: Test ID
+        in: query
+        name: id
+        type: string
+      - description: Chapter ID
+        in: query
+        name: chapterID
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All tests
+      tags:
+      - Test
   /private/user/connect:
     post:
       consumes:

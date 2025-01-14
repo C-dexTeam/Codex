@@ -19,6 +19,9 @@ const (
 	ErrRewardNotFound              = "REWARD_NOT_FOUND"
 	ErrRewardAttributeNotFound     = "REWARD_ATTRIBUTE_NOT_FOUND"
 	ErrChapterNotFound             = "CHAPTER_NOT_FOUND"
+	ErrTestNotFound                = "TEST_NOT_FOUND"
+	ErrInputNotFound               = "INPUT_NOT_FOUND"
+	ErrOutputNotFound              = "OUTPUT_NOT_FOUND"
 )
 
 // 400

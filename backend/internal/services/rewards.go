@@ -171,7 +171,7 @@ func (s *rewardService) DeleteReward(
 	ctx context.Context,
 	id string,
 ) (err error) {
-	idUUID, err := s.utilService.ParseUUID(id)
+	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
 		return err
 	}

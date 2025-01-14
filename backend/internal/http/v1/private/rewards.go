@@ -1,8 +1,6 @@
 package private
 
 import (
-	"fmt"
-
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
@@ -151,8 +149,6 @@ func (h *PrivateHandler) UpdateReward(c *fiber.Ctx) error {
 // @Router /private/admin/rewards/{id} [delete]
 func (h *PrivateHandler) DeleteReward(c *fiber.Ctx) error {
 	id := c.Params("id")
-
-	fmt.Println("Selam")
 
 	if err := h.services.RewardService().DeleteReward(c.Context(), id); err != nil {
 		return err

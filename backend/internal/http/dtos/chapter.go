@@ -28,12 +28,12 @@ type ChapterDTO struct {
 	CheckTmp         string     `json:"check_template"`
 	GrantsExperience bool       `json:"grantsExperience"`
 	Active           bool       `json:"active"`
-	Tests            []TestDTO  `json:"tests,omitempty"`
+	Tests            []TestView `json:"tests,omitempty"`
 	CreatedAt        time.Time  `json:"createdAt"`
 	DeletedAt        *time.Time `json:"deletedAt"`
 }
 
-func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter, testModel []repo.GetTestsRow) ChapterDTO {
+func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter, testModel []repo.TTest) ChapterDTO {
 	testManager := new(TestDTOManager)
 
 	var rewardID *uuid.UUID

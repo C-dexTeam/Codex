@@ -20,6 +20,7 @@ type IService interface {
 	CourseService() *courseService
 	ChapterService() *chapterService
 	AttributeService() *attributeService
+	TestService() *testService
 }
 
 type Services struct {
@@ -33,6 +34,7 @@ type Services struct {
 	pLanguageService   *pLanguageService
 	courseService      *courseService
 	chapterService     *chapterService
+	testService        *testService
 }
 
 func CreateNewServices(
@@ -51,6 +53,7 @@ func CreateNewServices(
 	pLanguageService := newPLanguageService(db, queries, utilService)
 	courseService := newCourseService(db, queries, utilService)
 	chapterService := NewChapterService(db, queries, utilService)
+	testService := newTestService(db, queries, utilService)
 
 	return &Services{
 		utilService:        utilService,
@@ -63,6 +66,7 @@ func CreateNewServices(
 		pLanguageService:   pLanguageService,
 		courseService:      courseService,
 		chapterService:     chapterService,
+		testService:        testService,
 	}
 }
 
@@ -104,6 +108,10 @@ func (s *Services) ChapterService() *chapterService {
 
 func (s *Services) AttributeService() *attributeService {
 	return s.attributeService
+}
+
+func (s *Services) TestService() *testService {
+	return s.testService
 }
 
 // ------------------------------------------------------

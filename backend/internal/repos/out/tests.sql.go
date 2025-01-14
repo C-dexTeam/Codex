@@ -7,17 +7,47 @@ package repo
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
 
-const createTest = `-- name: CreateTest :exec
-BEGIN
+const checkTestByID = `-- name: CheckTestByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_tests AS l
+        WHERE l.id = $1 
+    ) THEN true
+    ELSE false
+END AS exists
 `
 
-func (q *Queries) CreateTest(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, createTest)
-	return err
+func (q *Queries) CheckTestByID(ctx context.Context, testID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkTestByID, testID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const createTest = `-- name: CreateTest :one
+INSERT INTO t_tests (chapter_id, input_value, output_value)
+VALUES ($1, $2, $3)
+RETURNING id
+`
+
+type CreateTestParams struct {
+	ChapterID   uuid.UUID
+	InputValue  string
+	OutputValue string
+}
+
+func (q *Queries) CreateTest(ctx context.Context, arg CreateTestParams) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, createTest, arg.ChapterID, arg.InputValue, arg.OutputValue)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const deleteTest = `-- name: DeleteTest :exec
@@ -32,45 +62,32 @@ func (q *Queries) DeleteTest(ctx context.Context, testID uuid.UUID) error {
 	return err
 }
 
-const getTestByID = `-- name: GetTestByID :one
+const getTest = `-- name: GetTest :one
 SELECT
-    t.id, i.value, o.value
+    t.id, t.chapter_id, t.input_value, t.output_value
 FROM 
-    t_tests AS t
-INNER JOIN
-    t_inputs i
-ON i.test_id = t.id
-INNER JOIN 
-    t_outputs o
-ON o.test_id = t.id
+    t_tests as t
 WHERE
     t.id = $1
 `
 
-type GetTestByIDRow struct {
-	ID      uuid.UUID
-	Value   string
-	Value_2 string
-}
-
-func (q *Queries) GetTestByID(ctx context.Context, testID uuid.UUID) (GetTestByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getTestByID, testID)
-	var i GetTestByIDRow
-	err := row.Scan(&i.ID, &i.Value, &i.Value_2)
+func (q *Queries) GetTest(ctx context.Context, testID uuid.UUID) (TTest, error) {
+	row := q.db.QueryRowContext(ctx, getTest, testID)
+	var i TTest
+	err := row.Scan(
+		&i.ID,
+		&i.ChapterID,
+		&i.InputValue,
+		&i.OutputValue,
+	)
 	return i, err
 }
 
 const getTests = `-- name: GetTests :many
 SELECT
-    t.id, i.value, o.value
+    t.id, t.chapter_id, t.input_value, t.output_value
 FROM 
     t_tests AS t
-INNER JOIN
-    t_inputs i
-ON i.test_id = t.id
-INNER JOIN 
-    t_outputs o
-ON o.test_id = t.id
 WHERE
     ($1::UUID IS NULL OR t.id = $1::UUID) AND
     ($2::UUID IS NULL OR t.chapter_id = $2::UUID)
@@ -84,13 +101,7 @@ type GetTestsParams struct {
 	Lim       int32
 }
 
-type GetTestsRow struct {
-	ID      uuid.UUID
-	Value   string
-	Value_2 string
-}
-
-func (q *Queries) GetTests(ctx context.Context, arg GetTestsParams) ([]GetTestsRow, error) {
+func (q *Queries) GetTests(ctx context.Context, arg GetTestsParams) ([]TTest, error) {
 	rows, err := q.db.QueryContext(ctx, getTests,
 		arg.ID,
 		arg.ChapterID,
@@ -101,10 +112,15 @@ func (q *Queries) GetTests(ctx context.Context, arg GetTestsParams) ([]GetTestsR
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetTestsRow
+	var items []TTest
 	for rows.Next() {
-		var i GetTestsRow
-		if err := rows.Scan(&i.ID, &i.Value, &i.Value_2); err != nil {
+		var i TTest
+		if err := rows.Scan(
+			&i.ID,
+			&i.ChapterID,
+			&i.InputValue,
+			&i.OutputValue,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -116,4 +132,25 @@ func (q *Queries) GetTests(ctx context.Context, arg GetTestsParams) ([]GetTestsR
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateTest = `-- name: UpdateTest :exec
+UPDATE
+    t_tests
+SET
+    input_value =  COALESCE($1::TEXT, input_value),
+    output_value =  COALESCE($2::TEXT, output_value)
+WHERE
+    id = $3
+`
+
+type UpdateTestParams struct {
+	InputValue  sql.NullString
+	OutputValue sql.NullString
+	TestID      uuid.UUID
+}
+
+func (q *Queries) UpdateTest(ctx context.Context, arg UpdateTestParams) error {
+	_, err := q.db.ExecContext(ctx, updateTest, arg.InputValue, arg.OutputValue, arg.TestID)
+	return err
 }

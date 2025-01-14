@@ -1,51 +1,49 @@
 -- name: GetTests :many
 SELECT
-    t.id, i.value, o.value
+    t.id, t.chapter_id, t.input_value, t.output_value
 FROM 
     t_tests AS t
-INNER JOIN
-    t_inputs i
-ON i.test_id = t.id
-INNER JOIN 
-    t_outputs o
-ON o.test_id = t.id
 WHERE
     (sqlc.narg(id)::UUID IS NULL OR t.id = sqlc.narg(id)::UUID) AND
     (sqlc.narg(chapter_id)::UUID IS NULL OR t.chapter_id = sqlc.narg(chapter_id)::UUID)
 LIMIT @lim OFFSET @off;
 
--- name: GetTestByID :one
+-- name: GetTest :one
 SELECT
-    t.id, i.value, o.value
+    t.id, t.chapter_id, t.input_value, t.output_value
 FROM 
-    t_tests AS t
-INNER JOIN
-    t_inputs i
-ON i.test_id = t.id
-INNER JOIN 
-    t_outputs o
-ON o.test_id = t.id
+    t_tests as t
 WHERE
     t.id = @test_id;
 
--- name: CreateTest :exec
-BEGIN;
-
--- 1. Adım: Test ekleme
-INSERT INTO t_tests (chapter_id)
-VALUES (@chapter_id)
+-- name: CreateTest :one
+INSERT INTO t_tests (chapter_id, input_value, output_value)
+VALUES (@chapter_id, @input_value, @output_value)
 RETURNING id;
-
--- 2. Adım: Input ekleme
-INSERT INTO t_inputs (test_id, value)
-VALUES ((SELECT id FROM t_tests WHERE chapter_id = @chapter_id), @input_value);
-
--- 3. Adım: Output ekleme
-INSERT INTO t_outputs (test_id, value)
-VALUES ((SELECT id FROM t_tests WHERE chapter_id = @chapter_id), @output_value);
 
 -- name: DeleteTest :exec
 DELETE FROM 
     t_tests
 WHERE 
     id = @test_id;
+
+-- name: UpdateTest :exec
+UPDATE
+    t_tests
+SET
+    input_value =  COALESCE(sqlc.narg(input_value)::TEXT, input_value),
+    output_value =  COALESCE(sqlc.narg(output_value)::TEXT, output_value)
+WHERE
+    id = @test_id;
+
+-- name: CheckTestByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_tests AS l
+        WHERE l.id = @test_id 
+    ) THEN true
+    ELSE false
+END AS exists;
+

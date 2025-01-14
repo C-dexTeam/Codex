@@ -50,22 +50,10 @@ type TCourse struct {
 	DeletedAt             sql.NullTime
 }
 
-type TInput struct {
-	ID     uuid.UUID
-	TestID uuid.UUID
-	Value  string
-}
-
 type TLanguage struct {
 	ID        uuid.UUID
 	Value     string
 	IsDefault bool
-}
-
-type TOutput struct {
-	ID     uuid.UUID
-	TestID uuid.UUID
-	Value  string
 }
 
 type TProgrammingLanguage struct {
@@ -97,8 +85,10 @@ type TRole struct {
 }
 
 type TTest struct {
-	ID        uuid.UUID
-	ChapterID uuid.UUID
+	ID          uuid.UUID
+	ChapterID   uuid.UUID
+	InputValue  string
+	OutputValue string
 }
 
 type TUserCourse struct {
