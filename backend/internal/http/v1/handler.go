@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/C-dexTeam/codex/internal/config/models"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/v1/private"
@@ -14,12 +15,18 @@ import (
 type V1Handler struct {
 	services   *services.Services
 	dtoManager dto.IDTOManager
+	defaults   *models.Defaults
 }
 
-func NewV1Handler(services *services.Services, dtoManager dto.IDTOManager) *V1Handler {
+func NewV1Handler(
+	services *services.Services,
+	dtoManager dto.IDTOManager,
+	defaults *models.Defaults,
+) *V1Handler {
 	return &V1Handler{
 		services:   services,
 		dtoManager: dtoManager,
+		defaults:   defaults,
 	}
 }
 
@@ -30,6 +37,14 @@ func (h *V1Handler) Init(router fiber.Router, sessionStore *session.Store) {
 	})
 
 	// Init Fiber Session Store
-	public.NewPublicHandler(h.services, sessionStore, h.dtoManager).Init(root)
-	private.NewPrivateHandler(h.services, sessionStore, h.dtoManager).Init(root)
+	public.NewPublicHandler(h.services,
+		sessionStore,
+		h.dtoManager,
+		h.defaults,
+	).Init(root)
+	private.NewPrivateHandler(h.services,
+		sessionStore,
+		h.dtoManager,
+		h.defaults,
+	).Init(root)
 }

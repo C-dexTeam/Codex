@@ -1,10 +1,10 @@
 package public
 
 import (
-	"github.com/C-dexTeam/codex/internal/domains"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -37,14 +37,14 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	var userProfileData *domains.UserProfile
-	userProfiles, err := h.services.UserProfileService().GetUsers(c.Context(), "", userAuthData.GetID().String(), "", "", "", "1", "1")
+	var userProfileData *repo.TUsersProfile
+	userProfiles, err := h.services.UserProfileService().GetUsers(c.Context(), "", userAuthData.ID.String(), "", "", "", "1", "1")
 	if err != nil {
 		return err
 	}
 	userProfileData = &userProfiles[0]
 
-	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfileData.GetRoleID())
+	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfileData.RoleID)
 	if err != nil {
 		return err
 	}
@@ -81,19 +81,24 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	userAuthData, err := h.services.UserService().AuthWallet(c.Context(), wallet.PublicKeyBase58, wallet.Message, wallet.Signature)
+	userAuthData, err := h.services.UserService().AuthWallet(
+		c.Context(),
+		wallet.PublicKeyBase58,
+		wallet.Message,
+		wallet.Signature,
+	)
 	if err != nil {
 		return err
 	}
 
-	var userProfileData *domains.UserProfile
-	userProfiles, err := h.services.UserProfileService().GetUsers(c.Context(), "", userAuthData.GetID().String(), "", "", "", "1", "1")
+	var userProfileData *repo.TUsersProfile
+	userProfiles, err := h.services.UserProfileService().GetUsers(c.Context(), "", userAuthData.ID.String(), "", "", "", "1", "1")
 	if err != nil {
 		return err
 	}
 	userProfileData = &userProfiles[0]
 
-	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfileData.GetRoleID())
+	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfileData.RoleID)
 	if err != nil {
 		return err
 	}
@@ -130,12 +135,21 @@ func (h *PublicHandler) Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	firstLoginRole, err := h.services.RoleService().GetByName(c.Context(), domains.RoleDefaultRole)
+	defaultRole, err := h.services.RoleService().GetByName(c.Context(), h.defaults.Roles.DefaultRole)
 	if err != nil {
 		return err
 	}
 
-	if err := h.services.UserService().Register(c.Context(), register.Username, register.Email, register.Password, register.ConfirmPassword, register.Name, register.Email, firstLoginRole.GetID()); err != nil {
+	if err := h.services.UserService().Register(
+		c.Context(),
+		register.Username,
+		register.Email,
+		register.Password,
+		register.ConfirmPassword,
+		register.Name,
+		register.Email,
+		defaultRole.ID,
+	); err != nil {
 		return err
 	}
 	return response.Response(200, "Register successful", nil)

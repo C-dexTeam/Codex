@@ -2,25 +2,37 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"strconv"
+	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
 
 type attributeService struct {
-	attributeRepository domains.IAttributeRepository
+	db          *sql.DB
+	queries     *repo.Queries
+	utilService IUtilService
 }
 
-func NewAttributeService(attributeRepository domains.IAttributeRepository) domains.IAttributeService {
+func NewAttributeService(
+	db *sql.DB,
+	queries *repo.Queries,
+	utilService IUtilService,
+) *attributeService {
 	return &attributeService{
-		attributeRepository: attributeRepository,
+		db:          db,
+		queries:     queries,
+		utilService: utilService,
 	}
 }
 
-func (s *attributeService) GetAttributes(ctx context.Context, id, rewardID, traitType, page, limit string) (attributes []domains.Attribute, err error) {
+func (s *attributeService) GetAttributes(
+	ctx context.Context,
+	id, rewardID, traitType, page, limit string,
+) ([]repo.TAttribute, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -28,33 +40,29 @@ func (s *attributeService) GetAttributes(ctx context.Context, id, rewardID, trai
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultAttributeLimit
+		limitNum = s.utilService.D().Limits.DefaultAttributeLimit
 	}
 
-	var (
-		attributeUUID uuid.UUID
-		rewardUUID    uuid.UUID
-	)
-	if id != "" {
-		attributeUUID, err = uuid.Parse(id)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
+	if _, err := s.utilService.ParseUUID(id); err != nil {
+		return nil, err
 	}
-	if rewardID != "" {
-		rewardUUID, err = uuid.Parse(rewardID)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
+	if _, err := s.utilService.ParseUUID(id); err != nil {
+		return nil, err
 	}
 
-	attributes, _, err = s.attributeRepository.Filter(ctx, domains.AttributeFilter{
-		ID:        attributeUUID,
-		RewardID:  rewardUUID,
-		TraitType: traitType,
-	}, int64(limitNum), int64(pageNum))
+	attributes, err := s.queries.GetAttributes(ctx, repo.GetAttributesParams{
+		ID:        s.utilService.ParseNullUUID(id),
+		RewardID:  s.utilService.ParseNullUUID(rewardID),
+		TraitType: s.utilService.ParseString(traitType),
+		Lim:       int32(limitNum),
+		Off:       (int32(pageNum) - 1) * int32(limitNum),
+	})
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewardsAttributes, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewardsAttributes,
+			err,
+		)
 	}
 
 	return attributes, nil
@@ -64,17 +72,15 @@ func (s *attributeService) AddAttribute(
 	ctx context.Context,
 	rewardID, traitType, value string,
 ) (uuid.UUID, error) {
-	newAttribute, err := domains.NewAttribute(
-		"",
-		rewardID,
-		traitType,
-		value,
-	)
-	if err != nil {
+	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
 		return uuid.Nil, err
 	}
 
-	id, err := s.attributeRepository.Add(ctx, newAttribute)
+	id, err := s.queries.CreateAttribute(ctx, repo.CreateAttributeParams{
+		RewardID:  s.utilService.ParseNullUUID(rewardID),
+		TraitType: traitType,
+		Value:     value,
+	})
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -86,58 +92,66 @@ func (s *attributeService) UpdateAttribute(
 	ctx context.Context,
 	id, rewardID, traitType, value string,
 ) error {
-	var idUUID uuid.UUID
-	idUUID, err := uuid.Parse(id)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-	}
-
-	attributes, _, err := s.attributeRepository.Filter(ctx, domains.AttributeFilter{
-		ID: idUUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewardsAttributes, err)
-	}
-	if len(attributes) != 1 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrRewardAttributeNotFound)
-	}
-
-	updateAttribute, err := domains.NewAttribute(
-		id,
-		rewardID,
-		traitType,
-		value,
-	)
+	idUUID, err := s.utilService.ParseUUID(id)
 	if err != nil {
 		return err
 	}
+	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
+		return err
+	}
 
-	if err := s.attributeRepository.Update(ctx, updateAttribute); err != nil {
+	_, err = s.queries.GetAttributeByID(ctx, idUUID)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return serviceErrors.NewServiceErrorWithMessage(
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrRewardAttributeNotFound,
+			)
+		}
+		return serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewardsAttributes,
+			err,
+		)
+	}
+
+	if err := s.queries.UpdateAttribute(ctx, repo.UpdateAttributeParams{
+		AttributeID: idUUID,
+		RewardID:    s.utilService.ParseNullUUID(rewardID),
+		TraitType:   s.utilService.ParseString(traitType),
+		Value:       s.utilService.ParseString(value),
+	}); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *attributeService) DeleteAttribute(ctx context.Context, attributeID string) (err error) {
-	var attributeUUID uuid.UUID
-	attributeUUID, err = uuid.Parse(attributeID)
+func (s *attributeService) DeleteAttribute(ctx context.Context, id string) (err error) {
+
+	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return err
 	}
 
-	attributes, _, err := s.attributeRepository.Filter(ctx, domains.AttributeFilter{
-		ID: attributeUUID,
-	}, 1, 1)
+	_, err = s.queries.GetAttributeByID(ctx, idUUID)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringRewardsAttributes, err)
-	}
-	if len(attributes) != 1 {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrRewardAttributeNotFound, err)
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return serviceErrors.NewServiceErrorWithMessage(
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrRewardAttributeNotFound,
+			)
+		}
+		return serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringRewardsAttributes,
+			err,
+		)
 	}
 
-	if err = s.attributeRepository.Delete(ctx, attributeUUID); err != nil {
-		return
+	if err := s.queries.DeleteAttribute(ctx, idUUID); err != nil {
+		return err
 	}
+
 	return
 }

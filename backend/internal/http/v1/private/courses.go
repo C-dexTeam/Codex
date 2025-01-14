@@ -64,11 +64,11 @@ func (h *PrivateHandler) GetCourse(c *fiber.Ctx) error {
 	page := c.Query("page")
 	limit := c.Query("limit")
 
-	course, err := h.services.CourseService().GetCourse(c.Context(), id, page, limit)
+	course, chapters, err := h.services.CourseService().GetCourse(c.Context(), id, page, limit)
 	if err != nil {
 		return err
 	}
-	courseDTO := h.dtoManager.CourseManager().ToCourseDTO(*course)
+	courseDTO := h.dtoManager.CourseManager().ToCourseDTO(course, chapters)
 
 	return response.Response(200, "Status OK", courseDTO)
 }
@@ -97,11 +97,12 @@ func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		languageID = defaultLanguage.GetID().String()
+		languageID = defaultLanguage.ID.String()
 	} else {
 		languageID = newCourse.LanguageID
 	}
 
+	// Checks if exists
 	if newCourse.PLanguageID != "" {
 		if _, err := h.services.ProgrammingService().GetProgrammingLanguage(c.Context(), newCourse.PLanguageID); err != nil {
 			return err

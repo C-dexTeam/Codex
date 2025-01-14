@@ -14,7 +14,7 @@ func (h *PrivateHandler) initRewardsRoutes(root fiber.Router) {
 	rewardAdminRoutes := root.Group("/admin/rewards")
 	rewardAdminRoutes.Use(h.adminRoleMiddleware)
 	rewardAdminRoutes.Post("/", h.AddReward)
-	rewardAdminRoutes.Delete("/", h.DeleteReward)
+	rewardAdminRoutes.Delete("/:id", h.DeleteReward)
 	rewardAdminRoutes.Patch("/", h.UpdateReward)
 }
 
@@ -63,11 +63,11 @@ func (h *PrivateHandler) GetReward(c *fiber.Ctx) error {
 	page := c.Query("page")
 	limit := c.Query("limit")
 
-	reward, err := h.services.RewardService().GetReward(c.Context(), id, page, limit)
+	reward, attribute, err := h.services.RewardService().GetReward(c.Context(), id, page, limit)
 	if err != nil {
 		return err
 	}
-	rewardDTO := h.dtoManager.RewardManager().ToRewardDTO(reward)
+	rewardDTO := h.dtoManager.RewardManager().ToRewardDTO(reward, attribute)
 
 	return response.Response(200, "Status OK", rewardDTO)
 }

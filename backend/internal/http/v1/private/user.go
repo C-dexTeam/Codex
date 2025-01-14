@@ -1,7 +1,6 @@
 package private
 
 import (
-	"github.com/C-dexTeam/codex/internal/domains"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
@@ -13,6 +12,10 @@ func (h *PrivateHandler) initUserRoutes(root fiber.Router) {
 	user.Get("/profile", h.Profile)
 	user.Post("/profile", h.UpdateProfile)
 	user.Post("/connect", h.ConnectWallet)
+
+	userAdminRoutes := root.Group("/admin/user")
+	userAdminRoutes.Use(h.adminRoleMiddleware)
+	userAdminRoutes.Get("/", h.GetUsers)
 }
 
 // @Tags User
@@ -50,6 +53,17 @@ func (h *PrivateHandler) UpdateProfile(c *fiber.Ctx) error {
 
 	// Update Profile
 	if err := h.services.UserProfileService().Update(c.Context(), userSession.UserProfileID, newUserProfile.Name, newUserProfile.Surname); err != nil {
+		return err
+	}
+
+	// Mevcut session'ı alıyoruz
+	sess, err := h.sess_store.Get(c)
+	if err != nil {
+		return err
+	}
+	userSession.SetNameSurname(newUserProfile.Name, newUserProfile.Surname)
+	sess.Set("user", userSession)
+	if err := sess.Save(); err != nil {
 		return err
 	}
 
@@ -93,17 +107,45 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 	}
 
 	// Get First Login Role
-	walletUser, err := h.services.RoleService().GetByName(c.Context(), domains.RoleWalletUser)
+	walletUser, err := h.services.RoleService().GetByName(c.Context(), h.defaults.Roles.RoleWalletUser)
 	if err != nil {
 		return err
 	}
 
 	// If the user in user Role. Change The Users role to wallet-user.
-	if userSession.Role != domains.RoleAdmin {
-		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, walletUser.GetID().String()); err != nil {
+	if userSession.Role != h.defaults.Roles.RoleAdmin {
+		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, walletUser.ID.String()); err != nil {
 			return err
 		}
 	}
 
 	return response.Response(200, "Status OK", nil)
+}
+
+// @Tags User
+// @Summary Get All Users
+// @Description Retrieves all users based on the provided query parameters.
+// @Accept json
+// @Produce json
+// @Param id query string false "User ID"
+// @Param username query string false "Username"
+// @Param email query string false "User's Email"
+// @Param page query string false "Page"
+// @Param limit query string false "Limit"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/admin/user [get]
+func (h *PrivateHandler) GetUsers(c *fiber.Ctx) error {
+	id := c.Query("id")
+	username := c.Query("username")
+	email := c.Query("email")
+	page := c.Query("page")
+	limit := c.Query("limit")
+
+	users, err := h.services.UserService().GetUsers(c.Context(), id, username, email, page, limit)
+	if err != nil {
+		return err
+	}
+	userAuthDTOs := h.dtoManager.UserManager().ToUserAuthViews(users)
+
+	return response.Response(200, "Status OK", userAuthDTOs)
 }

@@ -2,7 +2,6 @@ package dto
 
 type IDTOManager interface {
 	UserManager() *UserDTOManager
-	AdminManager() *AdminDTOManager
 	LanguageManager() *LanguageDTOManager
 	RewardManager() *RewardDTOManager
 	ProgrammingManager() *ProgrammingLanguageDTOManager
@@ -13,7 +12,6 @@ type IDTOManager interface {
 
 type DTOManager struct {
 	userDTOManager      *UserDTOManager
-	adminDTOManager     *AdminDTOManager
 	languageDTOManager  *LanguageDTOManager
 	rewardDTOManager    *RewardDTOManager
 	pLanguageDTOManager *ProgrammingLanguageDTOManager
@@ -24,7 +22,6 @@ type DTOManager struct {
 
 func CreateNewDTOManager() IDTOManager {
 	userDTOManager := NewUserDTOManager()
-	adminDTOManager := NewAdminDTOManager()
 	languageDTOManager := NewLanguageDTOManager()
 	rewardDTOManager := NewRewardDTOManager()
 	pLanguageDTOManager := NewProgrammingLanguageDTOManager()
@@ -34,7 +31,6 @@ func CreateNewDTOManager() IDTOManager {
 
 	return &DTOManager{
 		userDTOManager:      &userDTOManager,
-		adminDTOManager:     &adminDTOManager,
 		languageDTOManager:  &languageDTOManager,
 		rewardDTOManager:    &rewardDTOManager,
 		pLanguageDTOManager: &pLanguageDTOManager,
@@ -46,10 +42,6 @@ func CreateNewDTOManager() IDTOManager {
 
 func (m *DTOManager) UserManager() *UserDTOManager {
 	return m.userDTOManager
-}
-
-func (m *DTOManager) AdminManager() *AdminDTOManager {
-	return m.adminDTOManager
 }
 
 func (m *DTOManager) LanguageManager() *LanguageDTOManager {

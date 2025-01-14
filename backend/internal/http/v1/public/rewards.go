@@ -21,11 +21,11 @@ func (h *PublicHandler) initRewardsRoutes(root fiber.Router) {
 func (h *PublicHandler) GetReward(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	reward, err := h.services.RewardService().GetReward(c.Context(), id, "1", "50")
+	reward, attributes, err := h.services.RewardService().GetReward(c.Context(), id, "1", "50")
 	if err != nil {
 		return err
 	}
-	rewardDTO := h.dtoManager.RewardManager().ToRewardDTO(reward)
+	rewardDTO := h.dtoManager.RewardManager().ToRewardDTO(reward, attributes)
 
 	return response.Response(200, "Status OK", rewardDTO)
 }

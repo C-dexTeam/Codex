@@ -3,6 +3,7 @@ package private
 import (
 	"fmt"
 
+	"github.com/C-dexTeam/codex/internal/config/models"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
@@ -17,17 +18,20 @@ type PrivateHandler struct {
 	services   *services.Services
 	sess_store *session.Store
 	dtoManager dto.IDTOManager
+	defaults   *models.Defaults
 }
 
 func NewPrivateHandler(
 	service *services.Services,
 	sessStore *session.Store,
 	dtoManager dto.IDTOManager,
+	defaults *models.Defaults,
 ) *PrivateHandler {
 	return &PrivateHandler{
 		services:   service,
 		sess_store: sessStore,
 		dtoManager: dtoManager,
+		defaults:   defaults,
 	}
 }
 
@@ -41,7 +45,6 @@ func (h *PrivateHandler) Init(router fiber.Router) {
 	})
 
 	// Initialize Routes
-	h.initAdminRoutes(root)
 	h.initUserRoutes(root)
 	h.initLanguageRoutes(root)
 	h.initRewardsRoutes(root)
@@ -49,7 +52,7 @@ func (h *PrivateHandler) Init(router fiber.Router) {
 	h.initCoursesRoutes(root)
 	h.initChaptersRoutes(root)
 	h.initAttributesRoutes(root)
-	h.initInputRoutes(root)
+	h.initTestsRoutes(root)
 }
 
 func (h *PrivateHandler) authMiddleware(c *fiber.Ctx) error {

@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/C-dexTeam/codex/internal/domains"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
 
@@ -18,7 +18,7 @@ type ChapterDTO struct {
 	CourseID         uuid.UUID  `json:"courseID"`
 	LanguageID       uuid.UUID  `json:"languageID"`
 	RewardID         *uuid.UUID `json:"rewardID"`
-	RewardAmount     int        `json:"rewardAmount"`
+	RewardAmount     int32      `json:"rewardAmount"`
 	Title            string     `json:"title"`
 	Description      string     `json:"description"`
 	Content          string     `json:"content"`
@@ -28,39 +28,53 @@ type ChapterDTO struct {
 	CheckTmp         string     `json:"check_template"`
 	GrantsExperience bool       `json:"grantsExperience"`
 	Active           bool       `json:"active"`
-	Tests            []TestDTO  `json:"tests,omitempty"`
+	Tests            []TestView `json:"tests,omitempty"`
 	CreatedAt        time.Time  `json:"createdAt"`
 	DeletedAt        *time.Time `json:"deletedAt"`
 }
 
-func (d *ChapterDTOManager) ToChapterDTO(appModel domains.Chapter) ChapterDTO {
+func (d *ChapterDTOManager) ToChapterDTO(appModel repo.TChapter, testModel []repo.TTest) ChapterDTO {
 	testManager := new(TestDTOManager)
 
+	var rewardID *uuid.UUID
+	if appModel.RewardID.Valid {
+		r := uuid.MustParse(appModel.RewardID.UUID.String())
+		rewardID = &r
+	} else {
+		rewardID = nil
+	}
+	var deletedAt *time.Time
+	if appModel.DeletedAt.Valid {
+		deletedAt = &appModel.DeletedAt.Time
+	} else {
+		deletedAt = nil
+	}
+
 	return ChapterDTO{
-		ID:               appModel.GetID(),
-		CourseID:         appModel.GetCourseID(),
-		LanguageID:       appModel.GetLanguageID(),
-		RewardID:         appModel.GetRewardID(),
-		RewardAmount:     appModel.GetRewardAmount(),
-		Title:            appModel.GetTitle(),
-		Description:      appModel.GetDescription(),
-		Content:          appModel.GetContent(),
-		FuncName:         appModel.GetFuncName(),
-		FrontendTmp:      appModel.GetFrontendTmp(),
-		DockerTmp:        appModel.GetDockerTmp(),
-		CheckTmp:         appModel.GetCheckTmp(),
-		GrantsExperience: appModel.GetGrantsExperience(),
-		Active:           appModel.GetActive(),
-		Tests:            testManager.ToTestDTOs(appModel.GetTests()),
-		CreatedAt:        appModel.GetCreatedAt(),
-		DeletedAt:        appModel.GetDeletedAt(),
+		ID:               appModel.ID,
+		CourseID:         appModel.CourseID,
+		LanguageID:       appModel.LanguageID,
+		RewardID:         rewardID,
+		RewardAmount:     appModel.RewardAmount,
+		Title:            appModel.Title,
+		Description:      appModel.Description,
+		Content:          appModel.Content,
+		FuncName:         appModel.FuncName,
+		FrontendTmp:      appModel.FrontendTemplate,
+		DockerTmp:        appModel.DockerTemplate,
+		CheckTmp:         appModel.CheckTemplate,
+		GrantsExperience: appModel.GrantsExperience,
+		Active:           appModel.Active,
+		Tests:            testManager.ToTestDTOs(testModel),
+		CreatedAt:        appModel.CreatedAt.Time,
+		DeletedAt:        deletedAt,
 	}
 }
 
-func (d *ChapterDTOManager) ToChapterDTOs(appModels []domains.Chapter) []ChapterDTO {
+func (d *ChapterDTOManager) ToChapterDTOs(appModels []repo.TChapter) []ChapterDTO {
 	var chapterDTOs []ChapterDTO
 	for _, model := range appModels {
-		chapterDTOs = append(chapterDTOs, d.ToChapterDTO(model))
+		chapterDTOs = append(chapterDTOs, d.ToChapterDTO(model, nil))
 	}
 	return chapterDTOs
 }
@@ -86,7 +100,7 @@ type UpdateChapterDTO struct {
 	CourseID         string `json:"courseID"`
 	LanguageID       string `json:"languageID"`
 	RewardID         string `json:"rewardID"`
-	RewardAmount     int    `json:"rewardAmount" validate:"gte=1"`
+	RewardAmount     int    `json:"rewardAmount"`
 	Title            string `json:"title"`
 	Description      string `json:"description"`
 	Content          string `json:"content"`

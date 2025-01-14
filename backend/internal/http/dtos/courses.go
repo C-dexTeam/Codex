@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/C-dexTeam/codex/internal/domains"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
 
@@ -18,36 +18,50 @@ type CourseDTO struct {
 	LanguageID   uuid.UUID    `json:"languageID"`
 	PLanguageID  uuid.UUID    `json:"programmingLanguageID"`
 	RewardID     *uuid.UUID   `json:"rewardID"`
-	RewardAmount int          `json:"rewardAmount"`
+	RewardAmount int32        `json:"rewardAmount"`
 	Title        string       `json:"title"`
 	Description  string       `json:"description"`
 	ImagePath    string       `json:"imagePath"`
 	CreatedAt    time.Time    `json:"createdAt"`
-	DeletedAt    time.Time    `json:"deletedAt"`
-	Chapters     []ChapterDTO `json:"chapters"`
+	DeletedAt    *time.Time   `json:"deletedAt"`
+	Chapters     []ChapterDTO `json:"chapters,omitempty"`
 }
 
-func (d *CourseDTOManager) ToCourseDTO(appModel domains.Course) CourseDTO {
+func (d *CourseDTOManager) ToCourseDTO(courseModel *repo.TCourse, chapterModels []repo.TChapter) CourseDTO {
 	chapterDTOManager := new(ChapterDTOManager)
+	var rewardID *uuid.UUID
+	if courseModel.RewardID.Valid {
+		r := uuid.MustParse(courseModel.RewardID.UUID.String())
+		rewardID = &r
+	} else {
+		rewardID = nil
+	}
+	var deletedAt *time.Time
+	if courseModel.DeletedAt.Valid {
+		deletedAt = &courseModel.DeletedAt.Time
+	} else {
+		deletedAt = nil
+	}
+
 	return CourseDTO{
-		ID:           appModel.GetID(),
-		LanguageID:   appModel.GetLanguageID(),
-		PLanguageID:  appModel.GetPLanguageID(),
-		RewardID:     appModel.GetRewardID(),
-		RewardAmount: appModel.GetRewardAmount(),
-		Title:        appModel.GetTitle(),
-		Description:  appModel.GetDescription(),
-		ImagePath:    appModel.GetImagePath(),
-		CreatedAt:    appModel.GetCreatedAt(),
-		DeletedAt:    appModel.GetDeletedAt(),
-		Chapters:     chapterDTOManager.ToChapterDTOs(appModel.GetChapters()),
+		ID:           courseModel.ID,
+		LanguageID:   courseModel.LanguageID,
+		PLanguageID:  courseModel.ProgrammingLanguageID.UUID,
+		RewardID:     rewardID,
+		RewardAmount: courseModel.RewardAmount,
+		Title:        courseModel.Title,
+		Description:  courseModel.Description,
+		ImagePath:    courseModel.ImagePath,
+		CreatedAt:    courseModel.CreatedAt.Time,
+		DeletedAt:    deletedAt,
+		Chapters:     chapterDTOManager.ToChapterDTOs(chapterModels),
 	}
 }
 
-func (d *CourseDTOManager) ToCourseDTOs(appModels []domains.Course) []CourseDTO {
+func (d *CourseDTOManager) ToCourseDTOs(courseModels []repo.TCourse) []CourseDTO {
 	var courseDTOs []CourseDTO
-	for _, model := range appModels {
-		courseDTOs = append(courseDTOs, d.ToCourseDTO(model))
+	for _, model := range courseModels {
+		courseDTOs = append(courseDTOs, d.ToCourseDTO(&model, nil))
 	}
 
 	return courseDTOs

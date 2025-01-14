@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS t_programming_languages (
     image_path VARCHAR(60) NOT NULL,
     file_extention VARCHAR(10) NOT NULL,
     monaco_editor VARCHAR(30) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_language_id FOREIGN KEY (language_id) REFERENCES t_languages(id) ON DELETE CASCADE
 );

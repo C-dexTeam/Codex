@@ -2,30 +2,37 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"strconv"
+	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
 
 type chapterService struct {
-	chapterRepository domains.IChapterRepository
+	db          *sql.DB
+	queries     *repo.Queries
+	utilService IUtilService
 }
 
 func NewChapterService(
-	chapterRepository domains.IChapterRepository,
-) domains.IChapterService {
+	db *sql.DB,
+	queries *repo.Queries,
+	utilService IUtilService,
+) *chapterService {
 	return &chapterService{
-		chapterRepository: chapterRepository,
+		db:          db,
+		queries:     queries,
+		utilService: utilService,
 	}
 }
 
 func (s *chapterService) GetChapters(
 	ctx context.Context,
 	id, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
-) (chapters []domains.Chapter, err error) {
+) ([]repo.TChapter, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -33,93 +40,85 @@ func (s *chapterService) GetChapters(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = domains.DefaultChapterLimit
+		limitNum = s.utilService.D().Limits.DefaultChapterLimit
 	}
 
-	var (
-		chapterUUID   uuid.UUID
-		languageUUID  uuid.UUID
-		courseUUID    uuid.UUID
-		rewardUUID    uuid.UUID
-		grantsExpBool *bool
-		activeBool    *bool
-	)
-	if id != "" {
-		chapterUUID, err = uuid.Parse(id)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
+	// Hata var ise dönsün diye
+	if _, err := s.utilService.ParseUUID(id); err != nil {
+		return nil, err
 	}
-	if langugeID != "" {
-		languageUUID, err = uuid.Parse(langugeID)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
+	if _, err := s.utilService.ParseUUID(langugeID); err != nil {
+		return nil, err
 	}
-	if courseID != "" {
-		courseUUID, err = uuid.Parse(courseID)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
+	if _, err := s.utilService.ParseUUID(courseID); err != nil {
+		return nil, err
 	}
-	if rewardID != "" {
-		rewardUUID, err = uuid.Parse(rewardID)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-		}
-	}
-	if grantsExperience != "" {
-		grantsExpBoolValue, err := strconv.ParseBool(grantsExperience)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidBoolean, err)
-		}
-		grantsExpBool = &grantsExpBoolValue
-	}
-	if active != "" {
-		activeBoolValue, err := strconv.ParseBool(active)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidBoolean, err)
-		}
-		activeBool = &activeBoolValue
+	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
+		return nil, err
 	}
 
-	chapters, _, err = s.chapterRepository.Filter(ctx, domains.ChapterFilter{
-		ID:               chapterUUID,
-		LanguageID:       languageUUID,
-		CourseID:         courseUUID,
-		RewardID:         rewardUUID,
-		Title:            title,
-		GrantsExperience: grantsExpBool,
-		Active:           activeBool,
-	}, int64(limitNum), int64(pageNum))
+	chapters, err := s.queries.GetChapters(ctx, repo.GetChaptersParams{
+		ID:         s.utilService.ParseNullUUID(id),
+		LanguageID: s.utilService.ParseNullUUID(langugeID),
+		RewardID:   s.utilService.ParseNullUUID(rewardID),
+		CourseID:   s.utilService.ParseNullUUID(courseID),
+		Title:      s.utilService.ParseString(title),
+		Lim:        int32(limitNum),
+		Off:        (int32(pageNum) - 1) * int32(limitNum),
+	})
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringChapter,
+			err,
+		)
 	}
 
-	return
+	return chapters, nil
 }
 
 func (s *chapterService) GetChapter(
 	ctx context.Context,
 	id, page, limit string,
-) (chapter *domains.Chapter, err error) {
-	chapterUUID, err := uuid.Parse(id)
-	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+) (*repo.TChapter, []repo.TTest, error) {
+	pageNum, err := strconv.Atoi(page)
+	if err != nil || page == "" {
+		pageNum = 1
 	}
 
-	chapters, _, err := s.chapterRepository.Filter(ctx, domains.ChapterFilter{
-		ID: chapterUUID,
-	}, 1, 1)
-	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
+	limitNum, err := strconv.Atoi(limit)
+	if err != nil || limit == "" {
+		limitNum = s.utilService.D().Limits.DefaultTestLimit
 	}
-	if len(chapters) == 0 {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrChapterNotFound, err)
-	}
-	chapter = &chapters[0]
 
-	return
+	idUUID, err := s.utilService.NParseUUID(id)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	chapter, err := s.queries.GetChapterByID(ctx, idUUID)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
+		}
+		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
+	}
+
+	// TODO: Return tests with input and output by chapter id
+	chapterTests, err := s.queries.GetTests(ctx, repo.GetTestsParams{
+		ChapterID: s.utilService.ParseNullUUID(id),
+		Lim:       int32(limitNum),
+		Off:       (int32(pageNum) - 1) * int32(limitNum),
+	})
+	if err != nil {
+		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringTests,
+			err,
+		)
+	}
+
+	return &chapter, chapterTests, nil
 }
 
 func (s *chapterService) AddChapter(
@@ -129,27 +128,32 @@ func (s *chapterService) AddChapter(
 	grantsExperience, active bool,
 	rewardAmount int,
 ) (uuid.UUID, error) {
-	newChapter, err := domains.NewChapter(
-		"",
-		languageID,
-		courseID,
-		rewardID,
-		title,
-		description,
-		content,
-		funcName,
-		frontendTmp,
-		dockerTmp,
-		checkTmp,
-		rewardAmount,
-		grantsExperience,
-		active,
-	)
+	languageUUID, err := s.utilService.NParseUUID(languageID)
 	if err != nil {
 		return uuid.Nil, err
 	}
+	courseUUID, err := s.utilService.ParseUUID(courseID)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
+		return uuid.Nil, err
+	}
 
-	id, err := s.chapterRepository.Add(ctx, newChapter)
+	id, err := s.queries.CreateChapter(ctx, repo.CreateChapterParams{
+		LanguageID:       languageUUID,
+		CourseID:         courseUUID,
+		RewardID:         s.utilService.ParseNullUUID(rewardID),
+		Title:            title,
+		Description:      description,
+		FuncName:         funcName,
+		FrontendTemplate: frontendTmp,
+		DockerTemplate:   dockerTmp,
+		CheckTemplate:    checkTmp,
+		RewardAmount:     int32(rewardAmount),
+		GrantsExperience: grantsExperience,
+		Active:           active,
+	})
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -164,43 +168,57 @@ func (s *chapterService) UpdateChapter(
 	grantsExperience, active bool,
 	rewardAmount int,
 ) error {
-	var idUUID uuid.UUID
-	idUUID, err := uuid.Parse(id)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
-	}
-
-	rewards, _, err := s.chapterRepository.Filter(ctx, domains.ChapterFilter{
-		ID: idUUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
-	}
-	if len(rewards) != 1 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrChapterNotFound)
-	}
-
-	updateChapter, err := domains.NewChapter(
-		id,
-		languageID,
-		courseID,
-		rewardID,
-		title,
-		description,
-		content,
-		funcName,
-		frontendTmp,
-		dockerTmp,
-		checkTmp,
-		rewardAmount,
-		grantsExperience,
-		active,
-	)
+	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
 		return err
 	}
 
-	if err := s.chapterRepository.Update(ctx, updateChapter); err != nil {
+	if ok, err := s.queries.CheckChapterByID(ctx, idUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
+	}
+
+	var rewAmountNullInt sql.NullInt32
+	if rewardAmount == 0 {
+		rewAmountNullInt.Valid = false
+	} else {
+		rewAmountNullInt.Valid = true
+		rewAmountNullInt.Int32 = int32(rewardAmount)
+	}
+
+	var grantsExpNullBool sql.NullBool
+	if grantsExperience {
+		grantsExpNullBool.Valid = true
+		grantsExpNullBool.Bool = true
+	} else {
+		grantsExpNullBool.Valid = false
+	}
+
+	var validNulBool sql.NullBool
+	if active {
+		validNulBool.Valid = true
+		validNulBool.Bool = true
+	} else {
+		validNulBool.Valid = false
+	}
+
+	if err := s.queries.UpdateChapter(ctx, repo.UpdateChapterParams{
+		ChapterID:        idUUID,
+		LanguageID:       s.utilService.ParseNullUUID(languageID),
+		CourseID:         s.utilService.ParseNullUUID(courseID),
+		RewardID:         s.utilService.ParseNullUUID(rewardID),
+		Title:            s.utilService.ParseString(title),
+		Description:      s.utilService.ParseString(description),
+		Content:          s.utilService.ParseString(content),
+		FuncName:         s.utilService.ParseString(funcName),
+		FrontendTemplate: s.utilService.ParseString(frontendTmp),
+		DockerTemplate:   s.utilService.ParseString(dockerTmp),
+		CheckTemplate:    s.utilService.ParseString(checkTmp),
+		RewardAmount:     rewAmountNullInt,
+		GrantsExperience: grantsExpNullBool,
+		Active:           validNulBool,
+	}); err != nil {
 		return err
 	}
 
@@ -211,23 +229,18 @@ func (s *chapterService) DeleteChapter(
 	ctx context.Context,
 	id string,
 ) (err error) {
-	var idUUID uuid.UUID
-	idUUID, err = uuid.Parse(id)
+	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return err
 	}
 
-	chapters, _, err := s.chapterRepository.Filter(ctx, domains.ChapterFilter{
-		ID: idUUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringChapter, err)
-	}
-	if len(chapters) != 1 {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrChapterNotFound, err)
+	if ok, err := s.queries.CheckChapterByID(ctx, idUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringChapter, err)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrChapterNotFound)
 	}
 
-	if err = s.chapterRepository.SoftDelete(ctx, idUUID); err != nil {
+	if err = s.queries.SoftDeleteChapter(ctx, idUUID); err != nil {
 		return
 	}
 	return

@@ -2,36 +2,39 @@ package services
 
 import (
 	"context"
+	"database/sql"
+	"math"
 	"strconv"
+	"strings"
 
-	"github.com/C-dexTeam/codex/internal/domains"
-	errorDomains "github.com/C-dexTeam/codex/internal/domains/errors"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 
 	"github.com/google/uuid"
 )
 
 type userProfileService struct {
-	userProfileRepository domains.IUserProfileRepository
-	utilService           IUtilService
+	db          *sql.DB
+	queries     *repo.Queries
+	utilService IUtilService
 }
 
 func newUserProfileService(
-	userProfileRepository domains.IUserProfileRepository,
-	utils IUtilService,
-) domains.IUserProfileService {
+	db *sql.DB,
+	queries *repo.Queries,
+	utilService IUtilService,
+) *userProfileService {
 	return &userProfileService{
-		userProfileRepository: userProfileRepository,
-		utilService:           utils,
+		db:          db,
+		queries:     queries,
+		utilService: utilService,
 	}
 }
 
 func (s *userProfileService) GetUsers(
 	ctx context.Context,
-	id, userID, roleID, name, surname, page, limit string,
-) ([]domains.UserProfile, error) {
-	var userProfileUUID, userAuthUUID, roleUUID uuid.UUID
-
+	id, userAuthID, roleID, name, surname, page, limit string,
+) ([]repo.TUsersProfile, error) {
 	// Default Values
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
@@ -40,66 +43,58 @@ func (s *userProfileService) GetUsers(
 
 	limitNum, err := strconv.Atoi(limit)
 	if err != nil || limit == "" {
-		limitNum = 10
+		limitNum = s.utilService.D().Limits.DefaultUserLimit
 	}
 
-	if id != "" {
-		userProfileUUID, err = uuid.Parse(id)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(400, "Invalid user profile id", err)
-		}
+	if _, err = s.utilService.ParseUUID(id); err != nil {
+		return nil, err
 	}
-	if userID != "" {
-		userAuthUUID, err = uuid.Parse(userID)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(400, "Invalid user id", err)
-		}
+	if _, err = s.utilService.ParseUUID(userAuthID); err != nil {
+		return nil, err
 	}
-	if roleID != "" {
-		roleUUID, err = uuid.Parse(roleID)
-		if err != nil {
-			return nil, serviceErrors.NewServiceErrorWithMessageAndError(400, "Invalid role id", err)
-		}
+	if _, err = s.utilService.ParseUUID(roleID); err != nil {
+		return nil, err
 	}
 
-	users, _, err := s.userProfileRepository.Filter(ctx, domains.UserProfileFilter{
-		ID:      userProfileUUID,
-		UserID:  userAuthUUID,
-		RoleID:  roleUUID,
-		Name:    name,
-		Surname: surname,
-	}, int64(limitNum), int64(pageNum))
+	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
+		ID:         s.utilService.ParseNullUUID(id),
+		UserAuthID: s.utilService.ParseNullUUID(userAuthID),
+		RoleID:     s.utilService.ParseNullUUID(roleID),
+		Name:       s.utilService.ParseString(name),
+		Surname:    s.utilService.ParseString(surname),
+		Lim:        int32(limitNum),
+		Off:        (int32(pageNum) - 1) * int32(limitNum),
+	})
 	if err != nil {
-		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "error while filtering users profile", err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
 	}
 
-	return users, nil
+	return usersProfile, nil
 }
 
 func (s *userProfileService) Update(
 	ctx context.Context,
-	userProfileID, name, surname string,
+	id, name, surname string,
 ) (err error) {
-	userProfileUUID, err := uuid.Parse(userProfileID)
+	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return err
 	}
 
-	userProfile, _, err := s.userProfileRepository.Filter(ctx, domains.UserProfileFilter{
-		ID: userProfileUUID,
-	}, 1, 1)
+	// Check if its exists
+	_, err = s.queries.GetUserProfileByID(ctx, idUUID)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserPorfile, err)
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserProfileNotFound)
+		}
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
 	}
-	if len(userProfile) == 0 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
-	}
-	newProfile := userProfile[0]
 
-	newProfile.SetName(name)
-	newProfile.SetSurname(surname)
-
-	if err := s.userProfileRepository.Update(ctx, &newProfile); err != nil {
+	if err := s.queries.UpdateUserProfile(ctx, repo.UpdateUserProfileParams{
+		UserProfileID: idUUID,
+		Name:          s.utilService.ParseString(name),
+		Surname:       s.utilService.ParseString(surname),
+	}); err != nil {
 		return err
 	}
 
@@ -108,26 +103,32 @@ func (s *userProfileService) Update(
 
 func (s *userProfileService) ChangeUserRole(
 	ctx context.Context,
-	userProfileID, newRoleID string,
+	id, newRoleID string,
 ) (err error) {
-	userProfileUUID, err := uuid.Parse(userProfileID)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+	if _, err := s.utilService.ParseUUID(id); err != nil {
+		return err
 	}
 
-	userProfile, _, err := s.userProfileRepository.Filter(ctx, domains.UserProfileFilter{
-		ID: userProfileUUID,
-	}, 1, 1)
+	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
+		ID:  s.utilService.ParseNullUUID(id),
+		Lim: 1,
+		Off: 1,
+	})
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserPorfile, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
 	}
-	if len(userProfile) == 0 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
+	if len(usersProfile) == 0 {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusNotFound, serviceErrors.ErrUserProfileNotFound)
+	}
+	newProfile := usersProfile[0]
+	if newRoleID != "" {
+		newProfile.RoleID = uuid.MustParse(newRoleID)
 	}
 
-	newProfile := userProfile[0]
-	newProfile.SetRoleID(newRoleID)
-	if err := s.userProfileRepository.ChangeRole(ctx, &newProfile); err != nil {
+	if err := s.queries.ChangeUserRole(ctx, repo.ChangeUserRoleParams{
+		UserProfileID: newProfile.ID,
+		RoleID:        newProfile.RoleID,
+	}); err != nil {
 		return err
 	}
 
@@ -135,37 +136,43 @@ func (s *userProfileService) ChangeUserRole(
 }
 
 func (s *userProfileService) AddUserExp(ctx context.Context,
-	userProfileID string, experience int,
+	id string, experience int,
 ) (err error) {
-	userProfileUUID, err := uuid.Parse(userProfileID)
+	if _, err := s.utilService.ParseUUID(id); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusBadRequest, serviceErrors.ErrInvalidID, err)
+	}
+
+	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
+		ID:  s.utilService.ParseNullUUID(id),
+		Lim: 1,
+		Off: 1,
+	})
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusBadRequest, errorDomains.ErrInvalidID, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
 	}
-
-	userProfile, _, err := s.userProfileRepository.Filter(ctx, domains.UserProfileFilter{
-		ID: userProfileUUID,
-	}, 1, 1)
-	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileFilteringUserPorfile, err)
+	if len(usersProfile) == 0 {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusNotFound, serviceErrors.ErrUserProfileNotFound)
 	}
-	if len(userProfile) == 0 {
-		return serviceErrors.NewServiceErrorWithMessage(errorDomains.StatusNotFound, errorDomains.ErrUserProfileNotFound)
+	profile := usersProfile[0]
+
+	totalExp := profile.Experience.Int32 + int32(experience)
+
+	for totalExp >= profile.NextLevelExp.Int32 {
+		totalExp -= profile.NextLevelExp.Int32
+
+		profile.Level.Int32 = profile.Level.Int32 + 1
+
+		profile.NextLevelExp.Int32 = int32(float64(profile.Experience.Int32) + math.Pow(float64(profile.Level.Int32), 1.2))
 	}
-	profile := userProfile[0]
+	profile.Experience.Int32 = int32(totalExp)
 
-	totalExp := profile.GetExperience() + experience
-
-	for totalExp >= profile.GetNextLevelExperience() {
-		totalExp -= profile.GetNextLevelExperience()
-
-		profile.SetLevel(profile.GetLevel() + 1)
-
-		profile.SetNextLevelExperience()
-	}
-	profile.SetExperience(totalExp)
-
-	if err := s.userProfileRepository.AddExp(ctx, &profile); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(errorDomains.StatusInternalServerError, errorDomains.ErrErrorWhileAddingExperience, err)
+	if err := s.queries.ChangeUserLevel(ctx, repo.ChangeUserLevelParams{
+		UserProfileID: profile.ID,
+		Level:         profile.Level,
+		NextLevelExp:  profile.NextLevelExp,
+		Experience:    profile.Experience,
+	}); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileAddingExperience, err)
 	}
 
 	return nil

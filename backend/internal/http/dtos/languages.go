@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/C-dexTeam/codex/internal/domains"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
 
@@ -16,14 +16,14 @@ type LanguageDTO struct {
 	Value string    `json:"value"`
 }
 
-func (m *LanguageDTOManager) ToLanguageDTO(appModel *domains.Language) LanguageDTO {
+func (m *LanguageDTOManager) ToLanguageDTO(appModel *repo.TLanguage) LanguageDTO {
 	return LanguageDTO{
-		ID:    appModel.GetID(),
-		Value: appModel.GetValue(),
+		ID:    appModel.ID,
+		Value: appModel.Value,
 	}
 }
 
-func (m *LanguageDTOManager) ToLanguageDTOs(appModels []domains.Language) []LanguageDTO {
+func (m *LanguageDTOManager) ToLanguageDTOs(appModels []repo.TLanguage) []LanguageDTO {
 	var languagesDTOs []LanguageDTO
 	for _, model := range appModels {
 		languagesDTOs = append(languagesDTOs, m.ToLanguageDTO(&model))

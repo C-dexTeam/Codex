@@ -67,17 +67,11 @@ func (h *PrivateHandler) GetChapter(c *fiber.Ctx) error {
 	page := c.Query("page")
 	limit := c.Query("limit")
 
-	chapter, err := h.services.ChapterService().GetChapter(c.Context(), id, page, limit)
+	chapter, tests, err := h.services.ChapterService().GetChapter(c.Context(), id, page, limit)
 	if err != nil {
 		return err
 	}
-
-	tests, err := h.services.TestService().GetTests(c.Context(), "", chapter.GetID().String(), page, limit)
-	if err != nil {
-		return err
-	}
-	chapter.SetTests(tests)
-	chapterDTO := h.dtoManager.ChapterManager().ToChapterDTO(*chapter)
+	chapterDTO := h.dtoManager.ChapterManager().ToChapterDTO(*chapter, tests)
 
 	return response.Response(200, "Status OK", chapterDTO)
 }
@@ -106,17 +100,17 @@ func (h *PrivateHandler) AddChapter(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		languageID = defaultLanguage.GetID().String()
+		languageID = defaultLanguage.ID.String()
 	} else {
 		languageID = newChapter.LanguageID
 	}
 
-	if _, err := h.services.CourseService().GetCourse(c.Context(), newChapter.CourseID, "1", "1"); err != nil {
+	if _, _, err := h.services.CourseService().GetCourse(c.Context(), newChapter.CourseID, "1", "1"); err != nil {
 		return err
 	}
 
 	if newChapter.RewardID != "" {
-		if _, err := h.services.RewardService().GetReward(c.Context(), newChapter.RewardID, "1", "1"); err != nil {
+		if _, _, err := h.services.RewardService().GetReward(c.Context(), newChapter.RewardID, "1", "1"); err != nil {
 			return err
 		}
 	}

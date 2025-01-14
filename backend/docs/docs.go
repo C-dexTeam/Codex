@@ -501,9 +501,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/user": {
-            "get": {
-                "description": "Retrieves all logs based on the provided query parameters.",
+        "/private/admin/tests/": {
+            "post": {
+                "description": "Adds Test Into DB.",
                 "consumes": [
                     "application/json"
                 ],
@@ -511,7 +511,104 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin"
+                    "Test"
+                ],
+                "summary": "Add Test",
+                "parameters": [
+                    {
+                        "description": "New Test",
+                        "name": "newTest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddTestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates tests Into DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Update Test",
+                "parameters": [
+                    {
+                        "description": "Update Test",
+                        "name": "updateTest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateTestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/tests/{id}": {
+            "delete": {
+                "description": "Delete tests from DB.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Delete Test",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Taest ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/admin/user": {
+            "get": {
+                "description": "Retrieves all users based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "summary": "Get All Users",
                 "parameters": [
@@ -831,55 +928,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/input/": {
-            "get": {
-                "description": "Retrieves all inputs based on the provided query parameters.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Inputs"
-                ],
-                "summary": "Get All inputs",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Input ID",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Input's Test ID",
-                        "name": "testID",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/private/language/": {
             "get": {
                 "description": "Retrieves all languages based on the provided query parameters.",
@@ -1093,6 +1141,55 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Reward Attribute Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/tests/": {
+            "get": {
+                "description": "Retrieves all tests based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Get All tests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Test ID",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "chapterID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
                         "name": "limit",
                         "in": "query"
                     }
@@ -1357,6 +1454,7 @@ const docTemplate = `{
         "dto.AddAttributeDTO": {
             "type": "object",
             "required": [
+                "rewardID",
                 "traitType",
                 "value"
             ],
@@ -1525,8 +1623,28 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AddTestDTO": {
+            "type": "object",
+            "required": [
+                "chapterID"
+            ],
+            "properties": {
+                "chapterID": {
+                    "type": "string"
+                },
+                "inputValue": {
+                    "type": "string"
+                },
+                "outputValue": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UpdateAttributeDTO": {
             "type": "object",
+            "required": [
+                "rewardID"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -1581,8 +1699,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "rewardAmount": {
-                    "type": "integer",
-                    "minimum": 1
+                    "type": "integer"
                 },
                 "rewardID": {
                     "type": "string"
@@ -1689,8 +1806,30 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateTestDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "inputValue": {
+                    "type": "string"
+                },
+                "outputValue": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UserAuthWallet": {
             "type": "object",
+            "required": [
+                "message",
+                "publicKeyBase58",
+                "signatureBase58"
+            ],
             "properties": {
                 "message": {
                     "type": "string"
@@ -1753,14 +1892,18 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 30,
+                    "minLength": 3
                 },
                 "password": {
                     "type": "string",
                     "minLength": 8
                 },
                 "surname": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 60,
+                    "minLength": 3
                 },
                 "username": {
                     "type": "string",

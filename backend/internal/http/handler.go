@@ -15,11 +15,16 @@ import (
 
 type Handler struct {
 	services *services.Services
+	defaults *models.Defaults
 }
 
-func NewHandler(services *services.Services) *Handler {
+func NewHandler(
+	services *services.Services,
+	defaults *models.Defaults,
+) *Handler {
 	return &Handler{
 		services: services,
+		defaults: defaults,
 	}
 }
 
@@ -43,7 +48,7 @@ func (h *Handler) Init(devMode bool, RedisConfig *models.RedisConfig, middleware
 	dtoManager := dto.CreateNewDTOManager()
 
 	// init routes
-	v1.NewV1Handler(h.services, dtoManager).Init(root, sessionStore)
+	v1.NewV1Handler(h.services, dtoManager, h.defaults).Init(root, sessionStore)
 
 	return app
 }

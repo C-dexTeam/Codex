@@ -11,6 +11,7 @@ definitions:
         maxLength: 30
         type: string
     required:
+    - rewardID
     - traitType
     - value
     type: object
@@ -120,6 +121,17 @@ definitions:
     - symbol
     - uri
     type: object
+  dto.AddTestDTO:
+    properties:
+      chapterID:
+        type: string
+      inputValue:
+        type: string
+      outputValue:
+        type: string
+    required:
+    - chapterID
+    type: object
   dto.UpdateAttributeDTO:
     properties:
       id:
@@ -132,6 +144,8 @@ definitions:
       value:
         maxLength: 30
         type: string
+    required:
+    - rewardID
     type: object
   dto.UpdateChapterDTO:
     properties:
@@ -158,7 +172,6 @@ definitions:
       languageID:
         type: string
       rewardAmount:
-        minimum: 1
         type: integer
       rewardID:
         type: string
@@ -231,6 +244,17 @@ definitions:
     required:
     - id
     type: object
+  dto.UpdateTestDTO:
+    properties:
+      id:
+        type: string
+      inputValue:
+        type: string
+      outputValue:
+        type: string
+    required:
+    - id
+    type: object
   dto.UserAuthWallet:
     properties:
       message:
@@ -239,6 +263,10 @@ definitions:
         type: string
       signatureBase58:
         type: string
+    required:
+    - message
+    - publicKeyBase58
+    - signatureBase58
     type: object
   dto.UserLoginDTO:
     properties:
@@ -270,11 +298,15 @@ definitions:
       email:
         type: string
       name:
+        maxLength: 30
+        minLength: 3
         type: string
       password:
         minLength: 8
         type: string
       surname:
+        maxLength: 60
+        minLength: 3
         type: string
       username:
         maxLength: 30
@@ -621,11 +653,74 @@ paths:
       summary: Delete Reward
       tags:
       - Reward
+  /private/admin/tests/:
+    patch:
+      consumes:
+      - application/json
+      description: Updates tests Into DB.
+      parameters:
+      - description: Update Test
+        in: body
+        name: updateTest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update Test
+      tags:
+      - Test
+    post:
+      consumes:
+      - application/json
+      description: Adds Test Into DB.
+      parameters:
+      - description: New Test
+        in: body
+        name: newTest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddTestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Add Test
+      tags:
+      - Test
+  /private/admin/tests/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete tests from DB.
+      parameters:
+      - description: Taest ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete Test
+      tags:
+      - Test
   /private/admin/user:
     get:
       consumes:
       - application/json
-      description: Retrieves all logs based on the provided query parameters.
+      description: Retrieves all users based on the provided query parameters.
       parameters:
       - description: User ID
         in: query
@@ -656,7 +751,7 @@ paths:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Users
       tags:
-      - Admin
+      - User
   /private/attributes/:
     get:
       consumes:
@@ -837,38 +932,6 @@ paths:
       summary: Get Course By ID
       tags:
       - Courses
-  /private/input/:
-    get:
-      consumes:
-      - application/json
-      description: Retrieves all inputs based on the provided query parameters.
-      parameters:
-      - description: Input ID
-        in: query
-        name: id
-        type: string
-      - description: Input's Test ID
-        in: query
-        name: testID
-        type: string
-      - description: Page
-        in: query
-        name: page
-        type: string
-      - description: Limit
-        in: query
-        name: limit
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.BaseResponse'
-      summary: Get All inputs
-      tags:
-      - Inputs
   /private/language/:
     get:
       consumes:
@@ -1019,6 +1082,38 @@ paths:
       summary: Get Reward By ID
       tags:
       - Reward
+  /private/tests/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all tests based on the provided query parameters.
+      parameters:
+      - description: Test ID
+        in: query
+        name: id
+        type: string
+      - description: Chapter ID
+        in: query
+        name: chapterID
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All tests
+      tags:
+      - Test
   /private/user/connect:
     post:
       consumes:

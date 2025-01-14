@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -9,44 +10,34 @@ import (
 	"syscall"
 
 	"github.com/C-dexTeam/codex/internal/config"
-	"github.com/C-dexTeam/codex/internal/domains"
 	"github.com/C-dexTeam/codex/internal/http"
 	"github.com/C-dexTeam/codex/internal/http/middlewares"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/server"
-	"github.com/C-dexTeam/codex/internal/repositories"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/C-dexTeam/codex/internal/services"
-	dbadapter "github.com/C-dexTeam/codex/pkg/db_adapters/core"
 	validatorService "github.com/C-dexTeam/codex/pkg/validator_service"
+	"github.com/pressly/goose"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 func Run(cfg *config.Config) {
 	// Postgres Client
 	connStr := fmt.Sprintf("user=%v password=%v dbname=%v port=%v sslmode=%v host=%v", cfg.DatabaseConfig.Managment.ManagmentUsername, cfg.DatabaseConfig.Managment.ManagmentPassword, cfg.DatabaseConfig.DBName, cfg.DatabaseConfig.Port, cfg.DatabaseConfig.SSLMode, cfg.DatabaseConfig.Host)
-	dbAdapter, err := dbadapter.Init(dbadapter.POSTGRESQL, cfg.DatabaseConfig.Driver, connStr, cfg.Application.MigrationsPath)
+	conn, err := sql.Open(cfg.DatabaseConfig.Driver, connStr)
 	if err != nil {
+		return
+	}
+	if err := conn.Ping(); err != nil && err.Error() != "pq: database system is starting up" {
 		panic(err)
 	}
-	conn, err := dbAdapter.ConnectAndMigrateGoose()
-	if err != nil {
+	if err := goose.Up(conn, cfg.Application.MigrationsPath); err != nil {
 		panic(err)
 	}
 
-	// Repository Initialize
-	userRepository := repositories.NewUserRepository(conn)
-	userProfileRepository := repositories.NewUserProfileRepository(conn)
-	transactionRepository := repositories.NewTransactionRepository(conn)
-	roleRepository := repositories.NewRoleRepository(conn)
-	languageRepository := repositories.NewLanguageRepository(conn)
-	rewardRepository := repositories.NewRewardsRepository(conn)
-	attributeRepository := repositories.NewAttributesRepository(conn)
-	pLanguageRepository := repositories.NewPLanguageRepository(conn)
-	courseRepository := repositories.NewCourseRepository(conn)
-	chapterRepository := repositories.NewChapterRepository(conn)
-	testRepository := repositories.NewTestRepository(conn)
+	// Repos
+	queries := repo.New(conn)
 
 	// Utilities Initialize
 	validatorService := validatorService.NewValidatorService()
@@ -54,24 +45,18 @@ func Run(cfg *config.Config) {
 	// Service Initialize
 	allServices := services.CreateNewServices(
 		validatorService,
-		userRepository,
-		userProfileRepository,
-		transactionRepository,
-		roleRepository,
-		languageRepository,
-		rewardRepository,
-		attributeRepository,
-		pLanguageRepository,
-		courseRepository,
-		chapterRepository,
-		testRepository,
+		queries,
+		conn,
+		&cfg.Defaults,
 	)
 
+	allServices.RoleService()
+
 	// First Run & Creating Default Admin
-	firstRun(conn, allServices.RoleService(), allServices.UserService())
+	firstRun(queries, allServices.RoleService(), allServices.UserService(), cfg.Defaults.Roles.RoleAdmin)
 
 	// Handler Initialize
-	handlers := http.NewHandler(allServices)
+	handlers := http.NewHandler(allServices, &cfg.Defaults)
 
 	// Fiber İnitialize
 	fiberServer := server.NewServer(cfg, response.ResponseHandler)
@@ -92,14 +77,18 @@ func Run(cfg *config.Config) {
 	fmt.Println("Fiber was successful shutdown.")
 }
 
-func firstRun(db *sqlx.DB, roleService domains.IRoleService, userService domains.IUserService) {
-	var count int
-	err := db.Get(&count, "SELECT COUNT(*) FROM t_users WHERE username = $1", "admin")
+func firstRun(repo *repo.Queries, roleService *services.RoleService, userService *services.UserService, roleAdmin string) {
+	// SQL sorgusunu sqlc ile çalıştırıyoruz
+
+	count, err := repo.CountUserByName(context.Background(), sql.NullString{String: "admin", Valid: true})
 	if err != nil {
 		log.Fatalf("Error checking for admin user: %v", err)
 	}
 	if count == 0 {
-		adminRole, _ := roleService.GetByName(context.Background(), domains.RoleAdmin)
-		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", "admin", "admin", adminRole.GetID())
+		// Admin rolünü alıyoruz
+		adminRole, _ := roleService.GetByName(context.Background(), roleAdmin)
+
+		// Kullanıcıyı kaydediyoruz
+		userService.Register(context.Background(), "admin", "admin@gmail.com", "adminadmin", "adminadmin", "admin", "admin", adminRole.ID)
 	}
 }

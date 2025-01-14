@@ -1,6 +1,10 @@
 package dto
 
-import "github.com/C-dexTeam/codex/internal/http/sessionStore"
+import (
+	"github.com/C-dexTeam/codex/internal/http/sessionStore"
+	repo "github.com/C-dexTeam/codex/internal/repos/out"
+	"github.com/google/uuid"
+)
 
 // UserDTOManager handles the conversion of domain users to DTOs
 type UserDTOManager struct{}
@@ -24,8 +28,8 @@ func (m *UserDTOManager) ToLoginResponseDTO(role string) LoginResponseDTO {
 type UserRegisterDTO struct {
 	Username        string `json:"username" validate:"required,alphanum,min=3,max=30"`
 	Email           string `json:"email" validate:"required,email"`
-	Name            string `json:"name" validate:"required"`
-	Surname         string `json:"surname" validate:"required"`
+	Name            string `json:"name" validate:"required,min=3,max=30"`
+	Surname         string `json:"surname" validate:"required,min=3,max=60"`
 	Password        string `json:"password" validate:"required,min=8"`
 	ConfirmPassword string `json:"ConfirmPassword" validate:"required,min=8"`
 }
@@ -36,12 +40,36 @@ type UserLoginDTO struct {
 }
 
 type UserAuthWallet struct {
-	PublicKeyBase58 string `json:"publicKeyBase58"`
-	Message         string `json:"message"`
-	Signature       string `json:"signatureBase58"`
+	PublicKeyBase58 string `json:"publicKeyBase58" validate:"required"`
+	Message         string `json:"message" validate:"required"`
+	Signature       string `json:"signatureBase58" validate:"required"`
 }
 
-type UserProfileDTO struct {
+type UserAuthView struct {
+	ID       uuid.UUID `json:"id"`
+	Username string    `json:"username"`
+	Email    string    `json:"email"`
+	Password string    `json:"password"`
+}
+
+func (m *UserDTOManager) ToUserAuthView(user *repo.TUsersAuth) UserAuthView {
+	return UserAuthView{
+		ID:       user.ID,
+		Username: user.Username.String,
+		Email:    user.Email.String,
+		Password: "*********",
+	}
+}
+
+func (m *UserDTOManager) ToUserAuthViews(users []repo.TUsersAuth) []UserAuthView {
+	var userAuthDTOS []UserAuthView
+	for _, user := range users {
+		userAuthDTOS = append(userAuthDTOS, m.ToUserAuthView(&user))
+	}
+	return userAuthDTOS
+}
+
+type UserProfileView struct {
 	PublicKey           string `json:"publicKey"`
 	RoleName            string `json:"role"`
 	Username            string `json:"username"`
@@ -53,8 +81,8 @@ type UserProfileDTO struct {
 	NextLevelExperience int    `json:"nextLevelExperience"`
 }
 
-func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfileDTO {
-	return UserProfileDTO{
+func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfileView {
+	return UserProfileView{
 		PublicKey:           userData.PublicKey,
 		RoleName:            userData.Role,
 		Username:            userData.Username,
