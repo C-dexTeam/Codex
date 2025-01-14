@@ -28,8 +28,8 @@ func (m *UserDTOManager) ToLoginResponseDTO(role string) LoginResponseDTO {
 type UserRegisterDTO struct {
 	Username        string `json:"username" validate:"required,alphanum,min=3,max=30"`
 	Email           string `json:"email" validate:"required,email"`
-	Name            string `json:"name" validate:"required"`
-	Surname         string `json:"surname" validate:"required"`
+	Name            string `json:"name" validate:"required,min=3,max=30"`
+	Surname         string `json:"surname" validate:"required,min=3,max=60"`
 	Password        string `json:"password" validate:"required,min=8"`
 	ConfirmPassword string `json:"ConfirmPassword" validate:"required,min=8"`
 }
@@ -40,9 +40,9 @@ type UserLoginDTO struct {
 }
 
 type UserAuthWallet struct {
-	PublicKeyBase58 string `json:"publicKeyBase58"`
-	Message         string `json:"message"`
-	Signature       string `json:"signatureBase58"`
+	PublicKeyBase58 string `json:"publicKeyBase58" validate:"required"`
+	Message         string `json:"message" validate:"required"`
+	Signature       string `json:"signatureBase58" validate:"required"`
 }
 type UserAuthDTO struct {
 	ID       uuid.UUID `json:"id"`

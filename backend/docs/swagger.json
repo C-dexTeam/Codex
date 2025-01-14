@@ -1301,6 +1301,7 @@
         "dto.AddAttributeDTO": {
             "type": "object",
             "required": [
+                "rewardID",
                 "traitType",
                 "value"
             ],
@@ -1471,6 +1472,9 @@
         },
         "dto.UpdateAttributeDTO": {
             "type": "object",
+            "required": [
+                "rewardID"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -1635,6 +1639,11 @@
         },
         "dto.UserAuthWallet": {
             "type": "object",
+            "required": [
+                "message",
+                "publicKeyBase58",
+                "signatureBase58"
+            ],
             "properties": {
                 "message": {
                     "type": "string"
@@ -1697,14 +1706,18 @@
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 30,
+                    "minLength": 3
                 },
                 "password": {
                     "type": "string",
                     "minLength": 8
                 },
                 "surname": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 60,
+                    "minLength": 3
                 },
                 "username": {
                     "type": "string",

@@ -1308,6 +1308,7 @@ const docTemplate = `{
         "dto.AddAttributeDTO": {
             "type": "object",
             "required": [
+                "rewardID",
                 "traitType",
                 "value"
             ],
@@ -1478,6 +1479,9 @@ const docTemplate = `{
         },
         "dto.UpdateAttributeDTO": {
             "type": "object",
+            "required": [
+                "rewardID"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -1642,6 +1646,11 @@ const docTemplate = `{
         },
         "dto.UserAuthWallet": {
             "type": "object",
+            "required": [
+                "message",
+                "publicKeyBase58",
+                "signatureBase58"
+            ],
             "properties": {
                 "message": {
                     "type": "string"
@@ -1704,14 +1713,18 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 30,
+                    "minLength": 3
                 },
                 "password": {
                     "type": "string",
                     "minLength": 8
                 },
                 "surname": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 60,
+                    "minLength": 3
                 },
                 "username": {
                     "type": "string",

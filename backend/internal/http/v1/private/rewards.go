@@ -1,6 +1,8 @@
 package private
 
 import (
+	"fmt"
+
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +16,7 @@ func (h *PrivateHandler) initRewardsRoutes(root fiber.Router) {
 	rewardAdminRoutes := root.Group("/admin/rewards")
 	rewardAdminRoutes.Use(h.adminRoleMiddleware)
 	rewardAdminRoutes.Post("/", h.AddReward)
-	rewardAdminRoutes.Delete("/", h.DeleteReward)
+	rewardAdminRoutes.Delete("/:id", h.DeleteReward)
 	rewardAdminRoutes.Patch("/", h.UpdateReward)
 }
 
@@ -149,6 +151,8 @@ func (h *PrivateHandler) UpdateReward(c *fiber.Ctx) error {
 // @Router /private/admin/rewards/{id} [delete]
 func (h *PrivateHandler) DeleteReward(c *fiber.Ctx) error {
 	id := c.Params("id")
+
+	fmt.Println("Selam")
 
 	if err := h.services.RewardService().DeleteReward(c.Context(), id); err != nil {
 		return err

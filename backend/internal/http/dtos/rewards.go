@@ -13,12 +13,12 @@ func NewRewardDTOManager() RewardDTOManager {
 
 type RewardDTO struct {
 	ID          uuid.UUID      `json:"id"`
-	RewardType  string         `json:"rewardType"`
-	Name        string         `json:"name"`
-	Symbol      string         `json:"symbol"`
-	Description string         `json:"description"`
+	RewardType  string         `json:"rewardType" validate:"required"`
+	Name        string         `json:"name" validate:"required,min=3,max=30"`
+	Symbol      string         `json:"symbol" validate:"required,min=2,max=8"`
+	Description string         `json:"description" validate:"required"`
 	ImagePath   string         `json:"imagePath"`
-	URI         string         `json:"uri"`
+	URI         string         `json:"uri" validate:"required"`
 	Attributes  []AttributeDTO `json:"attributes,omitempty"`
 }
 
@@ -96,14 +96,14 @@ func (m *RewardDTOManager) ToAttributeDTOs(appModels []repo.TAttribute) []Attrib
 }
 
 type AddAttributeDTO struct {
-	RewardID  string `json:"rewardID"`
+	RewardID  string `json:"rewardID" validate:"required"`
 	TraitType string `json:"traitType" validate:"required,max=30"`
 	Value     string `json:"value" validate:"required,max=30"`
 }
 
 type UpdateAttributeDTO struct {
 	ID        string `json:"id"`
-	RewardID  string `json:"rewardID"`
+	RewardID  string `json:"rewardID" validate:"required"`
 	TraitType string `json:"traitType" validate:"max=30"`
 	Value     string `json:"value" validate:"max=30"`
 }

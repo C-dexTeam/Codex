@@ -11,6 +11,7 @@ definitions:
         maxLength: 30
         type: string
     required:
+    - rewardID
     - traitType
     - value
     type: object
@@ -132,6 +133,8 @@ definitions:
       value:
         maxLength: 30
         type: string
+    required:
+    - rewardID
     type: object
   dto.UpdateChapterDTO:
     properties:
@@ -239,6 +242,10 @@ definitions:
         type: string
       signatureBase58:
         type: string
+    required:
+    - message
+    - publicKeyBase58
+    - signatureBase58
     type: object
   dto.UserLoginDTO:
     properties:
@@ -270,11 +277,15 @@ definitions:
       email:
         type: string
       name:
+        maxLength: 30
+        minLength: 3
         type: string
       password:
         minLength: 8
         type: string
       surname:
+        maxLength: 60
+        minLength: 3
         type: string
       username:
         maxLength: 30
