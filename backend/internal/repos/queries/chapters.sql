@@ -69,7 +69,7 @@ CASE
     WHEN EXISTS (
         SELECT 1 
         FROM t_chapters AS l
-        WHERE l.id = @chapter_id
+        WHERE l.id = @chapter_id AND l.deleted_at IS NULL
     ) THEN true
     ELSE false
 END AS exists;

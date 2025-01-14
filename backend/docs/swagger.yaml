@@ -161,7 +161,6 @@ definitions:
       languageID:
         type: string
       rewardAmount:
-        minimum: 1
         type: integer
       rewardID:
         type: string

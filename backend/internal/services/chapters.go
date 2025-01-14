@@ -235,9 +235,9 @@ func (s *chapterService) DeleteChapter(
 	}
 
 	if ok, err := s.queries.CheckChapterByID(ctx, idUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringChapter, err)
 	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrChapterNotFound)
 	}
 
 	if err = s.queries.SoftDeleteChapter(ctx, idUUID); err != nil {

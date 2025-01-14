@@ -100,7 +100,7 @@ type UpdateChapterDTO struct {
 	CourseID         string `json:"courseID"`
 	LanguageID       string `json:"languageID"`
 	RewardID         string `json:"rewardID"`
-	RewardAmount     int    `json:"rewardAmount" validate:"gte=1"`
+	RewardAmount     int    `json:"rewardAmount"`
 	Title            string `json:"title"`
 	Description      string `json:"description"`
 	Content          string `json:"content"`

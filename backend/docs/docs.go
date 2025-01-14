@@ -1536,8 +1536,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "rewardAmount": {
-                    "type": "integer",
-                    "minimum": 1
+                    "type": "integer"
                 },
                 "rewardID": {
                     "type": "string"
