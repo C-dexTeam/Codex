@@ -1,8 +1,6 @@
 package private
 
 import (
-	"fmt"
-
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
@@ -73,7 +71,6 @@ func (h *PrivateHandler) GetChapter(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(tests)
 	chapterDTO := h.dtoManager.ChapterManager().ToChapterDTO(*chapter, tests)
 
 	return response.Response(200, "Status OK", chapterDTO)
