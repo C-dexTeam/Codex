@@ -44,15 +44,16 @@ type UserAuthWallet struct {
 	Message         string `json:"message" validate:"required"`
 	Signature       string `json:"signatureBase58" validate:"required"`
 }
-type UserAuthDTO struct {
+
+type UserAuthView struct {
 	ID       uuid.UUID `json:"id"`
 	Username string    `json:"username"`
 	Email    string    `json:"email"`
 	Password string    `json:"password"`
 }
 
-func (m *UserDTOManager) ToUserAuthDTO(user *repo.TUsersAuth) UserAuthDTO {
-	return UserAuthDTO{
+func (m *UserDTOManager) ToUserAuthView(user *repo.TUsersAuth) UserAuthView {
+	return UserAuthView{
 		ID:       user.ID,
 		Username: user.Username.String,
 		Email:    user.Email.String,
@@ -60,15 +61,15 @@ func (m *UserDTOManager) ToUserAuthDTO(user *repo.TUsersAuth) UserAuthDTO {
 	}
 }
 
-func (m *UserDTOManager) ToUserAuthDTOs(users []repo.TUsersAuth) []UserAuthDTO {
-	var userAuthDTOS []UserAuthDTO
+func (m *UserDTOManager) ToUserAuthViews(users []repo.TUsersAuth) []UserAuthView {
+	var userAuthDTOS []UserAuthView
 	for _, user := range users {
-		userAuthDTOS = append(userAuthDTOS, m.ToUserAuthDTO(&user))
+		userAuthDTOS = append(userAuthDTOS, m.ToUserAuthView(&user))
 	}
 	return userAuthDTOS
 }
 
-type UserProfileDTO struct {
+type UserProfileView struct {
 	PublicKey           string `json:"publicKey"`
 	RoleName            string `json:"role"`
 	Username            string `json:"username"`
@@ -80,8 +81,8 @@ type UserProfileDTO struct {
 	NextLevelExperience int    `json:"nextLevelExperience"`
 }
 
-func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfileDTO {
-	return UserProfileDTO{
+func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfileView {
+	return UserProfileView{
 		PublicKey:           userData.PublicKey,
 		RoleName:            userData.Role,
 		Username:            userData.Username,

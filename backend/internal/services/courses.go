@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -130,13 +129,11 @@ func (s *courseService) AddCourse(
 	languageID, pLanguageID, rewardID, title, description, imagePath string,
 	rewardAmount int,
 ) (uuid.UUID, error) {
-	fmt.Println(languageID, pLanguageID, rewardID)
 	languageUUID, err := s.utilService.NParseUUID(languageID)
 	if err != nil {
 		return uuid.Nil, err
 	}
-	pLanguageUUID, err := s.utilService.NParseUUID(pLanguageID)
-	if err != nil {
+	if _, err := s.utilService.NParseUUID(pLanguageID); err != nil {
 		return uuid.Nil, err
 	}
 	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
@@ -145,7 +142,7 @@ func (s *courseService) AddCourse(
 
 	id, err := s.queries.CreateCourse(ctx, repo.CreateCourseParams{
 		LanguageID:            languageUUID,
-		ProgrammingLanguageID: pLanguageUUID,
+		ProgrammingLanguageID: s.utilService.ParseNullUUID(pLanguageID),
 		RewardID:              s.utilService.ParseNullUUID(rewardID),
 		RewardAmount:          int32(rewardAmount),
 		Title:                 title,

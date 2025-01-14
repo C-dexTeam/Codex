@@ -41,7 +41,7 @@ RETURNING id
 
 type CreateCourseParams struct {
 	LanguageID            uuid.UUID
-	ProgrammingLanguageID uuid.UUID
+	ProgrammingLanguageID uuid.NullUUID
 	RewardID              uuid.NullUUID
 	RewardAmount          int32
 	Title                 string

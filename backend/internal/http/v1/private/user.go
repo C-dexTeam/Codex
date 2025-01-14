@@ -145,7 +145,7 @@ func (h *PrivateHandler) GetUsers(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	userAuthDTOs := h.dtoManager.UserManager().ToUserAuthDTOs(users)
+	userAuthDTOs := h.dtoManager.UserManager().ToUserAuthViews(users)
 
 	return response.Response(200, "Status OK", userAuthDTOs)
 }

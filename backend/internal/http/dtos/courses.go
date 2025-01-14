@@ -46,7 +46,7 @@ func (d *CourseDTOManager) ToCourseDTO(courseModel *repo.TCourse, chapterModels 
 	return CourseDTO{
 		ID:           courseModel.ID,
 		LanguageID:   courseModel.LanguageID,
-		PLanguageID:  courseModel.ProgrammingLanguageID,
+		PLanguageID:  courseModel.ProgrammingLanguageID.UUID,
 		RewardID:     rewardID,
 		RewardAmount: courseModel.RewardAmount,
 		Title:        courseModel.Title,
