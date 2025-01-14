@@ -49,7 +49,7 @@ WHERE
 UPDATE
     t_users_profile
 SET
-    deleted_at = @deleted_at
+    deleted_at = CURRENT_TIMESTAMP
 WHERE
     id = @user_profile_id;
 

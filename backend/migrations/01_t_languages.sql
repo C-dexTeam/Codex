@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS t_languages (
 );
 
 INSERT INTO t_languages (value, is_default) VALUES ('EN', TRUE);
+INSERT INTO t_languages (value, is_default) VALUES ('TR', FALSE);
 -- +goose StatementEnd
 
 -- +goose Down

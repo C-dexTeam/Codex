@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"math"
 	"strconv"
+	"strings"
 
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -75,32 +76,22 @@ func (s *userProfileService) Update(
 	ctx context.Context,
 	id, name, surname string,
 ) (err error) {
-	if _, err := s.utilService.ParseUUID(id); err != nil {
+	idUUID, err := s.utilService.NParseUUID(id)
+	if err != nil {
 		return err
 	}
 
-	usersProfile, err := s.queries.GetUsersProfile(ctx, repo.GetUsersProfileParams{
-		ID:  uuid.NullUUID{UUID: uuid.MustParse(id), Valid: true},
-		Lim: 1,
-		Off: 1,
-	})
+	// Check if its exists
+	_, err = s.queries.GetUserProfileByID(ctx, idUUID)
 	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserProfileNotFound)
+		}
 		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
-	}
-	if len(usersProfile) == 0 {
-		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusNotFound, serviceErrors.ErrUserProfileNotFound)
-	}
-	newProfile := usersProfile[0]
-
-	if name != "" {
-		newProfile.Name.String = name
-	}
-	if surname != "" {
-		newProfile.Surname.String = surname
 	}
 
 	if err := s.queries.UpdateUserProfile(ctx, repo.UpdateUserProfileParams{
-		UserProfileID: newProfile.ID,
+		UserProfileID: idUUID,
 		Name:          s.utilService.ParseString(name),
 		Surname:       s.utilService.ParseString(surname),
 	}); err != nil {

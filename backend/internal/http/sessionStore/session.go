@@ -46,6 +46,15 @@ func (s *SessionData) SetPublicKey(publicKey string) {
 	s.PublicKey = publicKey
 }
 
+func (s *SessionData) SetNameSurname(name, surname string) {
+	if name != "" {
+		s.Name = name
+	}
+	if surname != "" {
+		s.Surname = surname
+	}
+}
+
 func GetSessionData(c *fiber.Ctx) *SessionData {
 	user := c.Locals("user")
 	if user == nil {

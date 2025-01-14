@@ -190,18 +190,13 @@ const softDeleteUserProfile = `-- name: SoftDeleteUserProfile :exec
 UPDATE
     t_users_profile
 SET
-    deleted_at = $1
+    deleted_at = CURRENT_TIMESTAMP
 WHERE
-    id = $2
+    id = $1
 `
 
-type SoftDeleteUserProfileParams struct {
-	DeletedAt     sql.NullTime
-	UserProfileID uuid.UUID
-}
-
-func (q *Queries) SoftDeleteUserProfile(ctx context.Context, arg SoftDeleteUserProfileParams) error {
-	_, err := q.db.ExecContext(ctx, softDeleteUserProfile, arg.DeletedAt, arg.UserProfileID)
+func (q *Queries) SoftDeleteUserProfile(ctx context.Context, userProfileID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, softDeleteUserProfile, userProfileID)
 	return err
 }
 

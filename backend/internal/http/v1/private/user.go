@@ -12,6 +12,10 @@ func (h *PrivateHandler) initUserRoutes(root fiber.Router) {
 	user.Get("/profile", h.Profile)
 	user.Post("/profile", h.UpdateProfile)
 	user.Post("/connect", h.ConnectWallet)
+
+	userAdminRoutes := root.Group("/admin/user")
+	userAdminRoutes.Use(h.adminRoleMiddleware)
+	userAdminRoutes.Get("/", h.GetUsers)
 }
 
 // @Tags User
@@ -49,6 +53,17 @@ func (h *PrivateHandler) UpdateProfile(c *fiber.Ctx) error {
 
 	// Update Profile
 	if err := h.services.UserProfileService().Update(c.Context(), userSession.UserProfileID, newUserProfile.Name, newUserProfile.Surname); err != nil {
+		return err
+	}
+
+	// Mevcut session'ı alıyoruz
+	sess, err := h.sess_store.Get(c)
+	if err != nil {
+		return err
+	}
+	userSession.SetNameSurname(newUserProfile.Name, newUserProfile.Surname)
+	sess.Set("user", userSession)
+	if err := sess.Save(); err != nil {
 		return err
 	}
 
