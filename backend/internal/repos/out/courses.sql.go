@@ -18,7 +18,7 @@ CASE
     WHEN EXISTS (
         SELECT 1 
         FROM t_courses AS l
-        WHERE l.id = $1
+        WHERE l.id = $1 AND l.deleted_at IS NULL
     ) THEN true
     ELSE false
 END AS exists
