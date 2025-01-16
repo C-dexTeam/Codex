@@ -5,7 +5,7 @@ const button = theme => {
     MuiButton: {
       styleOverrides: {
         root: ({ ownerState }) => ({
-          color: `${theme.palette[ownerState.color || "primary"].contrastText}`,
+          color: `${theme.palette.text.primary}`,
           background: `${theme.palette.background.paper}`,
           // outline: `0.1em solid ${theme.palette[ownerState.color || "primary"].main}`,
           // outlineOffset: "-0.1em",

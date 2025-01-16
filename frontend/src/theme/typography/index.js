@@ -56,6 +56,10 @@ const typography = theme => {
         },
         body: {
             ...defaultStyle,
+            fontWeight: 300,
+        },
+        body1: {
+            ...defaultStyle,
         },
         body2: {
             ...defaultStyle,
@@ -74,11 +78,12 @@ const typography = theme => {
         },
         link: {
             ...defaultStyle,
-            fontSize: "1.25rem",
-            lineHeight: "2rem",
+            fontSize: "inherit",
+            lineHeight: "inherit",
             cursor: "pointer",
             "&:hover": {
-                color: theme.palette.primary.main
+                color: theme.palette.primary.main,
+                textDecoration: "underline",
             }
         },
         link2: {

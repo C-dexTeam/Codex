@@ -1,5 +1,5 @@
 
-// import Navbar from "@/layout/components/Navbar";
+import Navbar from "@/layout/components/Navbar";
 import Footer from "@/layout/components/Footer";
 import ScrollTop from "@/layout/components/ScrollTop";
 // import NextNProgress from "nextjs-progressbar";
@@ -46,14 +46,13 @@ const Layout = ({ children }) => {
                 options={{ easing: "ease-in-out", speed: 500 }}
             /> */}
             {/* <Navbar /> */}
+            <Navbar />
 
             <Box sx={{
                 width: '100%', display: 'flex', py: '40px',
                 minHeight: `calc(100vh - 80px)`,
                 gap: '40px',
             }}>
-                {/* <Navbar /> */}
-
                 <Container maxWidth="xl">
                     <Box
                         sx={{
