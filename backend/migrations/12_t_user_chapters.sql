@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS t_user_course_chapters (
+CREATE TABLE IF NOT EXISTS t_user_chapters (
     user_auth_id UUID NOT NULL,
     course_id UUID NOT NULL,
     chapter_id UUID NOT NULL,
@@ -17,5 +17,5 @@ CREATE TABLE IF NOT EXISTS t_user_course_chapters (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS t_user_course_chapters;
+DROP TABLE IF EXISTS t_user_chapters;
 -- +goose StatementEnd

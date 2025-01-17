@@ -91,18 +91,18 @@ type TTest struct {
 	OutputValue string
 }
 
+type TUserChapter struct {
+	UserAuthID uuid.UUID
+	CourseID   uuid.UUID
+	ChapterID  uuid.UUID
+	IsFinished sql.NullBool
+	CreatedAt  sql.NullTime
+}
+
 type TUserCourse struct {
 	UserAuthID uuid.UUID
 	CourseID   uuid.UUID
 	Progress   int32
-	CreatedAt  sql.NullTime
-}
-
-type TUserCourseChapter struct {
-	UserAuthID uuid.UUID
-	CourseID   uuid.UUID
-	ChapterID  uuid.UUID
-	Isfinished sql.NullBool
 	CreatedAt  sql.NullTime
 }
 
