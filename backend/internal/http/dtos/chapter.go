@@ -111,3 +111,9 @@ type UpdateChapterDTO struct {
 	GrantsExperience bool   `json:"grantsExperience"`
 	Active           bool   `json:"active"`
 }
+
+type RunChapter struct {
+	ChapterID string `json:"chapterID" validate:"required,uuid4"`
+	CourseID  string `json:"courseID" validate:"required,uuid4"`
+	UserCode  string `json:"userCode"`
+}

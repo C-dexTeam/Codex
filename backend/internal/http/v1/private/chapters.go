@@ -10,6 +10,7 @@ func (h *PrivateHandler) initChaptersRoutes(root fiber.Router) {
 	chapterRoutes := root.Group("/chapters")
 	chapterRoutes.Get("/", h.GetChapters)
 	chapterRoutes.Get("/:id", h.GetChapter)
+	chapterRoutes.Post("/run", h.RunChapter)
 
 	chapterAdminRoutes := root.Group("/admin/chapters")
 	chapterAdminRoutes.Use(h.adminRoleMiddleware)
@@ -194,4 +195,32 @@ func (h *PrivateHandler) DeleteChapter(c *fiber.Ctx) error {
 		return err
 	}
 	return response.Response(200, "Status OK", nil)
+}
+
+// @Tags Chapters
+// @Summary Run Chapter
+// @Description Runs Chapter Code.
+// @Accept json
+// @Produce json
+// @Param runChapter body dto.RunChapter true "Runs Chapter's cODE"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/chapters/run [post]
+func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
+	var runChapter dto.RunChapter
+	if err := c.BodyParser(&runChapter); err != nil {
+		return err
+	}
+	if err := h.services.UtilService().Validator().ValidateStruct(runChapter); err != nil {
+		return err
+	}
+
+	chapter, tests, pLanguage, err := h.services.QuestService().GetQuest(c.Context(), runChapter.ChapterID, runChapter.CourseID)
+	if err != nil {
+		return err
+	}
+	quest := h.dtoManager.QuestManager().ToQuestDTO(chapter, tests, pLanguage, runChapter.UserCode)
+
+	// TODO: Request the Run endpoint from Codex-Compiler
+
+	return response.Response(200, "Status OK", quest)
 }
