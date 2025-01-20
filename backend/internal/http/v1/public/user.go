@@ -14,6 +14,7 @@ func (h *PublicHandler) initUserRoutes(root fiber.Router) {
 	root.Post("/register", h.Register)
 	root.Post("/wallet", h.AuthWallet)
 	root.Post("/logout", h.Logout)
+	root.Get("/verify", h.Verify)
 }
 
 // @Tags Auth
@@ -172,4 +173,30 @@ func (h *PublicHandler) Logout(c *fiber.Ctx) error {
 	}
 
 	return response.Response(200, "Logout successful", nil)
+}
+
+// @Tags Auth
+// @Summary Verify User
+// @Description Verifying User
+// @Accept json
+// @Produce json
+// @Param id query string false "User Auth ID"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /public/verify [get]
+func (h *PublicHandler) Verify(c *fiber.Ctx) error {
+	id := c.Query("id")
+
+	// Secret Header kontrolü
+	secretHeader := c.Get("Secret-Header")
+	if secretHeader != "b77759141fc85bf31e75b1d9c48bbe67" {
+		return response.Response(403, "Forbidden!", nil)
+	}
+
+	userSession := sessionStore.GetSessionData(c)
+
+	if userSession.UserID != id {
+		return response.Response(403, "User verification failed", nil)
+	}
+
+	return response.Response(200, "User verified successfully", nil)
 }
