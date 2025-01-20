@@ -885,6 +885,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/courses/start": {
+            "get": {
+                "description": "Starts the spesific course.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Starts Course",
+                "parameters": [
+                    {
+                        "description": "Start Course",
+                        "name": "startCourse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.StartCourseDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/courses/{id}": {
             "get": {
                 "description": "Retrieves one course.",
@@ -1636,6 +1667,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "outputValue": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.StartCourseDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
                     "type": "string"
                 }
             }

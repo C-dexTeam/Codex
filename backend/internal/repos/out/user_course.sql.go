@@ -33,3 +33,63 @@ func (q *Queries) AddCourseToUser(ctx context.Context, arg AddCourseToUserParams
 	_, err := q.db.ExecContext(ctx, addCourseToUser, arg.UserAuthID, arg.CourseID)
 	return err
 }
+
+const userCourses = `-- name: UserCourses :many
+SELECT 
+    uc.user_auth_id,
+    uc.course_id,
+    c.title,
+    uc.progress,
+    COUNT(ucp.id) AS completed_chapters,
+    (SELECT COUNT(*) FROM t_user_chapters WHERE course_id = uc.course_id) AS total_chapters
+FROM 
+    t_user_courses uc
+INNER JOIN 
+    t_courses c ON uc.course_id = c.id
+LEFT JOIN 
+    t_user_chapters ucp 
+    ON ucp.course_id = uc.course_id AND ucp.isFinished = true
+WHERE 
+    uc.user_auth_id = $1 AND c.deleted_at IS NULL
+GROUP BY 
+    uc.user_auth_id, uc.course_id, c.title, c.description, uc.progress
+`
+
+type UserCoursesRow struct {
+	UserAuthID        uuid.UUID
+	CourseID          uuid.UUID
+	Title             string
+	Progress          int32
+	CompletedChapters int64
+	TotalChapters     int64
+}
+
+func (q *Queries) UserCourses(ctx context.Context, userAuthID uuid.UUID) ([]UserCoursesRow, error) {
+	rows, err := q.db.QueryContext(ctx, userCourses, userAuthID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserCoursesRow
+	for rows.Next() {
+		var i UserCoursesRow
+		if err := rows.Scan(
+			&i.UserAuthID,
+			&i.CourseID,
+			&i.Title,
+			&i.Progress,
+			&i.CompletedChapters,
+			&i.TotalChapters,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -95,7 +95,7 @@ type TUserChapter struct {
 	UserAuthID uuid.UUID
 	CourseID   uuid.UUID
 	ChapterID  uuid.UUID
-	IsFinished sql.NullBool
+	Isfinished sql.NullBool
 	CreatedAt  sql.NullTime
 }
 

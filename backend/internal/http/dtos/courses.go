@@ -13,7 +13,7 @@ func NewCourseDTOManager() CourseDTOManager {
 	return CourseDTOManager{}
 }
 
-type CourseDTO struct {
+type CourseView struct {
 	ID           uuid.UUID    `json:"id"`
 	LanguageID   uuid.UUID    `json:"languageID"`
 	PLanguageID  uuid.UUID    `json:"programmingLanguageID"`
@@ -27,7 +27,7 @@ type CourseDTO struct {
 	Chapters     []ChapterDTO `json:"chapters,omitempty"`
 }
 
-func (d *CourseDTOManager) ToCourseDTO(courseModel *repo.TCourse, chapterModels []repo.TChapter) CourseDTO {
+func (d *CourseDTOManager) ToCourseDTO(courseModel *repo.TCourse, chapterModels []repo.TChapter) CourseView {
 	chapterDTOManager := new(ChapterDTOManager)
 	var rewardID *uuid.UUID
 	if courseModel.RewardID.Valid {
@@ -43,7 +43,7 @@ func (d *CourseDTOManager) ToCourseDTO(courseModel *repo.TCourse, chapterModels 
 		deletedAt = nil
 	}
 
-	return CourseDTO{
+	return CourseView{
 		ID:           courseModel.ID,
 		LanguageID:   courseModel.LanguageID,
 		PLanguageID:  courseModel.ProgrammingLanguageID.UUID,
@@ -58,8 +58,8 @@ func (d *CourseDTOManager) ToCourseDTO(courseModel *repo.TCourse, chapterModels 
 	}
 }
 
-func (d *CourseDTOManager) ToCourseDTOs(courseModels []repo.TCourse) []CourseDTO {
-	var courseDTOs []CourseDTO
+func (d *CourseDTOManager) ToCourseDTOs(courseModels []repo.TCourse) []CourseView {
+	var courseDTOs []CourseView
 	for _, model := range courseModels {
 		courseDTOs = append(courseDTOs, d.ToCourseDTO(&model, nil))
 	}
@@ -86,4 +86,8 @@ type UpdateCourseDTO struct {
 	Title        string `json:"title" validate:"max=60"`
 	Description  string `json:"description"`
 	ImagePath    string `json:"imagePath"`
+}
+
+type StartCourseDTO struct {
+	ID string `json:"id" validate:"required,uudi4"`
 }
