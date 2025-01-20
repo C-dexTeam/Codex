@@ -1446,6 +1446,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/public/verify": {
+            "get": {
+                "description": "Verifying User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify User",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Auth ID",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/public/wallet": {
             "post": {
                 "description": "Auth Wallet",

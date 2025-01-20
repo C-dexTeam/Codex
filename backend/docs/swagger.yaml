@@ -1278,6 +1278,26 @@ paths:
       summary: Get Reward By ID
       tags:
       - Metadata
+  /public/verify:
+    get:
+      consumes:
+      - application/json
+      description: Verifying User
+      parameters:
+      - description: User Auth ID
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Verify User
+      tags:
+      - Auth
   /public/wallet:
     post:
       consumes:
