@@ -3,6 +3,7 @@ package private
 import (
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
+	"github.com/C-dexTeam/codex/internal/http/sessionStore"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -188,4 +189,28 @@ func (h *PrivateHandler) DeleteCourse(c *fiber.Ctx) error {
 		return err
 	}
 	return response.Response(200, "Status OK", nil)
+}
+
+// @Tags Courses
+// @Summary Starts Course
+// @Description Starts the spesific course.
+// @Accept json
+// @Param startCourse body dto.StartCourseDTO true "Start Course"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/courses/start [get]
+func (h *PrivateHandler) StartCourse(c *fiber.Ctx) error {
+	userSession := sessionStore.GetSessionData(c)
+	var startCourse dto.StartCourseDTO
+	if err := c.BodyParser(&startCourse); err != nil {
+		return err
+	}
+	if err := h.services.UtilService().Validator().ValidateStruct(startCourse); err != nil {
+		return err
+	}
+	id, err := h.services.CourseService().StartCourse(c.Context(), startCourse.ID, userSession.UserID)
+	if err != nil {
+		return err
+	}
+
+	return response.Response(200, "Status OK", id)
 }

@@ -216,3 +216,31 @@ func (s *courseService) DeleteCourse(
 	}
 	return
 }
+
+func (s *courseService) StartCourse(
+	ctx context.Context,
+	id, userAuthID string,
+) (uuid.UUID, error) {
+	idUUID, err := s.utilService.NParseUUID(id)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	// Comes From Session
+	userAuthUUID := uuid.MustParse(userAuthID)
+
+	if ok, err := s.queries.CheckCourseByID(ctx, idUUID); err != nil {
+		return uuid.Nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourse, err)
+	} else if !ok {
+		return uuid.Nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
+	}
+
+	if err := s.queries.AddCourseToUser(ctx, repo.AddCourseToUserParams{
+		CourseID:   idUUID,
+		UserAuthID: userAuthUUID,
+	}); err != nil {
+		return uuid.Nil, err
+	}
+
+	return userAuthUUID, nil
+}

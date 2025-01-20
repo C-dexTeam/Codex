@@ -132,6 +132,13 @@ definitions:
     required:
     - chapterID
     type: object
+  dto.StartCourseDTO:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
   dto.UpdateAttributeDTO:
     properties:
       id:
@@ -930,6 +937,26 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get Course By ID
+      tags:
+      - Courses
+  /private/courses/start:
+    get:
+      consumes:
+      - application/json
+      description: Starts the spesific course.
+      parameters:
+      - description: Start Course
+        in: body
+        name: startCourse
+        required: true
+        schema:
+          $ref: '#/definitions/dto.StartCourseDTO'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Starts Course
       tags:
       - Courses
   /private/language/:
