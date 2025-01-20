@@ -53,6 +53,7 @@ func (h *PrivateHandler) Init(router fiber.Router) {
 	h.initChaptersRoutes(root)
 	h.initAttributesRoutes(root)
 	h.initTestsRoutes(root)
+	h.initVerifyRoutes(root)
 }
 
 func (h *PrivateHandler) authMiddleware(c *fiber.Ctx) error {

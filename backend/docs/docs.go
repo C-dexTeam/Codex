@@ -824,6 +824,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/compiler/template": {
+            "get": {
+                "description": "This is a template for an endpoint created to make requests to Codex-Compiler.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Codex-Compiler"
+                ],
+                "summary": "Run Template",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/courses/": {
             "get": {
                 "description": "Retrieves all courses based on the provided query parameters.",
@@ -1434,37 +1457,6 @@ const docTemplate = `{
                         "description": "Reward ID",
                         "name": "id",
                         "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/public/verify": {
-            "get": {
-                "description": "Verifying User",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Verify User",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User Auth ID",
-                        "name": "id",
-                        "in": "query"
                     }
                 ],
                 "responses": {
