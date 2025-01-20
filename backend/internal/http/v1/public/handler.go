@@ -35,7 +35,7 @@ func (h *PublicHandler) Init(router fiber.Router) {
 	root := router.Group("/public")
 
 	root.Get("/", func(c *fiber.Ctx) error {
-		return response.Response(200, "Welcome to <github.com/C-dexTeam/codex> API (Public Zone)", nil)
+		return response.Response(200, "Welcome to Codex API (Public Zone)", nil)
 	})
 
 	h.initUserRoutes(root)
