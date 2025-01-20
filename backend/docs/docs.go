@@ -781,6 +781,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/chapters/run": {
+            "post": {
+                "description": "Runs Chapter Code.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Run Chapter",
+                "parameters": [
+                    {
+                        "description": "Runs Chapter's cODE",
+                        "name": "runChapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RunChapter"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/chapters/{id}": {
             "get": {
                 "description": "Retrieves spesific chapters based on the provided query parameters.",
@@ -1690,6 +1724,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "outputValue": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RunChapter": {
+            "type": "object",
+            "required": [
+                "chapterID",
+                "courseID"
+            ],
+            "properties": {
+                "chapterID": {
+                    "type": "string"
+                },
+                "courseID": {
                     "type": "string"
                 }
             }

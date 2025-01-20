@@ -132,6 +132,16 @@ definitions:
     required:
     - chapterID
     type: object
+  dto.RunChapter:
+    properties:
+      chapterID:
+        type: string
+      courseID:
+        type: string
+    required:
+    - chapterID
+    - courseID
+    type: object
   dto.StartCourseDTO:
     properties:
       id:
@@ -869,6 +879,28 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get One Chapter
+      tags:
+      - Chapters
+  /private/chapters/run:
+    post:
+      consumes:
+      - application/json
+      description: Runs Chapter Code.
+      parameters:
+      - description: Runs Chapter's cODE
+        in: body
+        name: runChapter
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RunChapter'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Run Chapter
       tags:
       - Chapters
   /private/compiler/template:
