@@ -50,8 +50,6 @@ func Run(cfg *config.Config) {
 		&cfg.Defaults,
 	)
 
-	allServices.RoleService()
-
 	// First Run & Creating Default Admin
 	firstRun(queries, allServices.RoleService(), allServices.UserService(), cfg.Defaults.Roles.RoleAdmin)
 

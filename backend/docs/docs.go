@@ -796,7 +796,7 @@ const docTemplate = `{
                 "summary": "Run Chapter",
                 "parameters": [
                     {
-                        "description": "Runs Chapter's cODE",
+                        "description": "Runs Chapter's Code",
                         "name": "runChapter",
                         "in": "body",
                         "required": true,
@@ -1739,6 +1739,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "courseID": {
+                    "type": "string"
+                },
+                "userCode": {
                     "type": "string"
                 }
             }

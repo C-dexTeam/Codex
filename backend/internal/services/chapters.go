@@ -1,12 +1,19 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"strconv"
 	"strings"
 
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	dto "github.com/C-dexTeam/codex/internal/http/dtos"
+	"github.com/C-dexTeam/codex/internal/http/response"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
 )
@@ -244,4 +251,65 @@ func (s *chapterService) DeleteChapter(
 		return
 	}
 	return
+}
+
+func (s *chapterService) Run(ctx context.Context, sessionID string, questView dto.QuestView) error {
+	data, err := s.requestCompiler(sessionID, questView)
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCompilerRunError)
+	}
+
+	fmt.Println("data", data)
+
+	return nil
+}
+
+func (s *chapterService) requestCompiler(sessionID string, questView dto.QuestView) (*response.BaseResponse, error) {
+	// nginx domain because we are inside of docker & i'm going to do load balancer.
+	url := "http://nginx/compiler-api/v1/private/run"
+
+	// Serialize questDTO to JSON
+	requestBody, err := json.Marshal(questView)
+	if err != nil {
+		return nil, response.Response(500, "Error marshalling questDTO", err)
+	}
+
+	// Create a new POST request with the JSON body
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return nil, response.Response(500, "Error creating POST request", err)
+	}
+
+	// Set the Content-Type header to application/json
+	req.Header.Add("Content-Type", "application/json")
+
+	// Add the Codex-Compiler header
+	req.Header.Add("Codex-Compiler", "b77759141fc85bf31e75b1d9c48bbe67")
+
+	// Add the session_id cookie to the request
+	req.AddCookie(&http.Cookie{
+		Name:  "session_id",
+		Value: sessionID,
+	})
+
+	// Create an HTTP client and execute the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, response.Response(500, "Error making POST request", err)
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, response.Response(500, "Error reading response body", nil)
+	}
+
+	var data response.BaseResponse
+	if err := json.Unmarshal(body, &data); err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessage(500, "Error decoding session data")
+	}
+
+	return &data, nil
 }
