@@ -15,6 +15,7 @@ const button = theme => {
           position: "relative",
           fontSize: "1em",
           fontHeight: "1.5em",
+          zIndex: 1,
 
           "&:hover": {
             background: `${hexToRGBA(theme.palette[ownerState.color || "primary"].main, 0.1)} !important`,
@@ -24,7 +25,7 @@ const button = theme => {
           ...(
             ownerState.variant === "outlined"
               ? { // outlined button
-                background: "transparent !important",
+                background: "inherit !important",
                 outline: `0.1em solid ${theme.palette[ownerState.color || "primary"].main}`,
                 outlineOffset: "-0.1em",
               }

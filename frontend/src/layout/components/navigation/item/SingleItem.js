@@ -12,7 +12,6 @@ const SingleItem = (props) => {
 
     const router = useRouter()
     const handleLocate = (p) => { if (p) return () => router.replace(p) }
-    console.log(router.pathname, path);
 
     return (
         <ListItemButton onClick={handleLocate(path)} active={router.pathname == path} sx={{ ml: inside * 2 }} special={path == "/solana"}>

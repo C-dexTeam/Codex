@@ -5,7 +5,7 @@ import ScrollTop from "@/layout/components/ScrollTop";
 // import NextNProgress from "nextjs-progressbar";
 import { useState, useEffect, Fragment } from "react";
 import { Box, Container } from "@mui/material";
-import CustomBreadcrumbs from "@/components/breadcrumbs";
+// import CustomBreadcrumbs from "@/components/breadcrumbs";
 import { useRouter } from "next/router";
 import navigation from "@/navigation";
 import findParent from "@/utils/findParent";
@@ -64,7 +64,7 @@ const Layout = ({ children }) => {
                             // ml: '200px'
                         }}
                     >
-                        <CustomBreadcrumbs titles={titles} />
+                        {/* <CustomBreadcrumbs titles={titles} /> */}
 
                         <Box sx={{ mt: '1rem' }}>
                             {children}

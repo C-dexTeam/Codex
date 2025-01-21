@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText, TextField, Typography } from "@mui/material"
+import { Box, FormControl, FormHelperText, TextField, Typography } from "@mui/material"
 
 const Input = (props) => {
     let label = props.label
@@ -14,8 +14,8 @@ const Input = (props) => {
     delete _props.noControl
 
     return (
-        <>
-            {label ? <Typography variant='body2' component="label" {...(_props?.error ? { color: "error" } : {})}>{label}{required ? "*" : ""}</Typography> : null}
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+            {label ? <Typography variant='body1' component="label" {...(_props?.error ? { color: "error" } : {})}>{label}{required ? "*" : ""}</Typography> : null}
             {description ? <Typography variant='caption2' component="span" {...(_props?.error ? { color: "error" } : {})}>{description}</Typography> : null}
 
             <TextField {..._props} />
@@ -26,7 +26,7 @@ const Input = (props) => {
                     {_props?.error}
                 </FormHelperText>
             }
-        </>
+        </Box>
     )
 }
 

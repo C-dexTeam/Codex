@@ -5,12 +5,14 @@ const defaultStyle = {
     fontSize: "1rem",
     lineHeight: "1.5rem",
     fontWeight: 500,
-    cursor: "default",
-    letterSpacing: "-0.25px",
+    // cursor: "default",
+    letterSpacing: "0.25px",
     display: "flex",
     alignItems: "center",
     gap: "0.5rem",
-    width: "fit-content"
+    width: "fit-content",
+    maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis"
+
 }
 
 const typography = theme => {
@@ -69,6 +71,11 @@ const typography = theme => {
         caption: {
             ...defaultStyle,
             lineHeight: "1.25rem",
+            fontWeight: 300,
+        },
+        caption1: {
+            ...defaultStyle,
+            lineHeight: "1rem",
             fontWeight: 300,
         },
         caption2: {
