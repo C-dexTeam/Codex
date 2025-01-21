@@ -71,6 +71,7 @@ func (m *UserDTOManager) ToUserAuthViews(users []repo.TUsersAuth) []UserAuthView
 
 type UserProfileView struct {
 	PublicKey           string `json:"publicKey"`
+	UserID              string `json:"userAuthID"`
 	RoleName            string `json:"role"`
 	Username            string `json:"username"`
 	Email               string `json:"email"`
@@ -84,6 +85,7 @@ type UserProfileView struct {
 func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfileView {
 	return UserProfileView{
 		PublicKey:           userData.PublicKey,
+		UserID:              userData.UserID,
 		RoleName:            userData.Role,
 		Username:            userData.Username,
 		Email:               userData.Email,
