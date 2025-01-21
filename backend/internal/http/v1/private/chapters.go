@@ -202,10 +202,11 @@ func (h *PrivateHandler) DeleteChapter(c *fiber.Ctx) error {
 // @Description Runs Chapter Code.
 // @Accept json
 // @Produce json
-// @Param runChapter body dto.RunChapter true "Runs Chapter's cODE"
+// @Param runChapter body dto.RunChapter true "Runs Chapter's Code"
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/chapters/run [post]
 func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
+	sessionID := c.Cookies("session_id")
 	var runChapter dto.RunChapter
 	if err := c.BodyParser(&runChapter); err != nil {
 		return err
@@ -221,6 +222,10 @@ func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 	quest := h.dtoManager.QuestManager().ToQuestDTO(chapter, tests, pLanguage, runChapter.UserCode)
 
 	// TODO: Request the Run endpoint from Codex-Compiler
+	err = h.services.ChapterService().Run(c.Context(), sessionID, *quest)
+	if err != nil {
+		return err
+	}
 
 	return response.Response(200, "Status OK", quest)
 }

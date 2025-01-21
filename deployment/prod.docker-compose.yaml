@@ -12,17 +12,29 @@ services:
     networks:
       - codex
   
-  compiler-api:
-    container_name: compiler-api
+  compiler-api-1:
+    container_name: compiler-api-1
     build:
       context: ../compiler/.
-      dockerfile: ../deployment/compiler/dev.Dockerfile
+      dockerfile: ../deployment/compiler/prod.Dockerfile
     ports:
       - 8081:8081
     volumes:
       - ../compiler:/app
     networks:
       - codex
+
+  compiler-api-2:
+      container_name: compiler-api-2
+      build:
+        context: ../compiler/.
+        dockerfile: ../deployment/compiler/prod.Dockerfile
+      ports:
+        - 8082:8081
+      volumes:
+        - ../compiler:/app
+      networks:
+        - codex
 
   frontend:
     container_name: codex-frontend

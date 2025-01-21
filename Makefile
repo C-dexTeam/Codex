@@ -10,7 +10,18 @@ dev:
 		docker compose -f deployment/dev.docker-compose.yaml -p codex up -d; \
 	fi
 	@echo "\n[+] Project is started in development mode..."
-	
+
+prod:
+	@echo "[i] Project is starting in production mode...\n"
+	@if command -v docker-compose > /dev/null; then \
+		echo "[i] Using docker-compose..."; \
+		docker-compose -f deployment/prod.docker-compose.yaml -p codex up -d; \
+	else \
+		echo "[i] Using docker compose..."; \
+		docker compose -f deployment/prod.docker-compose.yaml -p codex up -d; \
+	fi
+	@echo "\n[+] Project is started in production mode..."
+
 down:
 	@echo "[i] Stopping and removing containers...\n"
 	@if command -v docker compose > /dev/null; then \

@@ -113,4 +113,7 @@ const (
 	ErrErrorWhileHashing                       = "ERROR_WHILE_HASHING"
 	ErrTransactionError                        = "ERROR_WHILE_COMMITING"
 	ErrWalletVerificationError                 = "ERROR_WHILE_VERIFICATON_WALLET"
+
+	ErrCompilerRunError    = "COMPILER_RUN_ERROR"
+	ErrCompilerCreateError = "COMPILER_CREATE_ERROR"
 )

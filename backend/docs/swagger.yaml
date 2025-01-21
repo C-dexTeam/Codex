@@ -138,6 +138,8 @@ definitions:
         type: string
       courseID:
         type: string
+      userCode:
+        type: string
     required:
     - chapterID
     - courseID
@@ -887,7 +889,7 @@ paths:
       - application/json
       description: Runs Chapter Code.
       parameters:
-      - description: Runs Chapter's cODE
+      - description: Runs Chapter's Code
         in: body
         name: runChapter
         required: true

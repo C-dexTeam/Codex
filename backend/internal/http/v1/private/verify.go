@@ -27,7 +27,7 @@ func (h *PrivateHandler) RunTemplate(c *fiber.Ctx) error {
 	// TODO: This is my request template for all.
 
 	// URL to send GET request to
-	url := "http://compiler-api:8081/compiler-api/v1/private/run"
+	url := "http://nginx/compiler-api/v1/private/run"
 	sessionID := c.Cookies("session_id")
 
 	// Create a new GET request
