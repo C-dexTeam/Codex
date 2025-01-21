@@ -1,11 +1,11 @@
 
-// import Navbar from "@/layout/components/Navbar";
+import Navbar from "@/layout/components/Navbar";
 import Footer from "@/layout/components/Footer";
 import ScrollTop from "@/layout/components/ScrollTop";
 // import NextNProgress from "nextjs-progressbar";
 import { useState, useEffect, Fragment } from "react";
 import { Box, Container } from "@mui/material";
-import CustomBreadcrumbs from "@/components/breadcrumbs";
+// import CustomBreadcrumbs from "@/components/breadcrumbs";
 import { useRouter } from "next/router";
 import navigation from "@/navigation";
 import findParent from "@/utils/findParent";
@@ -46,14 +46,13 @@ const Layout = ({ children }) => {
                 options={{ easing: "ease-in-out", speed: 500 }}
             /> */}
             {/* <Navbar /> */}
+            <Navbar />
 
             <Box sx={{
                 width: '100%', display: 'flex', py: '40px',
                 minHeight: `calc(100vh - 80px)`,
                 gap: '40px',
             }}>
-                {/* <Navbar /> */}
-
                 <Container maxWidth="xl">
                     <Box
                         sx={{
@@ -65,7 +64,7 @@ const Layout = ({ children }) => {
                             // ml: '200px'
                         }}
                     >
-                        <CustomBreadcrumbs titles={titles} />
+                        {/* <CustomBreadcrumbs titles={titles} /> */}
 
                         <Box sx={{ mt: '1rem' }}>
                             {children}

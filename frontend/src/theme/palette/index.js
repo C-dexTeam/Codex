@@ -29,7 +29,7 @@ const palette = {
         main: "#39D98A",
         light: "#ABFFD8",
         dark: "#01572F",
-        contrastText: text.primary,
+        contrastText: text.secondary,
     },
     secondary: {
         main: "#A1A6B4",
@@ -72,7 +72,7 @@ const palette = {
     },
     text: {
         primary: text.primary,
-        secondary: text.primary,
+        secondary: text.secondary,
         disabled: border.dark,
     },
 };

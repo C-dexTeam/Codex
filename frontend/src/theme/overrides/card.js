@@ -6,9 +6,12 @@ const card = theme => {
       styleOverrides: {
         root: ({ ownerState }) => ({
           position: "relative",
-          backgroundColor: theme.palette.background.paper,
+          backgroundColor: ownerState.mode == "dark" ? theme.palette.background.default : theme.palette.background.paper,
           borderRadius: "0rem",
           border: "none",
+          "& .MuiCardContent-root": {
+            paddingBottom: ownerState.variant == "gradient" ? `1rem` : `2rem`,
+          },
 
           ...(
             ownerState.variant == "flat"
@@ -56,6 +59,10 @@ const card = theme => {
                     backgroundClip: "content-box, border-box",
                     overflow: "visible",
 
+                    // "& .MuiCardContent-root": {
+                    //   paddingBottom: `calc(1rem + ${ownerState.btnHeight || 48}px + 1px + 4px) !important`,
+                    // },
+
                     "&::before": {
                       content: '""',
                       display: "block",
@@ -90,8 +97,8 @@ const card = theme => {
                     // }
                   }
                   : {
-                    borderRadius: "0.5rem",
-                    border: `1px solid ${hexToRGBA(theme.palette.border.light, 1)}`,
+                    borderRadius: ownerState.round == "lg" ? "1rem" : "0.5rem",
+                    border: `1px solid ${hexToRGBA(theme.palette.border.secondary, 1)}`,
                   }
           ),
         }),
@@ -110,10 +117,14 @@ const card = theme => {
     },
     MuiCardContent: {
       styleOverrides: {
-        root: {
-          padding: "1rem",
-          paddingBottom: "1rem !important",
-        },
+        root: ({ ownerState }) => ({
+          padding: "2rem 1rem",
+
+          ...(ownerState.size == "small" ? {
+            padding: "0.75rem",
+            paddingBottom: "0.75rem !important",
+          } : {})
+        }),
       },
     },
     MuiCardActions: {

@@ -28,3 +28,39 @@ a {
 ::-webkit-scrollbar-thumb:hover {
     background: #BDC4CC;
 }
+
+.star {
+    position: fixed;
+    background: white;
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.star.yellow {
+    background: #FFD700;
+}
+
+.star.orange {
+    background: #FFA500;
+}
+
+.star.red {
+    background: #FF0000;
+}
+
+@keyframes twinkle {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

@@ -4,16 +4,45 @@ const textfield = theme => {
     MuiTextField: {
       styleOverrides: {
         root: ({ ownerState }) => ({
-          // "& fieldset": {
-          //     border: "1px solid #5C5C5C",
-          //     borderRadius: "0.75rem",
-          //     backgroundColor: "#FCFCFC",
-          // },
-          // // yazı rengi
-          // "& .MuiInputBase-input": {
-          //     color: "#000",
-          //     zIndex: 9,
-          // },
+          width: "fit-content",
+
+          "& .MuiButtonBase-root": {
+            color: theme.palette.border.secondary,
+          },
+
+          "&:hover": {
+            ".MuiButtonBase-root": {
+              color: theme.palette.border.main,
+            }
+          },
+          "& .Mui-focused": {
+            ".MuiButtonBase-root": {
+              color: theme.palette.primary.main,
+            }
+          },
+
+          "& fieldset": {
+            border: `1px solid ${theme.palette.border.secondary}`,
+            borderRadius: "0.5rem",
+            padding: 0,
+
+            "&:hover": {
+              borderColor: theme.palette.border.main,
+            },
+
+          },
+
+          // yazı rengi
+          "& .MuiInputBase-input": {
+            padding: "0.5rem",
+            zIndex: 9,
+          },
+
+          "& .MuiInputBase-root": {
+            padding: 0,
+            paddingRight: "0.5rem",
+            paddingLeft: "0.5rem",
+          },
 
           // ...(ownerState.variant === "filled" && {
           //     borderRadius: "0.75rem",

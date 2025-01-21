@@ -27,6 +27,7 @@ import ThemeComponent from '@/layout/ThemeComponent'
 import WindowWrapper from '@/components/window-wrapper'
 import AclGuard from '@/layout/auth/AclGuard'
 import { Wallet } from '@/layout/auth/Wallet'
+import { useEffect } from 'react'
 
 // ** Pace Loader
 if (themeConfig.routingLoader) {
@@ -60,6 +61,51 @@ const App = props => {
   const authGuard = Component.authGuard ?? true
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj
+
+  useEffect(() => {
+    const container = document.querySelectorAll(".stars");
+    const n = 64; //Amount of stars
+
+    container.forEach((item) => {
+      for (let i = n; i > 0; i--) {
+        //Rng stuff
+        let pos1 = Math.random() * 100 + "%";
+        let pos2 = Math.random() * 100 + "%";
+        let size = Math.random() * 3;
+
+        let star = document.createElement("star");
+
+        //Individual Properties
+        star.classList.add("star");
+        star.style.height = size + "px";
+        star.style.width = size + "px";
+        star.style.top = pos1;
+        star.style.right = pos2;
+        star.style.boxShadow = `0 0 ${size + 2 + "px"} 1px rgba(255,255,255,0.2)`;
+
+        // sarı yıldızlar
+        let randn = Math.random() * 100
+        if (randn > 56 && randn < 64) {
+          star.classList.add("yellow");
+        } else if (randn > 64 && randn < 72) {
+          star.classList.add("orange");
+        } else if (randn > 72 && randn < 80) {
+          star.classList.add("red");
+        } else if (randn > 80 && randn < 100) {
+        }
+
+        let randn2 = Math.random() * 100
+        // yanıp sönme efekti ver
+        if (randn2 > 16 && randn2 < 32) {
+          let duration = Math.random() * 5 + 2;
+          star.style.animation = `twinkle ${duration}s infinite`;
+        }
+
+        item.append(star);
+      }
+    });
+
+  }, [])
 
   return (
     <Provider store={store}>

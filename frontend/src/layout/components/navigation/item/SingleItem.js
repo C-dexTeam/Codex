@@ -14,10 +14,14 @@ const SingleItem = (props) => {
     const handleLocate = (p) => { if (p) return () => router.replace(p) }
 
     return (
-        <ListItemButton onClick={handleLocate(path)} active={router.pathname == path} sx={{ ml: inside * 2 }}>
-            <ListItemIcon>
-                {icon}
-            </ListItemIcon>
+        <ListItemButton onClick={handleLocate(path)} active={router.pathname == path} sx={{ ml: inside * 2 }} special={path == "/solana"}>
+            {
+                icon
+                    ? <ListItemIcon>
+                        {icon}
+                    </ListItemIcon>
+                    : null
+            }
 
             <ListItemText primary={title} />
         </ListItemButton>

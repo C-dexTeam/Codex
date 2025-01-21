@@ -21,7 +21,7 @@ const Home = () => {
             <br />
             <br />
 
-            <Button color="info" variant="gradient">Test</Button>
+            <Button color="warning" variant="gradient">Test</Button>
 
             <br />
             <br />

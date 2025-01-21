@@ -5,12 +5,14 @@ const defaultStyle = {
     fontSize: "1rem",
     lineHeight: "1.5rem",
     fontWeight: 500,
-    cursor: "default",
-    letterSpacing: "-0.25px",
+    // cursor: "default",
+    letterSpacing: "0.25px",
     display: "flex",
     alignItems: "center",
     gap: "0.5rem",
-    width: "fit-content"
+    width: "fit-content",
+    maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis"
+
 }
 
 const typography = theme => {
@@ -56,6 +58,10 @@ const typography = theme => {
         },
         body: {
             ...defaultStyle,
+            fontWeight: 300,
+        },
+        body1: {
+            ...defaultStyle,
         },
         body2: {
             ...defaultStyle,
@@ -67,6 +73,11 @@ const typography = theme => {
             lineHeight: "1.25rem",
             fontWeight: 300,
         },
+        caption1: {
+            ...defaultStyle,
+            lineHeight: "1rem",
+            fontWeight: 300,
+        },
         caption2: {
             ...defaultStyle,
             fontSize: "0.875rem",
@@ -74,11 +85,12 @@ const typography = theme => {
         },
         link: {
             ...defaultStyle,
-            fontSize: "1.25rem",
-            lineHeight: "2rem",
+            fontSize: "inherit",
+            lineHeight: "inherit",
             cursor: "pointer",
             "&:hover": {
-                color: theme.palette.primary.main
+                color: theme.palette.primary.main,
+                textDecoration: "underline",
             }
         },
         link2: {

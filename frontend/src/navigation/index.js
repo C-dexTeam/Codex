@@ -1,5 +1,3 @@
-import { HelpCenter, Home, People, Settings } from "@mui/icons-material";
-import Groups3Icon from '@mui/icons-material/Groups3';
 
 /*
     @data structure
@@ -16,41 +14,62 @@ import Groups3Icon from '@mui/icons-material/Groups3';
 const navigation = [
     { // single item
         type: "item",
-        path: "/home",
-        title: "Home",
-        icon: <Home />,
-        permission: "home",
+        path: "/courses",
+        title: "courses",
+        permission: "courses",
+        // icon: <HelpCenter />
     },
     { // single item
         type: "item",
-        path: "/challenges",
-        title: "Challenges",
-        permission: "challenges",
-        icon: <HelpCenter />
+        path: "/roadmap",
+        title: "roadmap",
+        permission: "roadmap",
+        // icon: <HelpCenter />
     },
-    { // item with children
+    { // single item
         type: "item",
-        title: "Team",
-        permission: "team",
-        icon: <Groups3Icon />,
-        children: [
-            {
-                type: "item",
-                path: "/team/members",
-                title: "Members",
-                permission: "team-members",
-                icon: <People />,
-            },
-            {
-                type: "item",
-                path: "/team/settings",
-                title: "Settings",
-                role: "admin",
-                permission: "team-settings",
-                icon: <Settings />
-            }
-        ]
+        path: "/solana",
+        title: "solana",
+        permission: "solana",
+        // icon: <HelpCenter />
     },
+    { // single item
+        type: "item",
+        path: "/build",
+        title: "build",
+        permission: "build",
+        // icon: <HelpCenter />
+    },
+    { // single item
+        type: "item",
+        path: "/community",
+        title: "community",
+        permission: "community",
+        // icon: <HelpCenter />
+    },
+    // { // item with children
+    //     type: "item",
+    //     title: "Team",
+    //     permission: "team",
+    //     icon: <Groups3Icon />,
+    //     children: [
+    //         {
+    //             type: "item",
+    //             path: "/team/members",
+    //             title: "Members",
+    //             permission: "team-members",
+    //             icon: <People />,
+    //         },
+    //         {
+    //             type: "item",
+    //             path: "/team/settings",
+    //             title: "Settings",
+    //             role: "admin",
+    //             permission: "team-settings",
+    //             icon: <Settings />
+    //         }
+    //     ]
+    // },
 ]
 
 export default navigation;

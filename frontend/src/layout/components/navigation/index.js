@@ -8,8 +8,7 @@ const NavigationList = () => {
             sx={{
                 display: 'flex',
                 gap: '0.5rem',
-                flexDirection: 'column',
-                height: '100%',
+                // flexDirection: 'column',
                 pt: 0
             }}
             component="nav"

@@ -20,7 +20,7 @@ class CustomDocument extends Document {
                     />
                     <link rel="shortcut icon" href="/images/favicon.png" />
                 </Head>
-                <body>
+                <body class="stars">
                     <Main />
                     <NextScript />
                 </body>
