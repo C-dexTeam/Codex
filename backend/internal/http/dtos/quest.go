@@ -17,6 +17,7 @@ type QuestView struct {
 }
 
 type QuestChapter struct {
+	ChapterID   string `json:"id"`
 	UserCode    string `json:"userCode"`
 	FuncName    string `json:"funcname"`
 	FrontendTmp string `json:"frontendTmp"`
@@ -26,6 +27,7 @@ type QuestChapter struct {
 
 func (q *QuestDTOManager) QuestChapterDTO(chapter *repo.TChapter, userCode string) QuestChapter {
 	return QuestChapter{
+		ChapterID:   chapter.ID.String(),
 		UserCode:    userCode,
 		FuncName:    chapter.FuncName,
 		FrontendTmp: chapter.FrontendTemplate,
@@ -35,24 +37,24 @@ func (q *QuestDTOManager) QuestChapterDTO(chapter *repo.TChapter, userCode strin
 }
 
 type QuestProgrammingLang struct {
-	Name          string `json:"name"`
-	FileExtention string `json:"fileExtention"`
+	Name string `json:"name"`
 }
 
 func (q *QuestDTOManager) QuestPLangDTO(pLang *repo.TProgrammingLanguage) QuestProgrammingLang {
 	return QuestProgrammingLang{
-		Name:          pLang.Name,
-		FileExtention: pLang.FileExtention,
+		Name: pLang.Name,
 	}
 }
 
 type QuestTest struct {
+	TestID string `json:"id"`
 	Input  string `json:"input"`
 	Output string `json:"output"`
 }
 
 func (q *QuestDTOManager) QuestTestDTO(test *repo.TTest) QuestTest {
 	return QuestTest{
+		TestID: test.ID.String(),
 		Input:  test.InputValue,
 		Output: test.OutputValue,
 	}
