@@ -19,7 +19,7 @@ const button = theme => {
 
           "&:hover": {
             background: `${hexToRGBA(theme.palette[ownerState.color || "primary"].main, 0.1)} !important`,
-            color: `${theme.palette[ownerState.color || "primary"].contrastText}`,
+            color: `${theme.palette[ownerState.color || "primary"].hoverText}`,
           },
 
           ...(

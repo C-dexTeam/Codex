@@ -48,7 +48,6 @@ const GradientCard = (props) => {
             <Button
                 ref={btnRef}
                 variant='contained'
-                color='primary'
                 sx={{
                     position: "absolute",
                     right: "0px",
