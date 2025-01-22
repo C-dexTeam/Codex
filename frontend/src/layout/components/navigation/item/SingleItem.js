@@ -14,7 +14,7 @@ const SingleItem = (props) => {
     const handleLocate = (p) => { if (p) return () => router.replace(p) }
 
     return (
-        <ListItemButton onClick={handleLocate(path)} active={router.pathname == path} sx={{ ml: inside * 2 }} special={path == "/solana"}>
+        <ListItemButton onClick={handleLocate(path)} active={router.asPath == path} sx={{ ml: inside * 2 }} special={path == "/courses/solana"}>
             {
                 icon
                     ? <ListItemIcon>

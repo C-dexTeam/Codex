@@ -1,12 +1,12 @@
 import themeConfig from "@/configs/themeConfig"
 
 const defaultStyle = {
-    fontFamily: themeConfig.fontFamily,
+    fontFamily: `${themeConfig.fontFamily}`,
     fontSize: "1rem",
     lineHeight: "1.5rem",
     fontWeight: 500,
     // cursor: "default",
-    letterSpacing: "0.25px",
+    letterSpacing: "0.5px",
     display: "flex",
     alignItems: "center",
     gap: "0.5rem",
@@ -52,36 +52,44 @@ const typography = theme => {
             lineHeight: "2rem",
             fontWeight: 700
         },
-        subtitle2: {
+        subtitle1: {
             ...defaultStyle,
             fontWeight: 700
         },
+        subtitle2: {
+            ...defaultStyle,
+            fontSize: "1.5rem",
+            lineHeight: "2rem",
+            fontWeight: 700,
+        },
         body: {
             ...defaultStyle,
-            fontWeight: 300,
+            fontSize: "1.25rem",
+            lineHeight: "2rem",
         },
         body1: {
             ...defaultStyle,
         },
         body2: {
             ...defaultStyle,
-            fontSize: "1.25rem",
+            fontSize: "1.5rem",
             lineHeight: "2rem",
         },
         caption: {
             ...defaultStyle,
-            lineHeight: "1.25rem",
-            fontWeight: 300,
+            lineHeight: "1rem",
+            fontSize: "0.75rem",
+            color: theme.palette.secondary.main,
         },
         caption1: {
             ...defaultStyle,
-            lineHeight: "1rem",
-            fontWeight: 300,
+            color: theme.palette.secondary.main,
         },
         caption2: {
             ...defaultStyle,
-            fontSize: "0.875rem",
-            fontWeight: 300,
+            fontSize: "1.25rem",
+            lineHeight: "1.5rem",
+            color: theme.palette.secondary.main,
         },
         link: {
             ...defaultStyle,
@@ -99,7 +107,19 @@ const typography = theme => {
             "&:hover": {
                 color: theme.palette.primary.main
             }
-        }
+        },
+        slim: {
+            color: "inherit",
+            fontSize: "inherit",
+            lineHeight: "inherit",
+            fontWeight: 300,
+        },
+        strong: {
+            color: "inherit",
+            fontSize: "inherit",
+            lineHeight: "inherit",
+            fontWeight: 700,
+        },
     }
 }
 

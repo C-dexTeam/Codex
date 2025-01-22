@@ -129,10 +129,10 @@ const card = theme => {
     },
     MuiCardActions: {
       styleOverrides: {
-        root: {
+        root: ({ ownerState }) => ({
           padding: "0.5rem 1rem",
-          borderTop: `0.5px dashed ${hexToRGBA(theme.palette.border.light, 1)}`,
-        },
+          borderTop: ownerState.flat ? "unset" : `0.5px dashed ${hexToRGBA(theme.palette.border.light, 1)}`,
+        }),
       },
     }
   }

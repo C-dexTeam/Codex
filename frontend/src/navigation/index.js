@@ -28,7 +28,7 @@ const navigation = [
     },
     { // single item
         type: "item",
-        path: "/solana",
+        path: "/courses/solana",
         title: "solana",
         permission: "solana",
         // icon: <HelpCenter />

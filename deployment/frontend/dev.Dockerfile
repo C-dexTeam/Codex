@@ -1,4 +1,4 @@
-FROM node:22.11-alpine AS builder
+FROM node:22.13.1-alpine AS builder
 ENV TZ=UTC 
 WORKDIR /app
 
