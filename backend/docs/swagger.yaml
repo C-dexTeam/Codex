@@ -69,11 +69,7 @@ definitions:
     type: object
   dto.AddPLanguageDTO:
     properties:
-      compileCMD:
-        type: string
       description:
-        type: string
-      downloadCMD:
         type: string
       fileExtention:
         maxLength: 30
@@ -220,11 +216,7 @@ definitions:
     type: object
   dto.UpdatePLanguageDTO:
     properties:
-      compileCMD:
-        type: string
       description:
-        type: string
-      downloadCMD:
         type: string
       fileExtention:
         type: string

@@ -221,11 +221,11 @@ func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 	}
 	quest := h.dtoManager.QuestManager().ToQuestDTO(chapter, tests, pLanguage, runChapter.UserCode)
 
-	// TODO: Request the Run endpoint from Codex-Compiler
+	// Request the Run endpoint from Codex-Compiler
 	err = h.services.ChapterService().Run(c.Context(), sessionID, *quest)
-	if err != nil {
+	if err.Error() != "" {
 		return err
 	}
 
-	return response.Response(200, "Status OK", quest)
+	return response.Response(200, "Status OK", err)
 }

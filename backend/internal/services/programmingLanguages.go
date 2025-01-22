@@ -90,7 +90,7 @@ func (s *pLanguageService) GetProgrammingLanguage(
 
 func (s *pLanguageService) AddProgrammingLanguage(
 	ctx context.Context,
-	languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
+	languageID, name, description, imagePath, fileExtention, monacoEditor string,
 ) (uuid.UUID, error) {
 	languageUUID, err := s.utilService.ParseUUID(languageID)
 	if err != nil {
@@ -101,8 +101,6 @@ func (s *pLanguageService) AddProgrammingLanguage(
 		LanguageID:    languageUUID,
 		Name:          name,
 		Description:   description,
-		DownloadCmd:   downloadCMD,
-		CompileCmd:    compileCMD,
 		ImagePath:     imagePath,
 		FileExtention: fileExtention,
 		MonacoEditor:  monacoEditor,
@@ -116,7 +114,7 @@ func (s *pLanguageService) AddProgrammingLanguage(
 
 func (s *pLanguageService) UpdateProgrammingLanguage(
 	ctx context.Context,
-	id, languageID, name, description, downloadCMD, compileCMD, imagePath, fileExtention, monacoEditor string,
+	id, languageID, name, description, imagePath, fileExtention, monacoEditor string,
 ) error {
 	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
@@ -147,8 +145,6 @@ func (s *pLanguageService) UpdateProgrammingLanguage(
 		LanguageID:            s.utilService.ParseNullUUID(languageID),
 		Name:                  s.utilService.ParseString(name),
 		Description:           s.utilService.ParseString(description),
-		DownloadCmd:           s.utilService.ParseString(downloadCMD),
-		CompileCmd:            s.utilService.ParseString(compileCMD),
 		FileExtention:         s.utilService.ParseString(fileExtention),
 		MonacoEditor:          s.utilService.ParseString(monacoEditor),
 		ImagePath:             s.utilService.ParseString(imagePath),
