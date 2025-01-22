@@ -53,7 +53,7 @@ const Layout = ({ children }) => {
                 minHeight: `calc(100vh - 80px)`,
                 gap: '40px',
             }}>
-                <Container maxWidth="xl">
+                <Container maxWidth="lg">
                     <Box
                         sx={{
                             // minHeight: `calc(100vh - ${(navbarHeight || 0) + (footerHeight || 0)}px)`

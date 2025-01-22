@@ -134,8 +134,8 @@ const Courses = () => {
                                 <GradientCard
                                     description={
                                         <Fragment>
-                                            <Typography variant="body" color={"primary"}>
-                                                <Typography variant="body1">{course.chapters}</Typography>
+                                            <Typography variant="body1" color={"primary"}>
+                                                <Typography variant="subtitle1">{course.chapters}</Typography>
                                                 Chapters
                                             </Typography>
                                         </Fragment>
@@ -160,8 +160,8 @@ const Courses = () => {
                                             />
                                         </Box>
 
-                                        <Typography variant="h5" sx={{ mt: 2 }}>{course.title}</Typography>
-                                        <Typography variant="body" sx={{ mt: 1 }}>{course.description}</Typography>
+                                        <Typography variant="subtitle1" sx={{ mt: 2 }}>{course.title}</Typography>
+                                        <Typography variant="caption1" sx={{ mt: 1 }}>{course.description}</Typography>
                                     </CardContent>
                                 </GradientCard>
                             </Grid>
@@ -214,8 +214,8 @@ const Courses = () => {
                                 <GradientCard
                                     description={
                                         <Fragment>
-                                            <Typography variant="body" color={"primary"}>
-                                                <Typography variant="body1">{course.chapters}</Typography>
+                                            <Typography variant="body1" color={"primary"}>
+                                                <Typography variant="subtitle1">{course.chapters}</Typography>
                                                 Chapters
                                             </Typography>
                                         </Fragment>
@@ -240,8 +240,8 @@ const Courses = () => {
                                             />
                                         </Box>
 
-                                        <Typography variant="h5" sx={{ mt: 2 }}>{course.title}</Typography>
-                                        <Typography variant="body" sx={{ mt: 1 }}>{course.description}</Typography>
+                                        <Typography variant="subtitle1" sx={{ mt: 2 }}>{course.title}</Typography>
+                                        <Typography variant="caption1" sx={{ mt: 1 }}>{course.description}</Typography>
                                     </CardContent>
                                 </GradientCard>
                             </Grid>
@@ -253,7 +253,7 @@ const Courses = () => {
             <Grid item xs={12} md={4}>
                 <Card sx={{ position: "sticky", top: "1rem" }}>
                     <CardContent>
-                        <Grid container spacing={2}>
+                        <Grid container spacing={4}>
                             <Grid item xs={12}>
                                 <Box
                                     sx={{
@@ -289,7 +289,7 @@ const Courses = () => {
 
                                     <Box sx={{ width: 'calc(100% - 5rem - 1rem)', position: "relative" }}>
                                         <Tooltip title={copy ? "Copied!" : "Click to copy"} placement="top" color={copy && "success"} arrow>
-                                            <Typography variant="body1"
+                                            <Typography variant="subtitle1"
                                                 sx={{
                                                     // fazlasına üç nokta koy
                                                     width: "calc(100%)",
@@ -305,14 +305,14 @@ const Courses = () => {
                                             </Typography>
                                         </Tooltip>
 
-                                        <Typography variant="caption2" color={"secondary"}>0 / 100 XP</Typography>
+                                        <Typography variant="caption1" color={"secondary"}>0 / 100 XP</Typography>
                                     </Box>
 
                                     <LevelBar level={1} proggress={44} />
                                 </Box>
                             </Grid>
 
-                            <Grid item container xs={12} spacing={2}>
+                            <Grid item container xs={12} spacing={1}>
                                 {
                                     statistics.map(stat => (
                                         <Grid item xs={6}>
@@ -355,16 +355,12 @@ const Courses = () => {
                                     <Grid item xs={12}>
                                         <ListItemButton
                                             key={item.label}
-                                            sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }}
                                             variant="btn"
                                         >
                                             <ListItemIcon sx={{ color: 'inherit' }}>
                                                 {item.icon}
                                             </ListItemIcon>
-                                            <ListItemText
-                                                primary={item.label}
-                                                primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
-                                            />
+                                            <ListItemText primary={item.label} />
                                         </ListItemButton>
                                     </Grid>
                                 ))}

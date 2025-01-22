@@ -21,6 +21,7 @@ const defineRulesFor = (role, permission, permissions) => {
   const userPerms = [
     'home',
     'courses',
+    'chapter',
   ]
 
   /**
@@ -53,6 +54,7 @@ const defineRulesFor = (role, permission, permissions) => {
       can(['read'], "solana")
       can(['read'], "build")
       can(['read'], "community")
+      can(['read'], "chapter")
       break
 
     default:

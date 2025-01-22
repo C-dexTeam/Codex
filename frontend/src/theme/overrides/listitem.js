@@ -26,7 +26,6 @@ const listitem = theme => {
     MuiListItemText: {
       styleOverrides: {
         root: {
-          fontSize: "1rem",
         },
       },
     },
@@ -50,50 +49,60 @@ const listitem = theme => {
               boxShadow: theme.shadows[2],
             },
           } : {
+            ...(ownerState?.special
+              ? {
+                borderRadius: "0.5rem",
 
-            "&:hover": {
-              ...(!ownerState?.special && {
-                background: `linear-gradient(90deg, ${hexToRGBA(theme.palette.primary.main, 0)} 0%, ${theme.palette.primary.main} 50%, ${hexToRGBA(theme.palette.primary.main, 0)} 100%)`,
-                webkitBackgroundClip: "text",
-                backgroundClip: "text",
-                webkitTextFillColor: "transparent",
-                color: "transparent",
-              })
-            },
+                ...(ownerState?.active
+                  ? {
+                    background: `linear-gradient(to right bottom, ${theme.palette[ownerState.color || "primary"].main} 0%, ${theme.palette.info.main} 70%)`,
 
-            ...(ownerState?.active && {
-              // gradient text color
-              background: `linear-gradient(90deg, ${hexToRGBA(theme.palette.primary.main, 0)} 0%, ${theme.palette.primary.main} 50%, ${hexToRGBA(theme.palette.primary.main, 0)} 100%)`,
-              webkitBackgroundClip: "text",
-              backgroundClip: "text",
-              webkitTextFillColor: "transparent",
-              color: "transparent",
-              display: "inline-block",
+                    "&:hover": {
+                      color: theme.palette.text.primary,
+                    },
+                  }
+                  : {
+                    border: "1px solid transparent",
+                    background: `linear-gradient(${theme.palette.background.paper}, ${theme.palette.background.paper}), linear-gradient(to right bottom, ${theme.palette[ownerState.color || "primary"].main} 0%, ${theme.palette.info.main} 70%)`,
+                    backgroundClip: "padding-box, border-box",
+                    backgroundOrigin: "padding-box, border-box",
 
-              "&::after": {
-                content: '""',
-                position: "absolute",
-                bottom: "calc(-26%)",
-                left: "calc(50% - 37.5%)",
-                width: "75%",
-                height: "0.05rem",
-                // background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.info.main})`,
-                background: `linear-gradient(90deg, ${hexToRGBA(theme.palette.primary.main, 0)} 0%, ${theme.palette.primary.main} 50%, ${hexToRGBA(theme.palette.primary.main, 0)} 100%)`,
+                    "&:hover": {
+                      color: theme.palette.primary.main,
+                    },
+                  }),
               }
-            }),
+              : {
+                "&:hover": {
+                  background: `linear-gradient(90deg, ${hexToRGBA(theme.palette.primary.main, 0)} 0%, ${theme.palette.primary.main} 50%, ${hexToRGBA(theme.palette.primary.main, 0)} 100%)`,
+                  webkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  webkitTextFillColor: "transparent",
+                  color: "transparent",
+                },
 
-            ...(ownerState?.special && {
-              // gradient text color
-              border: "1px solid transparent",
-              borderRadius: "0.5rem",
-              background: `linear-gradient(${theme.palette.background.paper}, ${theme.palette.background.paper}), linear-gradient(to right, ${theme.palette[ownerState.color || "primary"].main}, ${theme.palette.info.main})`,
-              backgroundClip: "padding-box, border-box",
-              backgroundOrigin: "padding-box, border-box",
+                ...(ownerState?.active && {
+                  // gradient text color
+                  background: `linear-gradient(90deg, ${hexToRGBA(theme.palette.primary.main, 0)} 0%, ${theme.palette.primary.main} 50%, ${hexToRGBA(theme.palette.primary.main, 0)} 100%)`,
+                  webkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  webkitTextFillColor: "transparent",
+                  color: "transparent",
+                  display: "inline-block",
 
-              "&:hover": {
-                color: theme.palette.primary.main,
-              },
-            }),
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    bottom: "calc(-26%)",
+                    left: "calc(50% - 37.5%)",
+                    width: "75%",
+                    height: "0.05rem",
+                    // background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.info.main})`,
+                    background: `linear-gradient(90deg, ${hexToRGBA(theme.palette.primary.main, 0)} 0%, ${theme.palette.primary.main} 50%, ${hexToRGBA(theme.palette.primary.main, 0)} 100%)`,
+                  }
+                })
+              }
+            )
           }),
         }),
       },
