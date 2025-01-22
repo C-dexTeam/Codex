@@ -5,7 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -259,9 +258,7 @@ func (s *chapterService) Run(ctx context.Context, sessionID string, questView dt
 		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCompilerRunError)
 	}
 
-	fmt.Println("data", data)
-
-	return nil
+	return data
 }
 
 func (s *chapterService) requestCompiler(sessionID string, questView dto.QuestView) (*response.BaseResponse, error) {

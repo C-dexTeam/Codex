@@ -1646,13 +1646,7 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
-                "compileCMD": {
-                    "type": "string"
-                },
                 "description": {
-                    "type": "string"
-                },
-                "downloadCMD": {
                     "type": "string"
                 },
                 "fileExtention": {
@@ -1860,13 +1854,7 @@ const docTemplate = `{
         "dto.UpdatePLanguageDTO": {
             "type": "object",
             "properties": {
-                "compileCMD": {
-                    "type": "string"
-                },
                 "description": {
-                    "type": "string"
-                },
-                "downloadCMD": {
                     "type": "string"
                 },
                 "fileExtention": {

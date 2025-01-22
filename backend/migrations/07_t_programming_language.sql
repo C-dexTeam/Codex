@@ -5,8 +5,6 @@ CREATE TABLE IF NOT EXISTS t_programming_languages (
     language_id UUID NOT NULL,
     name VARCHAR(30) NOT NULL,
     description TEXT NOT NULL,
-    download_cmd VARCHAR(256) NOT NULL,
-    compile_cmd VARCHAR(256) NOT NULL,
     image_path VARCHAR(60) NOT NULL,
     file_extention VARCHAR(10) NOT NULL,
     monaco_editor VARCHAR(30) NOT NULL,

@@ -1,7 +1,6 @@
 -- name: GetPLanguages :many
 SELECT 
-    pl.id, pl.language_id, pl.name, pl.description, pl.download_cmd, pl.compile_cmd, pl.image_path,
-    pl.file_extention, pl.monaco_editor, pl.created_at
+    pl.id, pl.language_id, pl.name, pl.description, pl.image_path, pl.file_extention, pl.monaco_editor, pl.created_at
 FROM 
     t_programming_languages as pl
 WHERE
@@ -13,8 +12,7 @@ LIMIT @lim OFFSET @off;
 
 -- name: GetPLanguageByID :one
 SELECT 
-    pl.id, pl.language_id, pl.name, pl.description, pl.download_cmd, pl.compile_cmd, pl.image_path,
-    pl.file_extention, pl.monaco_editor, pl.created_at
+    pl.id, pl.language_id, pl.name, pl.description, pl.image_path, pl.file_extention, pl.monaco_editor, pl.created_at
 FROM 
     t_programming_languages as pl
 WHERE
@@ -22,9 +20,9 @@ WHERE
 
 -- name: CreatePLanguage :one
 INSERT INTO
-    t_programming_languages (language_id, name, description, download_cmd, compile_cmd, image_path, file_extention, monaco_editor)
+    t_programming_languages (language_id, name, description, image_path, file_extention, monaco_editor)
 VALUES
-    (@language_id, @name, @description, @download_cmd, @compile_cmd, @image_path, @file_extention, @monaco_editor)
+    (@language_id, @name, @description, @image_path, @file_extention, @monaco_editor)
 RETURNING id;
 
 -- name: UpdatePLanguage :exec
@@ -34,8 +32,6 @@ SET
     language_id =  COALESCE(sqlc.narg(language_id)::UUID, language_id),
     name =  COALESCE(sqlc.narg(name)::TEXT, name),
     description =  COALESCE(sqlc.narg(description)::TEXT, description),
-    download_cmd =  COALESCE(sqlc.narg(download_cmd)::TEXT, download_cmd),
-    compile_cmd =  COALESCE(sqlc.narg(compile_cmd)::TEXT, compile_cmd),
     image_path =  COALESCE(sqlc.narg(image_path)::TEXT, image_path),
     file_extention =  COALESCE(sqlc.narg(file_extention)::TEXT, file_extention),
     monaco_editor =  COALESCE(sqlc.narg(monaco_editor)::TEXT, monaco_editor)
