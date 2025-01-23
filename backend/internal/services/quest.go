@@ -37,7 +37,7 @@ func (s *questService) GetQuest(ctx context.Context, chapterID, courseID string)
 		return nil, nil, nil, err
 	}
 
-	chapter, err := s.queries.GetChapterByID(ctx, chapterUUID)
+	chapter, err := s.queries.GetChapter(ctx, chapterUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return nil, nil, nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrChapterNotFound)
@@ -59,7 +59,7 @@ func (s *questService) GetQuest(ctx context.Context, chapterID, courseID string)
 		)
 	}
 
-	course, err := s.queries.GetCourseByID(ctx, courseUUID)
+	course, err := s.queries.GetCourse(ctx, courseUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return nil, nil, nil, serviceErrors.NewServiceErrorWithMessage(

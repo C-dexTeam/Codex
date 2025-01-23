@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/C-dexTeam/codex/internal/domains"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -32,7 +33,7 @@ func newCourseService(
 func (s *courseService) GetCourses(
 	ctx context.Context,
 	id, langugeID, pLanguageID, title, page, limit string,
-) ([]repo.TCourse, error) {
+) ([]domains.Course, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -70,14 +71,15 @@ func (s *courseService) GetCourses(
 			err,
 		)
 	}
+	domainCourses := domains.NewCourses(courses)
 
-	return courses, nil
+	return domainCourses, nil
 }
 
 func (s *courseService) GetCourse(
 	ctx context.Context,
 	id, page, limit string,
-) (*repo.TCourse, []repo.TChapter, error) {
+) (*domains.Course, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -90,18 +92,18 @@ func (s *courseService) GetCourse(
 
 	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	course, err := s.queries.GetCourseByID(ctx, idUUID)
+	course, err := s.queries.GetCourse(ctx, idUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, nil, serviceErrors.NewServiceErrorWithMessage(
+			return nil, serviceErrors.NewServiceErrorWithMessage(
 				serviceErrors.StatusBadRequest,
 				serviceErrors.ErrCourseNotFound,
 			)
 		}
-		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
 			serviceErrors.StatusInternalServerError,
 			serviceErrors.ErrErrorWhileFilteringCourse,
 			err,
@@ -114,14 +116,15 @@ func (s *courseService) GetCourse(
 		Off:      (int32(pageNum) - 1) * int32(limitNum),
 	})
 	if err != nil {
-		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
 			serviceErrors.StatusInternalServerError,
 			serviceErrors.ErrErrorWhileFilteringChapter,
 			err,
 		)
 	}
+	domainCourse := domains.NewCourse(&course, courseChapters, nil)
 
-	return &course, courseChapters, nil
+	return &domainCourse, nil
 }
 
 func (s *courseService) AddCourse(

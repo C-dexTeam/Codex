@@ -1,7 +1,9 @@
 -- name: GetCourses :many
 SELECT 
     c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
-    c.description, c.image_path, c.created_at, c.deleted_at
+    c.description, c.image_path, 
+    (SELECT COUNT(*) FROM t_chapters as ch WHERE ch.course_id = c.id) as chapter_count,
+    c.created_at, c.deleted_at
 FROM 
     t_courses as c
 WHERE
@@ -13,10 +15,12 @@ WHERE
     deleted_at IS NULL
 LIMIT @lim OFFSET @off;
 
--- name: GetCourseByID :one
+-- name: GetCourse :one
 SELECT 
     c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
-    c.description, c.image_path, c.created_at, c.deleted_at
+    c.description, c.image_path, 
+    (SELECT COUNT(*) FROM t_chapters as ch WHERE ch.course_id = c.id) as chapter_count,
+    c.created_at, c.deleted_at
 FROM 
     t_courses as c
 WHERE

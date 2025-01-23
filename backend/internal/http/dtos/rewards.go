@@ -64,24 +64,16 @@ type UpdateRewardDTO struct {
 
 // ATTRIBUTES
 type AttributeDTO struct {
-	ID        uuid.UUID  `json:"id"`
-	RewardID  *uuid.UUID `json:"rewardID"`
-	TraitType string     `json:"traitType" validate:"required,max=30"`
-	Value     string     `json:"value" validate:"required,max=30"`
+	ID        uuid.UUID `json:"id"`
+	RewardID  uuid.UUID `json:"rewardID"`
+	TraitType string    `json:"traitType" validate:"required,max=30"`
+	Value     string    `json:"value" validate:"required,max=30"`
 }
 
 func (m *RewardDTOManager) ToAttributeDTO(appModel *repo.TAttribute) AttributeDTO {
-	var rewardID *uuid.UUID
-	if appModel.RewardID.Valid {
-		r := uuid.MustParse(appModel.RewardID.UUID.String())
-		rewardID = &r
-	} else {
-		rewardID = nil
-	}
-
 	return AttributeDTO{
 		ID:        appModel.ID,
-		RewardID:  rewardID,
+		RewardID:  appModel.RewardID,
 		TraitType: appModel.TraitType,
 		Value:     appModel.Value,
 	}

@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/C-dexTeam/codex/internal/domains"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
@@ -38,7 +39,7 @@ func NewChapterService(
 func (s *chapterService) GetChapters(
 	ctx context.Context,
 	id, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
-) ([]repo.TChapter, error) {
+) ([]domains.Chapter, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -79,14 +80,15 @@ func (s *chapterService) GetChapters(
 			err,
 		)
 	}
+	domainChapters := domains.NewChapters(chapters)
 
-	return chapters, nil
+	return domainChapters, nil
 }
 
 func (s *chapterService) GetChapter(
 	ctx context.Context,
 	id, page, limit string,
-) (*repo.TChapter, []repo.TTest, error) {
+) (*domains.Chapter, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -99,15 +101,15 @@ func (s *chapterService) GetChapter(
 
 	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	chapter, err := s.queries.GetChapterByID(ctx, idUUID)
+	chapter, err := s.queries.GetChapter(ctx, idUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrChapterNotFound)
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrChapterNotFound)
 		}
-		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringChapter, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringChapter, err)
 	}
 
 	// TODO: Return tests with input and output by chapter id
@@ -117,14 +119,27 @@ func (s *chapterService) GetChapter(
 		Off:       (int32(pageNum) - 1) * int32(limitNum),
 	})
 	if err != nil {
-		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
 			serviceErrors.StatusInternalServerError,
 			serviceErrors.ErrErrorWhileFilteringTests,
 			err,
 		)
 	}
 
-	return &chapter, chapterTests, nil
+	var chapterReward repo.TReward
+	if chapter.RewardID.Valid {
+		chapterReward, err = s.queries.GetReward(ctx, chapter.RewardID.UUID)
+		if err != nil {
+			if strings.Contains(err.Error(), "sql: no rows in result set") {
+				return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrRewardNotFound)
+			}
+			return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringRewards, err)
+		}
+
+	}
+	domainChapter := domains.NewChapter(&chapter, chapterTests, &chapterReward)
+
+	return &domainChapter, nil
 }
 
 func (s *chapterService) AddChapter(

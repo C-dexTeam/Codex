@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/C-dexTeam/codex/internal/domains"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -32,7 +33,7 @@ func newTestService(
 func (s *testService) GetTests(
 	ctx context.Context,
 	id, chapterID, page, limit string,
-) ([]repo.TTest, error) {
+) ([]domains.Test, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -63,8 +64,9 @@ func (s *testService) GetTests(
 			err,
 		)
 	}
+	domainTests := domains.NewTests(tests)
 
-	return tests, nil
+	return domainTests, nil
 }
 
 func (s *testService) AddTest(

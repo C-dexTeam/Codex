@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	repo "github.com/C-dexTeam/codex/internal/repos/out"
+	"github.com/C-dexTeam/codex/internal/domains"
 	"github.com/google/uuid"
 )
 
@@ -13,9 +13,8 @@ func NewProgrammingLanguageDTOManager() ProgrammingLanguageDTOManager {
 	return ProgrammingLanguageDTOManager{}
 }
 
-type ProgrammingLanguageDTO struct {
+type UserPLanguageView struct {
 	ID            uuid.UUID `json:"id"`
-	LanguageID    uuid.UUID `json:"languageID"`
 	Name          string    `json:"name"`
 	Description   string    `json:"description"`
 	FileExtention string    `json:"fileExtention"`
@@ -23,10 +22,13 @@ type ProgrammingLanguageDTO struct {
 	CreatedAt     time.Time `json:"createdAt"`
 }
 
-func (m *ProgrammingLanguageDTOManager) ToPLanguageDTO(appModel *repo.TProgrammingLanguage) ProgrammingLanguageDTO {
-	return ProgrammingLanguageDTO{
+func (m *ProgrammingLanguageDTOManager) ToPLanguageDTO(appModel *domains.PLanguage) *UserPLanguageView {
+	if appModel == nil {
+		return nil
+	}
+
+	return &UserPLanguageView{
 		ID:            appModel.ID,
-		LanguageID:    appModel.LanguageID,
 		Name:          appModel.Name,
 		Description:   appModel.Description,
 		FileExtention: appModel.FileExtention,
@@ -35,10 +37,10 @@ func (m *ProgrammingLanguageDTOManager) ToPLanguageDTO(appModel *repo.TProgrammi
 	}
 }
 
-func (m *ProgrammingLanguageDTOManager) ToPLanguageDTOs(appModels []repo.TProgrammingLanguage) []ProgrammingLanguageDTO {
-	var pLanguagesDTOs []ProgrammingLanguageDTO
+func (m *ProgrammingLanguageDTOManager) ToPLanguageDTOs(appModels []domains.PLanguage) []UserPLanguageView {
+	var pLanguagesDTOs []UserPLanguageView
 	for _, model := range appModels {
-		pLanguagesDTOs = append(pLanguagesDTOs, m.ToPLanguageDTO(&model))
+		pLanguagesDTOs = append(pLanguagesDTOs, *m.ToPLanguageDTO(&model))
 	}
 	return pLanguagesDTOs
 }

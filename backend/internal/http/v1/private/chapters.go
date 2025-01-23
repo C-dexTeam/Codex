@@ -68,11 +68,11 @@ func (h *PrivateHandler) GetChapter(c *fiber.Ctx) error {
 	page := c.Query("page")
 	limit := c.Query("limit")
 
-	chapter, tests, err := h.services.ChapterService().GetChapter(c.Context(), id, page, limit)
+	chapter, err := h.services.ChapterService().GetChapter(c.Context(), id, page, limit)
 	if err != nil {
 		return err
 	}
-	chapterDTO := h.dtoManager.ChapterManager().ToChapterDTO(*chapter, tests)
+	chapterDTO := h.dtoManager.ChapterManager().ToChapterDTO(chapter)
 
 	return response.Response(200, "Status OK", chapterDTO)
 }
@@ -106,7 +106,7 @@ func (h *PrivateHandler) AddChapter(c *fiber.Ctx) error {
 		languageID = newChapter.LanguageID
 	}
 
-	if _, _, err := h.services.CourseService().GetCourse(c.Context(), newChapter.CourseID, "1", "1"); err != nil {
+	if _, err := h.services.CourseService().GetCourse(c.Context(), newChapter.CourseID, "1", "1"); err != nil {
 		return err
 	}
 

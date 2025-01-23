@@ -13,7 +13,7 @@ import (
 
 type TAttribute struct {
 	ID        uuid.UUID
-	RewardID  uuid.NullUUID
+	RewardID  uuid.UUID
 	TraitType string
 	Value     string
 }
