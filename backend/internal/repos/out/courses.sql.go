@@ -194,6 +194,87 @@ func (q *Queries) GetCourses(ctx context.Context, arg GetCoursesParams) ([]GetCo
 	return items, nil
 }
 
+const getTopCourses = `-- name: GetTopCourses :many
+SELECT 
+    c.id,
+    c.language_id,
+    c.programming_language_id,
+    c.reward_id,
+    c.reward_amount,
+    c.title,
+    c.description,
+    c.image_path,
+    (SELECT COUNT(*) FROM t_chapters AS ch WHERE ch.course_id = c.id) AS chapter_count,
+    c.created_at,
+    c.deleted_at
+FROM 
+    t_user_courses AS uc
+JOIN 
+    t_courses AS c
+ON 
+    uc.course_id = c.id
+GROUP BY 
+    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title, 
+    c.description, c.image_path, c.created_at, c.deleted_at
+ORDER BY 
+    COUNT(uc.user_auth_id) DESC
+LIMIT $2 OFFSET $1
+`
+
+type GetTopCoursesParams struct {
+	Off int32
+	Lim int32
+}
+
+type GetTopCoursesRow struct {
+	ID                    uuid.UUID
+	LanguageID            uuid.UUID
+	ProgrammingLanguageID uuid.NullUUID
+	RewardID              uuid.NullUUID
+	RewardAmount          int32
+	Title                 string
+	Description           string
+	ImagePath             string
+	ChapterCount          int64
+	CreatedAt             sql.NullTime
+	DeletedAt             sql.NullTime
+}
+
+func (q *Queries) GetTopCourses(ctx context.Context, arg GetTopCoursesParams) ([]GetTopCoursesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTopCourses, arg.Off, arg.Lim)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTopCoursesRow
+	for rows.Next() {
+		var i GetTopCoursesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.LanguageID,
+			&i.ProgrammingLanguageID,
+			&i.RewardID,
+			&i.RewardAmount,
+			&i.Title,
+			&i.Description,
+			&i.ImagePath,
+			&i.ChapterCount,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const softDeleteCourse = `-- name: SoftDeleteCourse :exec
 UPDATE
     t_courses

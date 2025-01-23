@@ -935,8 +935,45 @@
                 }
             }
         },
-        "/private/courses/start": {
+        "/private/courses/popular": {
             "get": {
+                "description": "Retrieves all popular courses.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get All Popular Courses",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/courses/start": {
+            "post": {
                 "description": "Starts the spesific course.",
                 "consumes": [
                     "application/json"

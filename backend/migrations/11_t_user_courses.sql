@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS t_user_courses (
     user_auth_id UUID NOT NULL,
     course_id UUID NOT NULL,
-    progress INT NOT NULL DEFAULT 0,
+    progress INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
 

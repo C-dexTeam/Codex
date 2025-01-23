@@ -73,5 +73,5 @@ type UpdateCourseDTO struct {
 }
 
 type StartCourseDTO struct {
-	ID string `json:"id" validate:"required,uudi4"`
+	ID string `json:"id" validate:"required"`
 }

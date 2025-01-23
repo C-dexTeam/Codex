@@ -10,7 +10,9 @@ import (
 func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
 	coursesRoutes := root.Group("/courses")
 	coursesRoutes.Get("/", h.GetCourses)
+	coursesRoutes.Get("/popular", h.GetPopulerCourses)
 	coursesRoutes.Get("/:id", h.GetCourse)
+	coursesRoutes.Post("/start", h.StartCourse)
 
 	// TODO: Reward Atama için Ayrı Endpoint
 	courseAdminRoutes := root.Group("/admin/courses")
@@ -42,6 +44,28 @@ func (h *PrivateHandler) GetCourses(c *fiber.Ctx) error {
 	limit := c.Query("limit")
 
 	courses, err := h.services.CourseService().GetCourses(c.Context(), id, languageID, pLanguageID, title, page, limit)
+	if err != nil {
+		return err
+	}
+	courseDTOs := h.dtoManager.CourseManager().ToCourseDTOs(courses)
+
+	return response.Response(200, "Status OK", courseDTOs)
+}
+
+// @Tags Courses
+// @Summary Get All Popular Courses
+// @Description Retrieves all popular courses.
+// @Accept json
+// @Produce json
+// @Param page query string false "Page"
+// @Param limit query string false "Limit"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/courses/popular [get]
+func (h *PrivateHandler) GetPopulerCourses(c *fiber.Ctx) error {
+	page := c.Query("page")
+	limit := c.Query("limit")
+
+	courses, err := h.services.CourseService().GetPopularCourses(c.Context(), page, limit)
 	if err != nil {
 		return err
 	}
@@ -197,7 +221,7 @@ func (h *PrivateHandler) DeleteCourse(c *fiber.Ctx) error {
 // @Accept json
 // @Param startCourse body dto.StartCourseDTO true "Start Course"
 // @Success 200 {object} response.BaseResponse{}
-// @Router /private/courses/start [get]
+// @Router /private/courses/start [post]
 func (h *PrivateHandler) StartCourse(c *fiber.Ctx) error {
 	userSession := sessionStore.GetSessionData(c)
 	var startCourse dto.StartCourseDTO

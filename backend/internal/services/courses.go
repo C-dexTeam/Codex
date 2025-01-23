@@ -76,6 +76,36 @@ func (s *courseService) GetCourses(
 	return domainCourses, nil
 }
 
+func (s *courseService) GetPopularCourses(
+	ctx context.Context,
+	page, limit string,
+) ([]domains.Course, error) {
+	pageNum, err := strconv.Atoi(page)
+	if err != nil || page == "" {
+		pageNum = 1
+	}
+
+	limitNum, err := strconv.Atoi(limit)
+	if err != nil || limit == "" {
+		limitNum = s.utilService.D().Limits.DefaultCourseLimit
+	}
+
+	courses, err := s.queries.GetTopCourses(ctx, repo.GetTopCoursesParams{
+		Lim: int32(limitNum),
+		Off: (int32(pageNum) - 1) * int32(limitNum),
+	})
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringCourse,
+			err,
+		)
+	}
+	domainCourses := domains.NewCourses(domains.ToGetCoursesRow(courses))
+
+	return domainCourses, nil
+}
+
 func (s *courseService) GetCourse(
 	ctx context.Context,
 	id, page, limit string,

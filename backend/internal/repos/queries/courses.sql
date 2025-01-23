@@ -26,6 +26,33 @@ FROM
 WHERE
     c.id = @course_id;
 
+-- name: GetTopCourses :many
+SELECT 
+    c.id,
+    c.language_id,
+    c.programming_language_id,
+    c.reward_id,
+    c.reward_amount,
+    c.title,
+    c.description,
+    c.image_path,
+    (SELECT COUNT(*) FROM t_chapters AS ch WHERE ch.course_id = c.id) AS chapter_count,
+    c.created_at,
+    c.deleted_at
+FROM 
+    t_user_courses AS uc
+JOIN 
+    t_courses AS c
+ON 
+    uc.course_id = c.id
+GROUP BY 
+    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title, 
+    c.description, c.image_path, c.created_at, c.deleted_at
+ORDER BY 
+    COUNT(uc.user_auth_id) DESC
+LIMIT @lim OFFSET @off;
+
+
 -- name: CreateCourse :one
 INSERT INTO
     t_courses (language_id, programming_language_id, reward_id, reward_amount, title, description, image_path)

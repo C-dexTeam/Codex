@@ -981,8 +981,32 @@ paths:
       summary: Get Course By ID
       tags:
       - Courses
-  /private/courses/start:
+  /private/courses/popular:
     get:
+      consumes:
+      - application/json
+      description: Retrieves all popular courses.
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get All Popular Courses
+      tags:
+      - Courses
+  /private/courses/start:
+    post:
       consumes:
       - application/json
       description: Starts the spesific course.

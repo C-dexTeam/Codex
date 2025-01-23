@@ -20,6 +20,7 @@ type LanguageDefaults struct {
 type LimitDefaults struct {
 	DefaultLanguageLimit            int
 	DefaultCourseLimit              int
+	DefaultPopulerCourseLimit       int
 	DefaultChapterLimit             int
 	DefaultTestLimit                int
 	DefaultRewardLimit              int
@@ -44,6 +45,7 @@ func NewDefaults() Defaults {
 		Limits: LimitDefaults{
 			DefaultLanguageLimit:            10,
 			DefaultCourseLimit:              10,
+			DefaultPopulerCourseLimit:       6,
 			DefaultChapterLimit:             10,
 			DefaultTestLimit:                10,
 			DefaultRewardLimit:              10,

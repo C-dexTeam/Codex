@@ -5,7 +5,7 @@ VALUES
     (@user_auth_id, @course_id, 
      (
         SELECT 
-            ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM t_user_chapters WHERE course_id = @course_id), 2)
+            ROUND(100.0 * COUNT(*) / NULLIF((SELECT COUNT(*) FROM t_user_chapters WHERE course_id = @course_id), 0), 2)
         FROM t_user_chapters
         WHERE course_id = @course_id AND isFinished = true
      ));

@@ -59,6 +59,30 @@ func NewCourse(
 	}
 }
 
+func NewGetCoursesRow(course repo.GetTopCoursesRow) *repo.GetCoursesRow {
+	return &repo.GetCoursesRow{
+		ID:                    course.ID,
+		LanguageID:            course.LanguageID,
+		ProgrammingLanguageID: course.ProgrammingLanguageID,
+		RewardID:              course.RewardID,
+		RewardAmount:          course.RewardAmount,
+		Title:                 course.Title,
+		Description:           course.Description,
+		ImagePath:             course.ImagePath,
+		ChapterCount:          course.ChapterCount,
+		CreatedAt:             course.CreatedAt,
+		DeletedAt:             course.DeletedAt,
+	}
+}
+
+func ToGetCoursesRow(courses []repo.GetTopCoursesRow) []repo.GetCoursesRow {
+	result := make([]repo.GetCoursesRow, len(courses))
+	for i, course := range courses {
+		result[i] = *NewGetCoursesRow(course)
+	}
+	return result
+}
+
 func NewCourses(
 	courses []repo.GetCoursesRow,
 ) []Course {

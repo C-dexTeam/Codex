@@ -7,6 +7,7 @@ package repo
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -18,7 +19,7 @@ VALUES
     ($1, $2, 
      (
         SELECT 
-            ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM t_user_chapters WHERE course_id = $2), 2)
+            ROUND(100.0 * COUNT(*) / NULLIF((SELECT COUNT(*) FROM t_user_chapters WHERE course_id = $2), 0), 2)
         FROM t_user_chapters
         WHERE course_id = $2 AND isFinished = true
      ))
@@ -59,7 +60,7 @@ type UserCoursesRow struct {
 	UserAuthID        uuid.UUID
 	CourseID          uuid.UUID
 	Title             string
-	Progress          int32
+	Progress          sql.NullInt32
 	CompletedChapters int64
 	TotalChapters     int64
 }

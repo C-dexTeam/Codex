@@ -100,7 +100,7 @@ type TUserChapter struct {
 type TUserCourse struct {
 	UserAuthID uuid.UUID
 	CourseID   uuid.UUID
-	Progress   int32
+	Progress   sql.NullInt32
 	CreatedAt  sql.NullTime
 }
 
