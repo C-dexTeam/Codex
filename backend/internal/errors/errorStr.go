@@ -89,6 +89,7 @@ const (
 	ErrInvalidID               = "INVALID_ID"
 	ErrInvalidBoolean          = "INVALID_BOOLEAN"
 	ErrInvalidWalletConnection = "INVALID_WALLET_CONNECTION"
+	ErrInvalidFileType         = "INVALID_FILE_TYPE"
 )
 
 // 500
@@ -114,6 +115,7 @@ const (
 	ErrTransactionError                        = "ERROR_WHILE_COMMITING"
 	ErrWalletVerificationError                 = "ERROR_WHILE_VERIFICATON_WALLET"
 
-	ErrCompilerRunError    = "COMPILER_RUN_ERROR"
-	ErrCompilerCreateError = "COMPILER_CREATE_ERROR"
+	ErrCompilerRunError     = "COMPILER_RUN_ERROR"
+	ErrCompilerCreateError  = "COMPILER_CREATE_ERROR"
+	ErrCreateDirectoryError = "DIRECTORY_CREATE_ERROR"
 )

@@ -213,7 +213,7 @@ const docTemplate = `{
             "post": {
                 "description": "Adds Course Into DB.",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -224,13 +224,45 @@ const docTemplate = `{
                 "summary": "Add Course",
                 "parameters": [
                     {
-                        "description": "New Course",
-                        "name": "newCourse",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.AddCourseDTO"
-                        }
+                        "type": "file",
+                        "description": "Course Image File",
+                        "name": "imageFile",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "languageID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "programmingLanguageID",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "rewardAmount",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "rewardID",
+                        "in": "formData"
+                    },
+                    {
+                        "maxLength": 60,
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -245,7 +277,7 @@ const docTemplate = `{
             "patch": {
                 "description": "Updates Course Into DB.",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -256,13 +288,48 @@ const docTemplate = `{
                 "summary": "Update Course",
                 "parameters": [
                     {
-                        "description": "Update Course",
-                        "name": "updateCourse",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateCourseDTO"
-                        }
+                        "type": "file",
+                        "description": "Course Image File",
+                        "name": "imageFile",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "languageID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "programmingLanguageID",
+                        "in": "formData"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "rewardAmount",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "rewardID",
+                        "in": "formData"
+                    },
+                    {
+                        "maxLength": 60,
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -1642,38 +1709,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.AddCourseDTO": {
-            "type": "object",
-            "required": [
-                "programmingLanguageID",
-                "title"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "imagePath": {
-                    "type": "string"
-                },
-                "languageID": {
-                    "type": "string"
-                },
-                "programmingLanguageID": {
-                    "type": "string"
-                },
-                "rewardAmount": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "rewardID": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 60
-                }
-            }
-        },
         "dto.AddPLanguageDTO": {
             "type": "object",
             "required": [
@@ -1854,37 +1889,6 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
-                }
-            }
-        },
-        "dto.UpdateCourseDTO": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "imagePath": {
-                    "type": "string"
-                },
-                "languageID": {
-                    "type": "string"
-                },
-                "programmingLanguageID": {
-                    "type": "string"
-                },
-                "rewardAmount": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "rewardID": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 60
                 }
             }
         },

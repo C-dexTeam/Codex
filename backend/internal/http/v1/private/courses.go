@@ -1,10 +1,13 @@
 package private
 
 import (
+	"path/filepath"
+
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
@@ -101,35 +104,49 @@ func (h *PrivateHandler) GetCourse(c *fiber.Ctx) error {
 // @Tags Courses
 // @Summary Add Course
 // @Description Adds Course Into DB.
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
-// @Param newCourse body dto.AddCourseDTO true "New Course"
+// @Param imageFile formData file true "Course Image File"
+// @Param courseInfo formData dto.AddCourseDTO true "Course Information"
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/admin/courses/ [post]
 func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
-	var newCourse dto.AddCourseDTO
-	if err := c.BodyParser(&newCourse); err != nil {
+	var courseInfo dto.AddCourseDTO
+	if err := c.BodyParser(&courseInfo); err != nil {
 		return err
 	}
-	if err := h.services.UtilService().Validator().ValidateStruct(newCourse); err != nil {
+	if err := h.services.UtilService().Validator().ValidateStruct(courseInfo); err != nil {
+		return err
+	}
+
+	// Dosya alanını alıyoruz (sadece imageFile)
+	imageFile, err := c.FormFile("imageFile")
+	if err != nil {
+		return err
+	}
+
+	// Dosyayı kaydetme işlemi
+	extention := filepath.Ext(imageFile.Filename)
+	imagePath := h.services.UploadService().MainDir() + "/" + uuid.New().String() + extention
+	if err := h.services.UploadService().SaveImage(imageFile, imagePath); err != nil {
 		return err
 	}
 
 	// Default Language if the languageID is ""
 	var languageID string
-	if newCourse.LanguageID == "" {
+	if courseInfo.LanguageID == "" {
 		defaultLanguage, err := h.services.LanguageService().GetDefault(c.Context())
 		if err != nil {
 			return err
 		}
 		languageID = defaultLanguage.ID.String()
 	} else {
-		languageID = newCourse.LanguageID
+		languageID = courseInfo.LanguageID
 	}
 
 	// Checks if exists
-	if newCourse.PLanguageID != "" {
-		if _, err := h.services.ProgrammingService().GetProgrammingLanguage(c.Context(), newCourse.PLanguageID); err != nil {
+	if courseInfo.ProgrammingLanguageID != "" {
+		if _, err := h.services.ProgrammingService().GetProgrammingLanguage(c.Context(), courseInfo.ProgrammingLanguageID); err != nil {
 			return err
 		}
 	}
@@ -137,12 +154,12 @@ func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
 	id, err := h.services.CourseService().AddCourse(
 		c.Context(),
 		languageID,
-		newCourse.PLanguageID,
-		newCourse.RewardID,
-		newCourse.Title,
-		newCourse.Description,
-		newCourse.ImagePath,
-		newCourse.RewardAmount,
+		courseInfo.ProgrammingLanguageID,
+		courseInfo.RewardID,
+		courseInfo.Title,
+		courseInfo.Description,
+		imagePath,
+		courseInfo.RewardAmount,
 	)
 	if err != nil {
 		return err
@@ -154,9 +171,10 @@ func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
 // @Tags Courses
 // @Summary Update Course
 // @Description Updates Course Into DB.
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
-// @Param updateCourse body dto.UpdateCourseDTO true "Update Course"
+// @Param imageFile formData file true "Course Image File"
+// @Param courseInfo formData dto.UpdateCourseDTO true "Update Course"
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/admin/courses/ [patch]
 func (h *PrivateHandler) UpdateCourse(c *fiber.Ctx) error {
@@ -166,6 +184,31 @@ func (h *PrivateHandler) UpdateCourse(c *fiber.Ctx) error {
 	}
 	if err := h.services.UtilService().Validator().ValidateStruct(updateCourse); err != nil {
 		return err
+	}
+
+	// Dosya alanını alıyoruz (sadece imageFile)
+	imageFile, err := c.FormFile("imageFile")
+	if err != nil {
+		return err
+	}
+
+	var newImagePath string
+	if imageFile != nil {
+		extention := filepath.Ext(imageFile.Filename)
+		newImagePath = h.services.UploadService().MainDir() + "/" + uuid.New().String() + extention
+		if err := h.services.UploadService().SaveImage(imageFile, newImagePath); err != nil {
+			return err
+		}
+	}
+
+	courses, err := h.services.CourseService().GetCourse(c.Context(), updateCourse.ID, "1", "1")
+	if err != nil {
+		return err
+	}
+	if courses.ImagePath != "" {
+		if err := h.services.UploadService().DeleteFile(courses.ImagePath); err != nil {
+			return err
+		}
 	}
 
 	// Check if is exists
@@ -180,7 +223,7 @@ func (h *PrivateHandler) UpdateCourse(c *fiber.Ctx) error {
 		}
 	}
 
-	err := h.services.CourseService().UpdateCourse(
+	err = h.services.CourseService().UpdateCourse(
 		c.Context(),
 		updateCourse.ID,
 		updateCourse.LanguageID,
@@ -188,7 +231,7 @@ func (h *PrivateHandler) UpdateCourse(c *fiber.Ctx) error {
 		updateCourse.RewardID,
 		updateCourse.Title,
 		updateCourse.Description,
-		updateCourse.ImagePath,
+		newImagePath,
 		updateCourse.RewardAmount,
 	)
 	if err != nil {

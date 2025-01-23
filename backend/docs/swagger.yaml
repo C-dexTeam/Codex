@@ -45,28 +45,6 @@ definitions:
       title:
         type: string
     type: object
-  dto.AddCourseDTO:
-    properties:
-      description:
-        type: string
-      imagePath:
-        type: string
-      languageID:
-        type: string
-      programmingLanguageID:
-        type: string
-      rewardAmount:
-        minimum: 1
-        type: integer
-      rewardID:
-        type: string
-      title:
-        maxLength: 60
-        type: string
-    required:
-    - programmingLanguageID
-    - title
-    type: object
   dto.AddPLanguageDTO:
     properties:
       description:
@@ -191,27 +169,6 @@ definitions:
       rewardID:
         type: string
       title:
-        type: string
-    type: object
-  dto.UpdateCourseDTO:
-    properties:
-      description:
-        type: string
-      id:
-        type: string
-      imagePath:
-        type: string
-      languageID:
-        type: string
-      programmingLanguageID:
-        type: string
-      rewardAmount:
-        minimum: 1
-        type: integer
-      rewardID:
-        type: string
-      title:
-        maxLength: 60
         type: string
     type: object
   dto.UpdatePLanguageDTO:
@@ -477,15 +434,37 @@ paths:
   /private/admin/courses/:
     patch:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Updates Course Into DB.
       parameters:
-      - description: Update Course
-        in: body
-        name: updateCourse
+      - description: Course Image File
+        in: formData
+        name: imageFile
         required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateCourseDTO'
+        type: file
+      - in: formData
+        name: description
+        type: string
+      - in: formData
+        name: id
+        type: string
+      - in: formData
+        name: languageID
+        type: string
+      - in: formData
+        name: programmingLanguageID
+        type: string
+      - in: formData
+        minimum: 1
+        name: rewardAmount
+        type: integer
+      - in: formData
+        name: rewardID
+        type: string
+      - in: formData
+        maxLength: 60
+        name: title
+        type: string
       produces:
       - application/json
       responses:
@@ -498,15 +477,36 @@ paths:
       - Courses
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Adds Course Into DB.
       parameters:
-      - description: New Course
-        in: body
-        name: newCourse
+      - description: Course Image File
+        in: formData
+        name: imageFile
         required: true
-        schema:
-          $ref: '#/definitions/dto.AddCourseDTO'
+        type: file
+      - in: formData
+        name: description
+        type: string
+      - in: formData
+        name: languageID
+        type: string
+      - in: formData
+        name: programmingLanguageID
+        required: true
+        type: string
+      - in: formData
+        minimum: 1
+        name: rewardAmount
+        type: integer
+      - in: formData
+        name: rewardID
+        type: string
+      - in: formData
+        maxLength: 60
+        name: title
+        required: true
+        type: string
       produces:
       - application/json
       responses:
