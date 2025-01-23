@@ -26,3 +26,4 @@ tmp/
 storage/
 storage/postgres_data/
 storage/redis_data/
+uploads/

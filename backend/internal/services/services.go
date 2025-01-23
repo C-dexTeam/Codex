@@ -22,6 +22,7 @@ type IService interface {
 	AttributeService() *attributeService
 	TestService() *testService
 	QuestService() *questService
+	UploadService() *uploadService
 }
 
 type Services struct {
@@ -37,6 +38,7 @@ type Services struct {
 	chapterService     *chapterService
 	testService        *testService
 	questService       *questService
+	uploadService      *uploadService
 }
 
 func CreateNewServices(
@@ -57,6 +59,7 @@ func CreateNewServices(
 	chapterService := NewChapterService(db, queries, utilService)
 	testService := newTestService(db, queries, utilService)
 	questService := NewQuestService(db, queries, utilService)
+	uploadService := newUploadService(utilService)
 
 	return &Services{
 		utilService:        utilService,
@@ -71,11 +74,16 @@ func CreateNewServices(
 		chapterService:     chapterService,
 		testService:        testService,
 		questService:       questService,
+		uploadService:      uploadService,
 	}
 }
 
 func (s *Services) UtilService() IUtilService {
 	return s.utilService
+}
+
+func (s *Services) UploadService() *uploadService {
+	return s.uploadService
 }
 
 func (s *Services) UserService() *UserService {
