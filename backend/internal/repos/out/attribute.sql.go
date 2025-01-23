@@ -21,7 +21,7 @@ RETURNING id
 `
 
 type CreateAttributeParams struct {
-	RewardID  uuid.NullUUID
+	RewardID  uuid.UUID
 	TraitType string
 	Value     string
 }

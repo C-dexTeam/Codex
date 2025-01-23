@@ -14,7 +14,7 @@ WHERE
     deleted_at IS NULL
 LIMIT @lim OFFSET @off;
 
--- name: GetChapterByID :one
+-- name: GetChapter :one
 SELECT
     c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
     c.func_name, c.frontend_template, c.docker_template, c.check_template, c.grants_experience, c.active,

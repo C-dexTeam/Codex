@@ -78,7 +78,7 @@ func (q *Queries) CreateChapter(ctx context.Context, arg CreateChapterParams) (u
 	return id, err
 }
 
-const getChapterByID = `-- name: GetChapterByID :one
+const getChapter = `-- name: GetChapter :one
 SELECT
     c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
     c.func_name, c.frontend_template, c.docker_template, c.check_template, c.grants_experience, c.active,
@@ -89,8 +89,8 @@ WHERE
     c.id = $1
 `
 
-func (q *Queries) GetChapterByID(ctx context.Context, chapterID uuid.UUID) (TChapter, error) {
-	row := q.db.QueryRowContext(ctx, getChapterByID, chapterID)
+func (q *Queries) GetChapter(ctx context.Context, chapterID uuid.UUID) (TChapter, error) {
+	row := q.db.QueryRowContext(ctx, getChapter, chapterID)
 	var i TChapter
 	err := row.Scan(
 		&i.ID,

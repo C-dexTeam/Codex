@@ -64,19 +64,35 @@ func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (uui
 	return id, err
 }
 
-const getCourseByID = `-- name: GetCourseByID :one
+const getCourse = `-- name: GetCourse :one
 SELECT 
     c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
-    c.description, c.image_path, c.created_at, c.deleted_at
+    c.description, c.image_path, 
+    (SELECT COUNT(*) FROM t_chapters as ch WHERE ch.course_id = c.id) as chapter_count,
+    c.created_at, c.deleted_at
 FROM 
     t_courses as c
 WHERE
     c.id = $1
 `
 
-func (q *Queries) GetCourseByID(ctx context.Context, courseID uuid.UUID) (TCourse, error) {
-	row := q.db.QueryRowContext(ctx, getCourseByID, courseID)
-	var i TCourse
+type GetCourseRow struct {
+	ID                    uuid.UUID
+	LanguageID            uuid.UUID
+	ProgrammingLanguageID uuid.NullUUID
+	RewardID              uuid.NullUUID
+	RewardAmount          int32
+	Title                 string
+	Description           string
+	ImagePath             string
+	ChapterCount          int64
+	CreatedAt             sql.NullTime
+	DeletedAt             sql.NullTime
+}
+
+func (q *Queries) GetCourse(ctx context.Context, courseID uuid.UUID) (GetCourseRow, error) {
+	row := q.db.QueryRowContext(ctx, getCourse, courseID)
+	var i GetCourseRow
 	err := row.Scan(
 		&i.ID,
 		&i.LanguageID,
@@ -86,6 +102,7 @@ func (q *Queries) GetCourseByID(ctx context.Context, courseID uuid.UUID) (TCours
 		&i.Title,
 		&i.Description,
 		&i.ImagePath,
+		&i.ChapterCount,
 		&i.CreatedAt,
 		&i.DeletedAt,
 	)
@@ -95,7 +112,9 @@ func (q *Queries) GetCourseByID(ctx context.Context, courseID uuid.UUID) (TCours
 const getCourses = `-- name: GetCourses :many
 SELECT 
     c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
-    c.description, c.image_path, c.created_at, c.deleted_at
+    c.description, c.image_path, 
+    (SELECT COUNT(*) FROM t_chapters as ch WHERE ch.course_id = c.id) as chapter_count,
+    c.created_at, c.deleted_at
 FROM 
     t_courses as c
 WHERE
@@ -118,7 +137,21 @@ type GetCoursesParams struct {
 	Lim                   int32
 }
 
-func (q *Queries) GetCourses(ctx context.Context, arg GetCoursesParams) ([]TCourse, error) {
+type GetCoursesRow struct {
+	ID                    uuid.UUID
+	LanguageID            uuid.UUID
+	ProgrammingLanguageID uuid.NullUUID
+	RewardID              uuid.NullUUID
+	RewardAmount          int32
+	Title                 string
+	Description           string
+	ImagePath             string
+	ChapterCount          int64
+	CreatedAt             sql.NullTime
+	DeletedAt             sql.NullTime
+}
+
+func (q *Queries) GetCourses(ctx context.Context, arg GetCoursesParams) ([]GetCoursesRow, error) {
 	rows, err := q.db.QueryContext(ctx, getCourses,
 		arg.ID,
 		arg.LanguageID,
@@ -132,9 +165,9 @@ func (q *Queries) GetCourses(ctx context.Context, arg GetCoursesParams) ([]TCour
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TCourse
+	var items []GetCoursesRow
 	for rows.Next() {
-		var i TCourse
+		var i GetCoursesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.LanguageID,
@@ -144,6 +177,7 @@ func (q *Queries) GetCourses(ctx context.Context, arg GetCoursesParams) ([]TCour
 			&i.Title,
 			&i.Description,
 			&i.ImagePath,
+			&i.ChapterCount,
 			&i.CreatedAt,
 			&i.DeletedAt,
 		); err != nil {

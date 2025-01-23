@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/C-dexTeam/codex/internal/domains"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -31,7 +32,7 @@ func newPLanguageService(
 
 func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
 	id, languageID, name, page, limit string,
-) ([]repo.TProgrammingLanguage, error) {
+) ([]domains.PLanguage, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -56,14 +57,15 @@ func (s *pLanguageService) GetProgrammingLanguages(ctx context.Context,
 			err,
 		)
 	}
+	domainPLang := domains.NewPLanguages(programmingLanguages)
 
-	return programmingLanguages, nil
+	return domainPLang, nil
 }
 
 func (s *pLanguageService) GetProgrammingLanguage(
 	ctx context.Context,
 	id string,
-) (*repo.TProgrammingLanguage, error) {
+) (*domains.PLanguage, error) {
 
 	idUUID, err := s.utilService.ParseUUID(id)
 	if err != nil {
@@ -84,8 +86,9 @@ func (s *pLanguageService) GetProgrammingLanguage(
 			err,
 		)
 	}
+	domainPLang := domains.NewPLanguage(&programmingLanguage)
 
-	return &programmingLanguage, nil
+	return domainPLang, nil
 }
 
 func (s *pLanguageService) AddProgrammingLanguage(

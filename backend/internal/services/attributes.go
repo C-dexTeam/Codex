@@ -72,12 +72,13 @@ func (s *attributeService) AddAttribute(
 	ctx context.Context,
 	rewardID, traitType, value string,
 ) (uuid.UUID, error) {
-	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
+	rewardUUID, err := s.utilService.ParseUUID(rewardID)
+	if err != nil {
 		return uuid.Nil, err
 	}
 
 	id, err := s.queries.CreateAttribute(ctx, repo.CreateAttributeParams{
-		RewardID:  s.utilService.ParseNullUUID(rewardID),
+		RewardID:  rewardUUID,
 		TraitType: traitType,
 		Value:     value,
 	})
