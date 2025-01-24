@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"fmt"
+
 	"github.com/C-dexTeam/codex/internal/domains"
 )
 
@@ -17,8 +19,14 @@ type TestView struct {
 	Output    string `json:"output"`
 }
 
-func (t *TestDTOManager) ToTestDTO(appModel domains.Test) TestView {
-	return TestView{
+func (t *TestDTOManager) ToTestDTO(appModel *domains.Test) *TestView {
+	fmt.Println(8)
+	if appModel == nil {
+		return nil
+	}
+	fmt.Println(9)
+
+	return &TestView{
 		ID:        appModel.ID.String(),
 		ChapterID: appModel.ChapterID.String(),
 		Input:     appModel.Input,
@@ -29,7 +37,7 @@ func (t *TestDTOManager) ToTestDTO(appModel domains.Test) TestView {
 func (t *TestDTOManager) ToTestDTOs(appModels []domains.Test) []TestView {
 	var testDTOs []TestView
 	for _, model := range appModels {
-		testDTOs = append(testDTOs, t.ToTestDTO(model))
+		testDTOs = append(testDTOs, *t.ToTestDTO(&model))
 	}
 
 	return testDTOs

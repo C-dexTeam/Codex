@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/C-dexTeam/codex/internal/domains"
@@ -28,10 +29,21 @@ type UserChapterView struct {
 	CreatedAt        time.Time  `json:"createdAt"`
 }
 
-func (d *ChapterDTOManager) ToChapterDTO(appModel *domains.Chapter) UserChapterView {
+func (d *ChapterDTOManager) ToChapterDTO(appModel *domains.Chapter) *UserChapterView {
 	testManager := new(TestDTOManager)
 
-	return UserChapterView{
+	if appModel == nil {
+		return nil
+	}
+
+	var imgPath string
+	if appModel.Reward != nil {
+		imgPath = appModel.Reward.ImagePath
+	} else {
+		imgPath = ""
+	}
+
+	return &UserChapterView{
 		ID:               appModel.ID,
 		CourseID:         appModel.CourseID,
 		RewardID:         appModel.RewardID,
@@ -40,7 +52,7 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel *domains.Chapter) UserChapterV
 		Description:      appModel.Description,
 		Content:          appModel.Content,
 		GrantsExperience: appModel.GrantsExp,
-		RewardImage:      appModel.Reward.ImagePath,
+		RewardImage:      imgPath,
 		Active:           appModel.Active,
 		Tests:            testManager.ToTestDTOs(appModel.Tests),
 		CreatedAt:        appModel.CreatedAt,
@@ -48,10 +60,14 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel *domains.Chapter) UserChapterV
 }
 
 func (d *ChapterDTOManager) ToChapterDTOs(appModels []domains.Chapter) []UserChapterView {
+	fmt.Println(1)
 	var chapterDTOs []UserChapterView
 	for _, model := range appModels {
-		chapterDTOs = append(chapterDTOs, d.ToChapterDTO(&model))
+		chapterDTOs = append(chapterDTOs, *d.ToChapterDTO(&model))
 	}
+
+	fmt.Println(2)
+
 	return chapterDTOs
 }
 

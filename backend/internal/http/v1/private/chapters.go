@@ -3,6 +3,7 @@ package private
 import (
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
+	"github.com/C-dexTeam/codex/internal/http/sessionStore"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -64,12 +65,17 @@ func (h *PrivateHandler) GetChapters(c *fiber.Ctx) error {
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/chapters/{id} [get]
 func (h *PrivateHandler) GetChapter(c *fiber.Ctx) error {
+	userSession := sessionStore.GetSessionData(c)
 	id := c.Params("id")
 	page := c.Query("page")
 	limit := c.Query("limit")
 
 	chapter, err := h.services.ChapterService().GetChapter(c.Context(), id, page, limit)
 	if err != nil {
+		return err
+	}
+
+	if err := h.services.ChapterService().StartChapter(c.Context(), id, chapter.CourseID.String(), userSession.UserID); err != nil {
 		return err
 	}
 	chapterDTO := h.dtoManager.ChapterManager().ToChapterDTO(chapter)
