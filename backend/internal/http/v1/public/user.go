@@ -36,7 +36,7 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	userProfile, err := h.services.UserProfileService().GetUser(c.Context(), userAuthData.ID.String())
+	userProfile, err := h.services.UserProfileService().GetUserWithUserAuthID(c.Context(), userAuthData.ID.String())
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	userProfile, err := h.services.UserProfileService().GetUser(c.Context(), userAuthData.ID.String())
+	userProfile, err := h.services.UserProfileService().GetUserWithUserAuthID(c.Context(), userAuthData.ID.String())
 	if err != nil {
 		return err
 	}

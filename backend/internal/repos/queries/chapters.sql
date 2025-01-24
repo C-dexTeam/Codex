@@ -53,8 +53,8 @@ SET
     frontend_template =  COALESCE(sqlc.narg(frontend_template), frontend_template),
     docker_template =  COALESCE(sqlc.narg(docker_template), docker_template),
     check_template =  COALESCE(sqlc.narg(check_template), check_template),
-    grants_experience =  COALESCE(sqlc.narg(grants_experience), grants_experience),
-    active =  COALESCE(sqlc.narg(active), active)
+    grants_experience =  COALESCE(sqlc.narg(grants_experience)::BOOLEAN, grants_experience),
+    active =  COALESCE(sqlc.narg(active)::BOOLEAN, active)
 WHERE
     id = @chapter_id;
 

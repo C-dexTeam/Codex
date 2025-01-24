@@ -224,8 +224,8 @@ SET
     frontend_template =  COALESCE($9, frontend_template),
     docker_template =  COALESCE($10, docker_template),
     check_template =  COALESCE($11, check_template),
-    grants_experience =  COALESCE($12, grants_experience),
-    active =  COALESCE($13, active)
+    grants_experience =  COALESCE($12::BOOLEAN, grants_experience),
+    active =  COALESCE($13::BOOLEAN, active)
 WHERE
     id = $14
 `

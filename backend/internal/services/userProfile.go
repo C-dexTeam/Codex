@@ -80,14 +80,32 @@ func (s *userProfileService) GetUser(
 	ctx context.Context,
 	id string,
 ) (*repo.TUsersProfile, error) {
-	// Default Values
-
-	idUUID, err := s.utilService.ParseUUID(id)
+	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	usersProfile, err := s.queries.GetUserProfile(ctx, idUUID)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserProfileNotFound)
+		}
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUserProfile, err)
+	}
+
+	return &usersProfile, nil
+}
+
+func (s *userProfileService) GetUserWithUserAuthID(
+	ctx context.Context,
+	userAuthID string,
+) (*repo.TUsersProfile, error) {
+	idUUID, err := s.utilService.NParseUUID(userAuthID)
+	if err != nil {
+		return nil, err
+	}
+
+	usersProfile, err := s.queries.GetUserProfileWithUserAuthID(ctx, idUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
 			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserProfileNotFound)

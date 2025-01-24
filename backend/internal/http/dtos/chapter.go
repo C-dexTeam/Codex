@@ -101,8 +101,8 @@ type UpdateChapterDTO struct {
 	FrontendTmp      string `json:"frontendTemplate"`
 	DockerTmp        string `json:"dockerTemplate"`
 	CheckTmp         string `json:"checkTemplate"`
-	GrantsExperience bool   `json:"grantsExperience"`
-	Active           bool   `json:"active"`
+	GrantsExperience *bool  `json:"grantsExperience"`
+	Active           *bool  `json:"active"`
 }
 
 type RunChapter struct {

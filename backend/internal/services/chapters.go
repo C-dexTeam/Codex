@@ -187,7 +187,7 @@ func (s *chapterService) UpdateChapter(
 	ctx context.Context,
 	id, courseID, languageID, rewardID, title, description, content, funcName string,
 	frontendTmp, dockerTmp, checkTmp string,
-	grantsExperience, active bool,
+	grantsExperience, active *bool,
 	rewardAmount int,
 ) error {
 	idUUID, err := s.utilService.NParseUUID(id)
@@ -210,19 +210,18 @@ func (s *chapterService) UpdateChapter(
 	}
 
 	var grantsExpNullBool sql.NullBool
-	if grantsExperience {
-		grantsExpNullBool.Valid = true
-		grantsExpNullBool.Bool = true
-	} else {
+	if grantsExperience == nil {
 		grantsExpNullBool.Valid = false
+	} else {
+		grantsExpNullBool.Valid = true
+		grantsExpNullBool.Bool = *grantsExperience
 	}
 
-	var validNulBool sql.NullBool
-	if active {
-		validNulBool.Valid = true
-		validNulBool.Bool = true
+	var validNullBool sql.NullBool
+	if active == nil {
+		validNullBool.Valid = false
 	} else {
-		validNulBool.Valid = false
+		validNullBool.Bool = *active
 	}
 
 	if err := s.queries.UpdateChapter(ctx, repo.UpdateChapterParams{
@@ -239,7 +238,7 @@ func (s *chapterService) UpdateChapter(
 		CheckTemplate:    s.utilService.ParseString(checkTmp),
 		RewardAmount:     rewAmountNullInt,
 		GrantsExperience: grantsExpNullBool,
-		Active:           validNulBool,
+		Active:           validNullBool,
 	}); err != nil {
 		return err
 	}
