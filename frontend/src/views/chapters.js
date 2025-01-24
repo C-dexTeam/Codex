@@ -1,6 +1,6 @@
 import LevelBar from "@/components/bar/LevelBar"
 import { SchoolOutlined } from "@mui/icons-material"
-import { Box, Button, Card, CardActions, CardContent, Grid, Typography } from "@mui/material"
+import { Box, Button, Card, CardActions, CardContent, Grid, Typography, useMediaQuery } from "@mui/material"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
 
@@ -12,19 +12,20 @@ const Chapters = () => {
         console.log(router.query.course)
     }, [router.isReady])
 
+    const _md = useMediaQuery(theme => theme.breakpoints.down('lgPlus'))
+
     return (
         <Grid container spacing={6}>
-            <Grid item container spacing={6} xs={12}
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "calc(100vh - 6rem)"
-                }}
-            >
-                <Grid item xs={12} md={9}>
-                    <Box sx={{ display: "flex", alignContent: "space-between", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
+            <Grid item xs={12}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        height: _md ? "calc(100vh - 12rem)" : "auto"
+                    }}
+                >
+                    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", gap: "5rem", justifyContent: "center" }}>
                         <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                             <Typography variant="h2" color={"primary"}>
                                 <Typography variant="strong">Learn Solidity:</Typography> <Typography variant="slim">Introduction to Solidity</Typography>
@@ -58,9 +59,7 @@ const Chapters = () => {
                             />
                         </Box>
                     </Box>
-                </Grid>
 
-                <Grid item xs={12} md={3} sx={{ textAlign: "end" }}>
                     <Box
                         sx={{
                             position: "relative",
@@ -109,7 +108,7 @@ const Chapters = () => {
                             </Typography>
                         </Box>
                     </Box>
-                </Grid>
+                </Box>
             </Grid>
 
             <Grid item xs={12}>
