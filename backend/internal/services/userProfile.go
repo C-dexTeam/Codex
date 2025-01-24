@@ -225,6 +225,20 @@ func (s *userProfileService) StreakUp(ctx context.Context, id string, lastStreak
 	return streak.Int32, nil
 }
 
+func (s *userProfileService) UserStatistic(ctx context.Context, userAuthID string) (*repo.UserStatisticRow, error) {
+	userAuthUUID, err := s.utilService.NParseUUID(userAuthID)
+	if err != nil {
+		return nil, err
+	}
+
+	statistic, err := s.queries.UserStatistic(ctx, userAuthUUID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &statistic, nil
+}
+
 func isSameDay(t1, t2 time.Time) bool {
 	y1, m1, d1 := t1.Date()
 	y2, m2, d2 := t2.Date()

@@ -252,3 +252,36 @@ func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfilePa
 	_, err := q.db.ExecContext(ctx, updateUserProfile, arg.Name, arg.Surname, arg.UserProfileID)
 	return err
 }
+
+const userStatistic = `-- name: UserStatistic :one
+SELECT
+    COUNT(DISTINCT uc.course_id) AS total_enrolled_courses,
+    COUNT(DISTINCT uc.course_id) FILTER (WHERE uc.progress = 100) AS completed_courses,
+    COUNT(DISTINCT ch.chapter_id) AS total_enrolled_chapters,
+    COUNT(DISTINCT ch.chapter_id) FILTER (WHERE ch.isFinished = TRUE) AS completed_chapters
+FROM 
+    t_user_courses uc
+INNER JOIN 
+    t_user_chapters ch ON uc.user_auth_id = ch.user_auth_id
+WHERE 
+    uc.user_auth_id = $1
+`
+
+type UserStatisticRow struct {
+	TotalEnrolledCourses  int64
+	CompletedCourses      int64
+	TotalEnrolledChapters int64
+	CompletedChapters     int64
+}
+
+func (q *Queries) UserStatistic(ctx context.Context, userAuthID uuid.UUID) (UserStatisticRow, error) {
+	row := q.db.QueryRowContext(ctx, userStatistic, userAuthID)
+	var i UserStatisticRow
+	err := row.Scan(
+		&i.TotalEnrolledCourses,
+		&i.CompletedCourses,
+		&i.TotalEnrolledChapters,
+		&i.CompletedChapters,
+	)
+	return i, err
+}

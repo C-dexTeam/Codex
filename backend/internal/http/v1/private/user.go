@@ -29,7 +29,12 @@ func (h *PrivateHandler) initUserRoutes(root fiber.Router) {
 // @Router /private/user/profile [get]
 func (h *PrivateHandler) Profile(c *fiber.Ctx) error {
 	userSession := sessionStore.GetSessionData(c)
-	userProfileDTO := h.dtoManager.UserManager().ToUserProfile(*userSession)
+
+	statistic, err := h.services.UserProfileService().UserStatistic(c.Context(), userSession.UserID)
+	if err != nil {
+		return err
+	}
+	userProfileDTO := h.dtoManager.UserManager().ToUserProfile(*userSession, statistic, userSession.Streak)
 
 	return response.Response(200, "Status OK", userProfileDTO)
 }

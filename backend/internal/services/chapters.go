@@ -325,3 +325,41 @@ func (s *chapterService) requestCompiler(sessionID string, questView dto.QuestVi
 
 	return &data, nil
 }
+
+func (s *chapterService) StartChapter(
+	ctx context.Context,
+	id, courseID, userAuthID string,
+) error {
+	idUUID, err := s.utilService.NParseUUID(id)
+	if err != nil {
+		return err
+	}
+	courseUUID, err := s.utilService.NParseUUID(courseID)
+	if err != nil {
+		return err
+	}
+
+	// Comes From Session
+	userAuthUUID := uuid.MustParse(userAuthID)
+
+	if ok, err := s.queries.CheckChapterByID(ctx, idUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringChapter, err)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrChapterNotFound)
+	}
+	if ok, err := s.queries.CheckCourseByID(ctx, courseUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourse, err)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
+	}
+
+	if err := s.queries.AddChapterToUser(ctx, repo.AddChapterToUserParams{
+		ChapterID:  idUUID,
+		CourseID:   courseUUID,
+		UserAuthID: userAuthUUID,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}

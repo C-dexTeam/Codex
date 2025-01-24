@@ -4,7 +4,6 @@ import (
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
-	repo "github.com/C-dexTeam/codex/internal/repos/out"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -37,14 +36,17 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	var userProfileData *repo.TUsersProfile
-	userProfiles, err := h.services.UserProfileService().GetUsers(c.Context(), "", userAuthData.ID.String(), "", "", "", "1", "1")
+	userProfile, err := h.services.UserProfileService().GetUser(c.Context(), userAuthData.ID.String())
 	if err != nil {
 		return err
 	}
-	userProfileData = &userProfiles[0]
 
-	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfileData.RoleID)
+	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfile.RoleID)
+	if err != nil {
+		return err
+	}
+
+	statistic, err := h.services.UserProfileService().UserStatistic(c.Context(), userProfile.ID.String())
 	if err != nil {
 		return err
 	}
@@ -54,12 +56,12 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 		return err
 	}
 	sessionData := sessionStore.SessionData{}
-	sessionData.ParseFromUser(userAuthData, userProfileData, userRole)
+	sessionData.ParseFromUser(userAuthData, userProfile, userRole)
 	sess.Set("user", sessionData)
 	if err := sess.Save(); err != nil {
 		return err
 	}
-	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData)
+	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData, statistic, sessionData.Streak)
 
 	return response.Response(200, "Login successful", profileResponse)
 }
@@ -91,14 +93,17 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	var userProfileData *repo.TUsersProfile
-	userProfiles, err := h.services.UserProfileService().GetUsers(c.Context(), "", userAuthData.ID.String(), "", "", "", "1", "1")
+	userProfile, err := h.services.UserProfileService().GetUser(c.Context(), userAuthData.ID.String())
 	if err != nil {
 		return err
 	}
-	userProfileData = &userProfiles[0]
 
-	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfileData.RoleID)
+	statistic, err := h.services.UserProfileService().UserStatistic(c.Context(), userProfile.ID.String())
+	if err != nil {
+		return err
+	}
+
+	userRole, err := h.services.RoleService().GetRoleByID(c.Context(), userProfile.RoleID)
 	if err != nil {
 		return err
 	}
@@ -108,12 +113,12 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 		return err
 	}
 	sessionData := sessionStore.SessionData{}
-	sessionData.ParseFromUser(userAuthData, userProfileData, userRole)
+	sessionData.ParseFromUser(userAuthData, userProfile, userRole)
 	sess.Set("user", sessionData)
 	if err := sess.Save(); err != nil {
 		return err
 	}
-	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData)
+	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData, statistic, sessionData.Streak)
 
 	return response.Response(200, "Login successful", profileResponse)
 }
