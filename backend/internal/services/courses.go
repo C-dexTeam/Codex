@@ -244,7 +244,7 @@ func (s *courseService) DeleteCourse(
 		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
 	}
 
-	if err := s.queries.SoftDeleteCourse(ctx, idUUID); err != nil {
+	if err := s.queries.DeleteCourse(ctx, idUUID); err != nil {
 		return err
 	}
 	return

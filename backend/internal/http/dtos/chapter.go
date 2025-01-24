@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/C-dexTeam/codex/internal/domains"
@@ -60,13 +59,10 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel *domains.Chapter) *UserChapter
 }
 
 func (d *ChapterDTOManager) ToChapterDTOs(appModels []domains.Chapter) []UserChapterView {
-	fmt.Println(1)
 	var chapterDTOs []UserChapterView
 	for _, model := range appModels {
 		chapterDTOs = append(chapterDTOs, *d.ToChapterDTO(&model))
 	}
-
-	fmt.Println(2)
 
 	return chapterDTOs
 }
