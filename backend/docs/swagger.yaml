@@ -1265,6 +1265,21 @@ paths:
       summary: Update User Profile
       tags:
       - User
+  /private/user/streak:
+    post:
+      consumes:
+      - application/json
+      description: + your streak and gain exp.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Streak Up
+      tags:
+      - User
   /public/login:
     post:
       consumes:

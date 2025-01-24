@@ -1485,6 +1485,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/user/streak": {
+            "post": {
+                "description": "+ your streak and gain exp.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Streak Up",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/public/login": {
             "post": {
                 "description": "Login",

@@ -85,6 +85,8 @@ const (
 	ErrEmailBeingUsed      = "EMAIL_ALREADY_BEING_USED"
 	ErrPasswordsDoNotMatch = "PASSWORDS_DO_NOT_MATCH"
 
+	ErrStreakAlreadyIncreased = "STREAK_ALREADY_INCREASED"
+
 	// General
 	ErrInvalidID               = "INVALID_ID"
 	ErrInvalidBoolean          = "INVALID_BOOLEAN"

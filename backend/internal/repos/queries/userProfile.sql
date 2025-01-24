@@ -1,6 +1,6 @@
 -- name: GetUsersProfile :many
 SELECT up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp,
-       up.created_at, up.deleted_at 
+       up.streak, up.last_streak_date, up.created_at, up.deleted_at 
 FROM t_users_profile as up
 WHERE
     (sqlc.narg(id)::UUID IS NULL OR up.id = sqlc.narg(id)::UUID) AND
@@ -13,10 +13,11 @@ WHERE
     (sqlc.narg(next_level_exp)::INTEGER IS NULL OR up.next_level_exp = sqlc.narg(next_level_exp)::INTEGER)
 LIMIT @lim OFFSET @off;
 
--- name: GetUserProfileByID :one
+-- name: GetUserProfile :one
 SELECT 
-    up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp, up.created_at, up.deleted_at 
-FROM t_users_profile as up
+    up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp, up.streak, up.last_streak_date, up.created_at, up.deleted_at 
+FROM 
+    t_users_profile as up
 WHERE
     up.id = @id;
 
@@ -35,15 +36,27 @@ SET
 WHERE
     id = @user_profile_id;
 
--- name: ChangeUserLevel :exec
+-- name: ChangeUserLevel :one
 UPDATE
     t_users_profile
 SET
-    level =  COALESCE(sqlc.narg(level)::INTEGER, level),
-    experience =  COALESCE(sqlc.narg(experience)::INTEGER, experience),
-    next_level_Exp =  COALESCE(sqlc.narg(next_level_exp)::INTEGER, next_level_Exp)
+    level = COALESCE(sqlc.narg(level)::INTEGER, level),
+    experience = COALESCE(sqlc.narg(experience)::INTEGER, experience),
+    next_level_Exp = COALESCE(sqlc.narg(next_level_exp)::INTEGER, next_level_Exp)
 WHERE
-    id = @user_profile_id;
+    id = @user_profile_id
+RETURNING
+    level, experience, next_level_Exp;
+
+
+-- name: StreakUp :one
+UPDATE
+    t_users_profile
+SET
+    streak = streak + 1, last_streak_date = CURRENT_TIMESTAMP
+WHERE
+    id = @user_profile_id
+RETURNING streak;
 
 -- name: SoftDeleteUserProfile :exec
 UPDATE

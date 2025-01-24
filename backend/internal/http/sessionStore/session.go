@@ -25,6 +25,7 @@ type SessionData struct {
 	Level         int
 	Experience    int
 	NextLevelExp  int
+	Streak        int
 }
 
 func (s *SessionData) ParseFromUser(user *repo.TUsersAuth, userProfile *repo.TUsersProfile, userRole *repo.TRole) {
@@ -40,10 +41,21 @@ func (s *SessionData) ParseFromUser(user *repo.TUsersAuth, userProfile *repo.TUs
 	s.Level = int(userProfile.Level.Int32)
 	s.Experience = int(userProfile.Experience.Int32)
 	s.NextLevelExp = int(userProfile.NextLevelExp.Int32)
+	s.Streak = int(userProfile.Streak.Int32)
 }
 
 func (s *SessionData) SetPublicKey(publicKey string) {
 	s.PublicKey = publicKey
+}
+
+func (s *SessionData) SetStreak(streak int) {
+	s.Streak = streak
+}
+
+func (s *SessionData) SetLevel(level, experience, nextLevelExp int32) {
+	s.Level = int(level)
+	s.Experience = int(experience)
+	s.NextLevelExp = int(nextLevelExp)
 }
 
 func (s *SessionData) SetNameSurname(name, surname string) {
