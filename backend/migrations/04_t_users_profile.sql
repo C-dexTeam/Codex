@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS t_users_profile (
     level INT DEFAULT 1,
     experience INT DEFAULT 0,
     next_level_exp INT DEFAULT 100,
+    streak INT DEFAULT 0,
+    last_streak_date TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 

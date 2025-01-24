@@ -12,15 +12,17 @@ import (
 	"github.com/google/uuid"
 )
 
-const changeUserLevel = `-- name: ChangeUserLevel :exec
+const changeUserLevel = `-- name: ChangeUserLevel :one
 UPDATE
     t_users_profile
 SET
-    level =  COALESCE($1::INTEGER, level),
-    experience =  COALESCE($2::INTEGER, experience),
-    next_level_Exp =  COALESCE($3::INTEGER, next_level_Exp)
+    level = COALESCE($1::INTEGER, level),
+    experience = COALESCE($2::INTEGER, experience),
+    next_level_Exp = COALESCE($3::INTEGER, next_level_Exp)
 WHERE
     id = $4
+RETURNING
+    level, experience, next_level_Exp
 `
 
 type ChangeUserLevelParams struct {
@@ -30,14 +32,22 @@ type ChangeUserLevelParams struct {
 	UserProfileID uuid.UUID
 }
 
-func (q *Queries) ChangeUserLevel(ctx context.Context, arg ChangeUserLevelParams) error {
-	_, err := q.db.ExecContext(ctx, changeUserLevel,
+type ChangeUserLevelRow struct {
+	Level        sql.NullInt32
+	Experience   sql.NullInt32
+	NextLevelExp sql.NullInt32
+}
+
+func (q *Queries) ChangeUserLevel(ctx context.Context, arg ChangeUserLevelParams) (ChangeUserLevelRow, error) {
+	row := q.db.QueryRowContext(ctx, changeUserLevel,
 		arg.Level,
 		arg.Experience,
 		arg.NextLevelExp,
 		arg.UserProfileID,
 	)
-	return err
+	var i ChangeUserLevelRow
+	err := row.Scan(&i.Level, &i.Experience, &i.NextLevelExp)
+	return i, err
 }
 
 const changeUserRole = `-- name: ChangeUserRole :exec
@@ -86,16 +96,17 @@ func (q *Queries) CreateUserProfile(ctx context.Context, arg CreateUserProfilePa
 	return id, err
 }
 
-const getUserProfileByID = `-- name: GetUserProfileByID :one
+const getUserProfile = `-- name: GetUserProfile :one
 SELECT 
-    up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp, up.created_at, up.deleted_at 
-FROM t_users_profile as up
+    up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp, up.streak, up.last_streak_date, up.created_at, up.deleted_at 
+FROM 
+    t_users_profile as up
 WHERE
     up.id = $1
 `
 
-func (q *Queries) GetUserProfileByID(ctx context.Context, id uuid.UUID) (TUsersProfile, error) {
-	row := q.db.QueryRowContext(ctx, getUserProfileByID, id)
+func (q *Queries) GetUserProfile(ctx context.Context, id uuid.UUID) (TUsersProfile, error) {
+	row := q.db.QueryRowContext(ctx, getUserProfile, id)
 	var i TUsersProfile
 	err := row.Scan(
 		&i.ID,
@@ -106,6 +117,8 @@ func (q *Queries) GetUserProfileByID(ctx context.Context, id uuid.UUID) (TUsersP
 		&i.Level,
 		&i.Experience,
 		&i.NextLevelExp,
+		&i.Streak,
+		&i.LastStreakDate,
 		&i.CreatedAt,
 		&i.DeletedAt,
 	)
@@ -114,7 +127,7 @@ func (q *Queries) GetUserProfileByID(ctx context.Context, id uuid.UUID) (TUsersP
 
 const getUsersProfile = `-- name: GetUsersProfile :many
 SELECT up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp,
-       up.created_at, up.deleted_at 
+       up.streak, up.last_streak_date, up.created_at, up.deleted_at 
 FROM t_users_profile as up
 WHERE
     ($1::UUID IS NULL OR up.id = $1::UUID) AND
@@ -170,6 +183,8 @@ func (q *Queries) GetUsersProfile(ctx context.Context, arg GetUsersProfileParams
 			&i.Level,
 			&i.Experience,
 			&i.NextLevelExp,
+			&i.Streak,
+			&i.LastStreakDate,
 			&i.CreatedAt,
 			&i.DeletedAt,
 		); err != nil {
@@ -198,6 +213,23 @@ WHERE
 func (q *Queries) SoftDeleteUserProfile(ctx context.Context, userProfileID uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, softDeleteUserProfile, userProfileID)
 	return err
+}
+
+const streakUp = `-- name: StreakUp :one
+UPDATE
+    t_users_profile
+SET
+    streak = streak + 1, last_streak_date = CURRENT_TIMESTAMP
+WHERE
+    id = $1
+RETURNING streak
+`
+
+func (q *Queries) StreakUp(ctx context.Context, userProfileID uuid.UUID) (sql.NullInt32, error) {
+	row := q.db.QueryRowContext(ctx, streakUp, userProfileID)
+	var streak sql.NullInt32
+	err := row.Scan(&streak)
+	return streak, err
 }
 
 const updateUserProfile = `-- name: UpdateUserProfile :exec

@@ -114,14 +114,16 @@ type TUsersAuth struct {
 }
 
 type TUsersProfile struct {
-	ID           uuid.UUID
-	UserAuthID   uuid.UUID
-	RoleID       uuid.UUID
-	Name         sql.NullString
-	Surname      sql.NullString
-	Level        sql.NullInt32
-	Experience   sql.NullInt32
-	NextLevelExp sql.NullInt32
-	CreatedAt    sql.NullTime
-	DeletedAt    sql.NullTime
+	ID             uuid.UUID
+	UserAuthID     uuid.UUID
+	RoleID         uuid.UUID
+	Name           sql.NullString
+	Surname        sql.NullString
+	Level          sql.NullInt32
+	Experience     sql.NullInt32
+	NextLevelExp   sql.NullInt32
+	Streak         sql.NullInt32
+	LastStreakDate sql.NullTime
+	CreatedAt      sql.NullTime
+	DeletedAt      sql.NullTime
 }
