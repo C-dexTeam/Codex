@@ -13,7 +13,8 @@ WHERE
     (sqlc.narg(reward_id)::UUID IS NULL OR c.reward_id = sqlc.narg(reward_id):: UUID) AND
     (sqlc.narg(title)::text IS NULL OR c.title ILIKE '%' || sqlc.narg(title)::text || '%') AND
     deleted_at IS NULL
-LIMIT @lim OFFSET @off;
+LIMIT 
+    @lim OFFSET @off;
 
 -- name: GetCourse :one
 SELECT 
@@ -80,6 +81,12 @@ UPDATE
 SET
     deleted_at = CURRENT_TIMESTAMP
 WHERE  
+    id = @course_id;
+
+-- name: DeleteCourse :exec
+DELETE FROM
+    t_courses
+WHERE
     id = @course_id;
 
 -- name: CheckCourseByID :one

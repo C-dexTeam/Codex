@@ -137,6 +137,7 @@ func (h *PrivateHandler) AddChapter(c *fiber.Ctx) error {
 		newChapter.GrantsExperience,
 		newChapter.Active,
 		newChapter.RewardAmount,
+		newChapter.Order,
 	)
 	if err != nil {
 		return err

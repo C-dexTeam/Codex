@@ -2,7 +2,7 @@
 SELECT 
     c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
     c.func_name, c.frontend_template, c.docker_template, c.check_template, c.grants_experience, c.active,
-    c.created_at, c.deleted_at
+    c.chapter_order, c.created_at, c.deleted_at
 FROM 
     t_chapters as c
 WHERE
@@ -12,13 +12,16 @@ WHERE
     (sqlc.narg(reward_id)::UUID IS NULL OR c.reward_id = sqlc.narg(reward_id)::UUID) AND
     (sqlc.narg(title)::text IS NULL OR c.title ILIKE '%' || sqlc.narg(title)::text || '%') AND
     deleted_at IS NULL
-LIMIT @lim OFFSET @off;
+ORDER BY
+    c.chapter_order  ASC
+LIMIT 
+    @lim OFFSET @off;
 
 -- name: GetChapter :one
 SELECT
     c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
     c.func_name, c.frontend_template, c.docker_template, c.check_template, c.grants_experience, c.active,
-    c.created_at, c.deleted_at
+    c.chapter_order, c.created_at, c.deleted_at
 FROM
     t_chapters as c
 WHERE
@@ -28,10 +31,10 @@ WHERE
 -- name: CreateChapter :one
 INSERT INTO
     t_chapters (course_id, language_id, reward_id, reward_amount, title, description, content,
-    func_name, frontend_template, docker_template, check_template, grants_experience, active)
+    func_name, frontend_template, docker_template, check_template, grants_experience, active, chapter_order)
 VALUES
    (@course_id, @language_id, @reward_id, @reward_amount, @title, @description, @content,
-    @func_name, @frontend_template, @docker_template, @check_template, @grants_experience, @active)
+    @func_name, @frontend_template, @docker_template, @check_template, @grants_experience, @active, @chapter_order)
 RETURNING id;
 
 

@@ -147,7 +147,7 @@ func (s *chapterService) AddChapter(
 	courseID, languageID, rewardID, title, description, content, funcName string,
 	frontendTmp, dockerTmp, checkTmp string,
 	grantsExperience, active bool,
-	rewardAmount int,
+	rewardAmount, order int,
 ) (uuid.UUID, error) {
 	languageUUID, err := s.utilService.NParseUUID(languageID)
 	if err != nil {
@@ -174,6 +174,7 @@ func (s *chapterService) AddChapter(
 		RewardAmount:     int32(rewardAmount),
 		GrantsExperience: grantsExperience,
 		Active:           active,
+		ChapterOrder:     int32(order),
 	})
 	if err != nil {
 		return uuid.Nil, err
