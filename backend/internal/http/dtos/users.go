@@ -70,19 +70,39 @@ func (m *UserDTOManager) ToUserAuthViews(users []repo.TUsersAuth) []UserAuthView
 }
 
 type UserProfileView struct {
-	PublicKey           string `json:"publicKey"`
-	UserID              string `json:"userAuthID"`
-	RoleName            string `json:"role"`
-	Username            string `json:"username"`
-	Email               string `json:"email"`
-	Name                string `json:"name"`
-	Surname             string `json:"surname"`
-	Level               int    `json:"level"`
-	Experience          int    `json:"experience"`
-	NextLevelExperience int    `json:"nextLevelExperience"`
+	PublicKey           string         `json:"publicKey"`
+	UserID              string         `json:"userAuthID"`
+	RoleName            string         `json:"role"`
+	Username            string         `json:"username"`
+	Email               string         `json:"email"`
+	Name                string         `json:"name"`
+	Surname             string         `json:"surname"`
+	Level               int            `json:"level"`
+	Experience          int            `json:"experience"`
+	NextLevelExperience int            `json:"nextLevelExperience"`
+	Statistic           *StatisticView `json:"statistic"`
 }
 
-func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfileView {
+type StatisticView struct {
+	TotalEnrolledCourses  int64 `json:"enrolledCourses"`
+	CompletedCourses      int64 `json:"completedCourses"`
+	TotalEnrolledChapters int64 `json:"enrolledChapters"`
+	CompletedChapters     int64 `json:"compleredChapters"`
+	Streak                int   `json:"streak"`
+}
+
+func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData, statistic *repo.UserStatisticRow, streak int) UserProfileView {
+	var stat StatisticView
+	if statistic != nil {
+		stat = StatisticView{
+			TotalEnrolledCourses:  statistic.TotalEnrolledCourses,
+			CompletedCourses:      statistic.CompletedCourses,
+			TotalEnrolledChapters: statistic.TotalEnrolledChapters,
+			CompletedChapters:     statistic.CompletedChapters,
+			Streak:                streak,
+		}
+	}
+
 	return UserProfileView{
 		PublicKey:           userData.PublicKey,
 		UserID:              userData.UserID,
@@ -94,6 +114,7 @@ func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData) UserProfi
 		Level:               userData.Level,
 		Experience:          userData.Experience,
 		NextLevelExperience: userData.NextLevelExp,
+		Statistic:           &stat,
 	}
 }
 

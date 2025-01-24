@@ -74,3 +74,16 @@ SET
     surname =  COALESCE(sqlc.narg(surname)::TEXT, surname)
 WHERE
     id = @user_profile_id;
+
+-- name: UserStatistic :one
+SELECT
+    COUNT(DISTINCT uc.course_id) AS total_enrolled_courses,
+    COUNT(DISTINCT uc.course_id) FILTER (WHERE uc.progress = 100) AS completed_courses,
+    COUNT(DISTINCT ch.chapter_id) AS total_enrolled_chapters,
+    COUNT(DISTINCT ch.chapter_id) FILTER (WHERE ch.isFinished = TRUE) AS completed_chapters
+FROM 
+    t_user_courses uc
+INNER JOIN 
+    t_user_chapters ch ON uc.user_auth_id = ch.user_auth_id
+WHERE 
+    uc.user_auth_id = @user_auth_id;
