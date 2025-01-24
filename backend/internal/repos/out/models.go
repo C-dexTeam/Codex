@@ -33,6 +33,7 @@ type TChapter struct {
 	CheckTemplate    string
 	GrantsExperience bool
 	Active           bool
+	ChapterOrder     int32
 	CreatedAt        sql.NullTime
 	DeletedAt        sql.NullTime
 }

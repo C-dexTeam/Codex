@@ -37,8 +37,9 @@ definitions:
         type: boolean
       languageID:
         type: string
+      order:
+        type: integer
       rewardAmount:
-        minimum: 1
         type: integer
       rewardID:
         type: string

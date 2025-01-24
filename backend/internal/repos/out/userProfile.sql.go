@@ -125,10 +125,41 @@ func (q *Queries) GetUserProfile(ctx context.Context, id uuid.UUID) (TUsersProfi
 	return i, err
 }
 
+const getUserProfileWithUserAuthID = `-- name: GetUserProfileWithUserAuthID :one
+SELECT 
+    up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp, up.streak, up.last_streak_date, up.created_at, up.deleted_at 
+FROM 
+    t_users_profile as up
+WHERE
+    up.user_auth_id = $1
+`
+
+func (q *Queries) GetUserProfileWithUserAuthID(ctx context.Context, userAuthID uuid.UUID) (TUsersProfile, error) {
+	row := q.db.QueryRowContext(ctx, getUserProfileWithUserAuthID, userAuthID)
+	var i TUsersProfile
+	err := row.Scan(
+		&i.ID,
+		&i.UserAuthID,
+		&i.RoleID,
+		&i.Name,
+		&i.Surname,
+		&i.Level,
+		&i.Experience,
+		&i.NextLevelExp,
+		&i.Streak,
+		&i.LastStreakDate,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const getUsersProfile = `-- name: GetUsersProfile :many
-SELECT up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp,
-       up.streak, up.last_streak_date, up.created_at, up.deleted_at 
-FROM t_users_profile as up
+SELECT 
+    up.id, up.user_auth_id, up.role_id, up.name, up.surname, up.level, up.experience, up.next_level_exp,
+    up.streak, up.last_streak_date, up.created_at, up.deleted_at 
+FROM
+    t_users_profile as up
 WHERE
     ($1::UUID IS NULL OR up.id = $1::UUID) AND
     ($2::UUID IS NULL OR up.user_auth_id = $2::UUID) AND
@@ -138,7 +169,8 @@ WHERE
     ($6::INTEGER IS NULL OR up.level = $6::INTEGER) AND
     ($7::INTEGER IS NULL OR up.experience = $7::INTEGER) AND
     ($8::INTEGER IS NULL OR up.next_level_exp = $8::INTEGER)
-LIMIT $10 OFFSET $9
+LIMIT
+    $10 OFFSET $9
 `
 
 type GetUsersProfileParams struct {

@@ -1720,9 +1720,11 @@ const docTemplate = `{
                 "languageID": {
                     "type": "string"
                 },
+                "order": {
+                    "type": "integer"
+                },
                 "rewardAmount": {
-                    "type": "integer",
-                    "minimum": 1
+                    "type": "integer"
                 },
                 "rewardID": {
                     "type": "string"

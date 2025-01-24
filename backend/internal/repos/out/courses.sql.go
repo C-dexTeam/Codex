@@ -64,6 +64,18 @@ func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (uui
 	return id, err
 }
 
+const deleteCourse = `-- name: DeleteCourse :exec
+DELETE FROM
+    t_courses
+WHERE
+    id = $1
+`
+
+func (q *Queries) DeleteCourse(ctx context.Context, courseID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteCourse, courseID)
+	return err
+}
+
 const getCourse = `-- name: GetCourse :one
 SELECT 
     c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
@@ -124,7 +136,8 @@ WHERE
     ($4::UUID IS NULL OR c.reward_id = $4:: UUID) AND
     ($5::text IS NULL OR c.title ILIKE '%' || $5::text || '%') AND
     deleted_at IS NULL
-LIMIT $7 OFFSET $6
+LIMIT 
+    $7 OFFSET $6
 `
 
 type GetCoursesParams struct {

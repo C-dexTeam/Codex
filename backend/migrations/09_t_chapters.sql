@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS t_chapters (
     check_template TEXT NOT NULL,
     grants_experience BOOLEAN NOT NULL DEFAULT FALSE,
     active BOOLEAN NOT NULL DEFAULT FALSE,
+    chapter_order INT NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP DEFAULT NULL,
 

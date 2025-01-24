@@ -1,8 +1,6 @@
 package dto
 
 import (
-	"fmt"
-
 	"github.com/C-dexTeam/codex/internal/domains"
 )
 
@@ -20,11 +18,9 @@ type TestView struct {
 }
 
 func (t *TestDTOManager) ToTestDTO(appModel *domains.Test) *TestView {
-	fmt.Println(8)
 	if appModel == nil {
 		return nil
 	}
-	fmt.Println(9)
 
 	return &TestView{
 		ID:        appModel.ID.String(),

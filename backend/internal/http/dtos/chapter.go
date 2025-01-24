@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/C-dexTeam/codex/internal/domains"
@@ -60,13 +59,10 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel *domains.Chapter) *UserChapter
 }
 
 func (d *ChapterDTOManager) ToChapterDTOs(appModels []domains.Chapter) []UserChapterView {
-	fmt.Println(1)
 	var chapterDTOs []UserChapterView
 	for _, model := range appModels {
 		chapterDTOs = append(chapterDTOs, *d.ToChapterDTO(&model))
 	}
-
-	fmt.Println(2)
 
 	return chapterDTOs
 }
@@ -75,7 +71,7 @@ type AddChapterDTO struct {
 	CourseID         string `json:"courseID"`
 	LanguageID       string `json:"languageID"`
 	RewardID         string `json:"rewardID"`
-	RewardAmount     int    `json:"rewardAmount" validate:"gte=1"`
+	RewardAmount     int    `json:"rewardAmount"`
 	Title            string `json:"title"`
 	Description      string `json:"description"`
 	Content          string `json:"content"`
@@ -85,6 +81,7 @@ type AddChapterDTO struct {
 	CheckTmp         string `json:"checkTemplate"`
 	GrantsExperience bool   `json:"grantsExperience"`
 	Active           bool   `json:"active"`
+	Order            int    `json:"order"`
 }
 
 type UpdateChapterDTO struct {
@@ -100,8 +97,8 @@ type UpdateChapterDTO struct {
 	FrontendTmp      string `json:"frontendTemplate"`
 	DockerTmp        string `json:"dockerTemplate"`
 	CheckTmp         string `json:"checkTemplate"`
-	GrantsExperience bool   `json:"grantsExperience"`
-	Active           bool   `json:"active"`
+	GrantsExperience *bool  `json:"grantsExperience"`
+	Active           *bool  `json:"active"`
 }
 
 type RunChapter struct {
