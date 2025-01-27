@@ -1,3 +1,6 @@
 [submodule "compiler"]
 	path = compiler
 	url = https://github.com/C-dexTeam/Codex-Compiler.git
+[submodule "web3"]
+	path = web3
+	url = https://github.com/C-dexTeam/Codex-Web3
