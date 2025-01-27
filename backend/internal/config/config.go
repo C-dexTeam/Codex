@@ -58,7 +58,7 @@ func Init(configsDir ...string) (cfg *Config, err error) {
 		return
 	}
 
-	cfg.Defaults = models.NewDefaults()
+	cfg.Defaults = models.NewDefaults(viper.GetString("app.secret"))
 
 	return
 }

@@ -15,6 +15,7 @@ import (
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
+	hasherService "github.com/C-dexTeam/codex/pkg/hasher"
 	"github.com/google/uuid"
 )
 
@@ -296,7 +297,7 @@ func (s *chapterService) requestCompiler(sessionID string, questView dto.QuestVi
 	req.Header.Add("Content-Type", "application/json")
 
 	// Add the Codex-Compiler header
-	req.Header.Add("Codex-Compiler", "b77759141fc85bf31e75b1d9c48bbe67")
+	req.Header.Add("Codex-Compiler", hasherService.MD5Hash(s.utilService.D().Secret))
 
 	// Add the session_id cookie to the request
 	req.AddCookie(&http.Cookie{

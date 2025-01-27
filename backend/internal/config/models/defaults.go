@@ -4,6 +4,7 @@ type Defaults struct {
 	Roles    RoleDefaults
 	Language LanguageDefaults
 	Limits   LimitDefaults
+	Secret   string
 }
 
 type RoleDefaults struct {
@@ -31,7 +32,7 @@ type LimitDefaults struct {
 }
 
 // Initialize Defaults
-func NewDefaults() Defaults {
+func NewDefaults(secret string) Defaults {
 	return Defaults{
 		Roles: RoleDefaults{
 			DefaultRole:    "user",
@@ -54,5 +55,6 @@ func NewDefaults() Defaults {
 			DefaultAttributeLimit:           10,
 			DefaultProgrammingLanguageLimit: 10,
 		},
+		Secret: secret,
 	}
 }

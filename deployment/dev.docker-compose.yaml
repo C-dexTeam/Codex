@@ -23,6 +23,18 @@ services:
       - ../compiler:/app
     networks:
       - codex
+  
+  web3-api:
+    container_name: web3-api
+    build:
+      context: ../web3/.
+      dockerfile: ../deployment/web3/dev.Dockerfile
+    ports:
+      - "8082:8082"
+    volumes:
+      - ../web3:/app
+    networks:
+      - codex
 
   frontend:
     container_name: codex-frontend
@@ -62,7 +74,6 @@ services:
       - ../backend/storage/redis_data:/data
     networks:
       - codex
-
 
   nginx:
     image: nginx:latest

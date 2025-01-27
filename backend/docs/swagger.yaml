@@ -899,7 +899,7 @@ paths:
       tags:
       - Chapters
   /private/compiler/template:
-    get:
+    post:
       consumes:
       - application/json
       description: This is a template for an endpoint created to make requests to

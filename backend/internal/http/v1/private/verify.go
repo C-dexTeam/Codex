@@ -13,7 +13,7 @@ import (
 
 func (h *PrivateHandler) initVerifyRoutes(root fiber.Router) {
 	compiler := root.Group("/compiler")
-	compiler.Get("/template", h.RunTemplate)
+	compiler.Post("/template", h.RunTemplate)
 }
 
 // @Tags Codex-Compiler
@@ -22,7 +22,7 @@ func (h *PrivateHandler) initVerifyRoutes(root fiber.Router) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} response.BaseResponse{}
-// @Router /private/compiler/template [get]
+// @Router /private/compiler/template [post]
 func (h *PrivateHandler) RunTemplate(c *fiber.Ctx) error {
 	// TODO: This is my request template for all.
 

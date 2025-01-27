@@ -234,5 +234,7 @@ func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 		return err
 	}
 
+	// TODO: look the err:logs if the test is wrong return de correct answer
+
 	return response.Response(200, "Status OK", err)
 }
