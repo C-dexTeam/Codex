@@ -926,7 +926,7 @@ const docTemplate = `{
             }
         },
         "/private/compiler/template": {
-            "get": {
+            "post": {
                 "description": "This is a template for an endpoint created to make requests to Codex-Compiler.",
                 "consumes": [
                     "application/json"

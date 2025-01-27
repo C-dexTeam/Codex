@@ -2,6 +2,8 @@ package hasherService
 
 import (
 	"crypto/ed25519"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/gagliardetto/solana-go"
@@ -53,4 +55,13 @@ func VerifySignature(pubKeyBase58 string, message string, signatureBase58 string
 	valid := ed25519.Verify(publicKey[:], []byte(message), signature)
 
 	return valid, nil
+}
+
+// MD5Hash takes a string and returns its MD5 hash as a hexadecimal string.
+func MD5Hash(msg string) string {
+	hash := md5.New()
+
+	hash.Write([]byte(msg))
+
+	return hex.EncodeToString(hash.Sum(nil))
 }
