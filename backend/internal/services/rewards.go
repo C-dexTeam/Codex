@@ -110,16 +110,13 @@ func (s *rewardService) GetReward(
 
 func (s *rewardService) AddReward(
 	ctx context.Context,
-	rewardType, symbol, name, description, imagePath, URI string,
+	rewardType, symbol, name, description string,
 ) (uuid.UUID, error) {
-	// TODO: Gelen verilerin kontrolü lazım. Len > 30 gibi normalde domainde yapıyorsun
 	id, err := s.queries.CreateReward(ctx, repo.CreateRewardParams{
 		RewardType:  rewardType,
 		Symbol:      symbol,
 		Name:        name,
 		Description: description,
-		ImagePath:   imagePath,
-		Uri:         URI,
 	})
 	if err != nil {
 		return uuid.Nil, err

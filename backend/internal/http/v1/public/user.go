@@ -140,7 +140,7 @@ func (h *PublicHandler) Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	defaultRole, err := h.services.RoleService().GetByName(c.Context(), h.defaults.Roles.DefaultRole)
+	defaultRole, err := h.services.RoleService().GetByName(c.Context(), h.config.Defaults.Roles.DefaultRole)
 	if err != nil {
 		return err
 	}

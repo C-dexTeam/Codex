@@ -1,7 +1,7 @@
 package public
 
 import (
-	"github.com/C-dexTeam/codex/internal/config/models"
+	"github.com/C-dexTeam/codex/internal/config"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/services"
@@ -14,20 +14,20 @@ type PublicHandler struct {
 	services     *services.Services
 	sessionStore *session.Store
 	dtoManager   dto.IDTOManager
-	defaults     *models.Defaults
+	config       *config.Config
 }
 
 func NewPublicHandler(
 	service *services.Services,
 	sessionStore *session.Store,
 	dtoManager dto.IDTOManager,
-	defaults *models.Defaults,
+	config *config.Config,
 ) *PublicHandler {
 	return &PublicHandler{
 		services:     service,
 		sessionStore: sessionStore,
 		dtoManager:   dtoManager,
-		defaults:     defaults,
+		config:       config,
 	}
 }
 

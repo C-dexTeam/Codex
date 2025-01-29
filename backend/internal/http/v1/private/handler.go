@@ -3,7 +3,7 @@ package private
 import (
 	"fmt"
 
-	"github.com/C-dexTeam/codex/internal/config/models"
+	"github.com/C-dexTeam/codex/internal/config"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
@@ -18,20 +18,20 @@ type PrivateHandler struct {
 	services   *services.Services
 	sess_store *session.Store
 	dtoManager dto.IDTOManager
-	defaults   *models.Defaults
+	config     *config.Config
 }
 
 func NewPrivateHandler(
 	service *services.Services,
 	sessStore *session.Store,
 	dtoManager dto.IDTOManager,
-	defaults *models.Defaults,
+	config *config.Config,
 ) *PrivateHandler {
 	return &PrivateHandler{
 		services:   service,
 		sess_store: sessStore,
 		dtoManager: dtoManager,
-		defaults:   defaults,
+		config:     config,
 	}
 }
 

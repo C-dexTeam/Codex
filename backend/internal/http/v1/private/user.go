@@ -112,13 +112,13 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 	}
 
 	// Get First Login Role
-	walletUser, err := h.services.RoleService().GetByName(c.Context(), h.defaults.Roles.RoleWalletUser)
+	walletUser, err := h.services.RoleService().GetByName(c.Context(), h.config.Defaults.Roles.RoleWalletUser)
 	if err != nil {
 		return err
 	}
 
 	// If the user in user Role. Change The Users role to wallet-user.
-	if userSession.Role != h.defaults.Roles.RoleAdmin {
+	if userSession.Role != h.config.Defaults.Roles.RoleAdmin {
 		if err := h.services.UserProfileService().ChangeUserRole(c.Context(), userSession.UserProfileID, walletUser.ID.String()); err != nil {
 			return err
 		}

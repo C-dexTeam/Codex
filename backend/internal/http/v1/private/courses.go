@@ -7,7 +7,6 @@ import (
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 func (h *PrivateHandler) initCoursesRoutes(root fiber.Router) {
@@ -125,13 +124,6 @@ func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Dosyayı kaydetme işlemi
-	extention := filepath.Ext(imageFile.Filename)
-	imagePath := h.services.UploadService().MainDir() + "/" + uuid.New().String() + extention
-	if err := h.services.UploadService().SaveImage(imageFile, imagePath); err != nil {
-		return err
-	}
-
 	// Default Language if the languageID is ""
 	var languageID string
 	if courseInfo.LanguageID == "" {
@@ -158,10 +150,21 @@ func (h *PrivateHandler) AddCourse(c *fiber.Ctx) error {
 		courseInfo.RewardID,
 		courseInfo.Title,
 		courseInfo.Description,
-		imagePath,
+		"imagePath",
 		courseInfo.RewardAmount,
 	)
 	if err != nil {
+		return err
+	}
+
+	// Save Course Image
+	extention := filepath.Ext(imageFile.Filename)
+	imagePath := h.services.UploadService().CourseDir() + "/" + id.String() + extention
+	if err := h.services.UploadService().SaveImage(imageFile, imagePath); err != nil {
+		return err
+	}
+
+	if err := h.services.CourseService().UpdateCourse(c.Context(), id.String(), "", "", "", "", "", imagePath, 0); err != nil {
 		return err
 	}
 
@@ -195,7 +198,7 @@ func (h *PrivateHandler) UpdateCourse(c *fiber.Ctx) error {
 	var newImagePath string
 	if imageFile != nil {
 		extention := filepath.Ext(imageFile.Filename)
-		newImagePath = h.services.UploadService().MainDir() + "/" + uuid.New().String() + extention
+		newImagePath = h.services.UploadService().CourseDir() + "/" + updateCourse.ID + extention
 		if err := h.services.UploadService().SaveImage(imageFile, newImagePath); err != nil {
 			return err
 		}

@@ -3,6 +3,7 @@ package services
 import (
 	"database/sql"
 
+	"github.com/C-dexTeam/codex/internal/config"
 	"github.com/C-dexTeam/codex/internal/config/models"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
@@ -45,9 +46,9 @@ func CreateNewServices(
 	validatorService IValidatorService,
 	queries *repo.Queries,
 	db *sql.DB,
-	defaults *models.Defaults,
+	cfg *config.Config,
 ) *Services {
-	utilService := newUtilService(validatorService, defaults)
+	utilService := newUtilService(validatorService, &cfg.Defaults)
 	userProfileService := newUserProfileService(db, queries, utilService)
 	userService := newUserService(db, queries, utilService)
 	roleService := newRoleService(db, queries, utilService)

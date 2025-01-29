@@ -2,6 +2,7 @@ package public
 
 import (
 	"github.com/C-dexTeam/codex/internal/http/response"
+	"github.com/C-dexTeam/codex/pkg/paths"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -25,7 +26,14 @@ func (h *PublicHandler) GetReward(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	rewardDTO := h.dtoManager.RewardManager().ToRewardDTO(reward, attributes)
+	rewardDTO := h.dtoManager.RewardManager().ToMetadataView(
+		reward,
+		attributes,
+		paths.CreateURL(
+			h.config.Application.Https,
+			h.config.Application.Site,
+		),
+	)
 
 	return response.Response(200, "Status OK", rewardDTO)
 }

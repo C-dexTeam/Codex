@@ -70,32 +70,6 @@ definitions:
     - monacoEditor
     - name
     type: object
-  dto.AddRewardDTO:
-    properties:
-      Description:
-        type: string
-      imagePath:
-        maxLength: 60
-        type: string
-      name:
-        maxLength: 30
-        type: string
-      rewardType:
-        maxLength: 30
-        type: string
-      symbol:
-        maxLength: 30
-        type: string
-      uri:
-        maxLength: 120
-        type: string
-    required:
-    - imagePath
-    - name
-    - rewardType
-    - symbol
-    - uri
-    type: object
   dto.AddTestDTO:
     properties:
       chapterID:
@@ -188,30 +162,6 @@ definitions:
         type: string
       name:
         type: string
-    type: object
-  dto.UpdateRewardDTO:
-    properties:
-      Description:
-        type: string
-      id:
-        type: string
-      imagePath:
-        maxLength: 60
-        type: string
-      name:
-        maxLength: 30
-        type: string
-      rewardType:
-        maxLength: 30
-        type: string
-      symbol:
-        maxLength: 30
-        type: string
-      uri:
-        maxLength: 120
-        type: string
-    required:
-    - id
     type: object
   dto.UpdateTestDTO:
     properties:
@@ -608,12 +558,29 @@ paths:
       - application/json
       description: Updates Reward Into DB.
       parameters:
-      - description: Update Reward
-        in: body
-        name: updateReward
+      - in: formData
+        name: Description
+        type: string
+      - in: formData
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateRewardDTO'
+        type: string
+      - in: formData
+        maxLength: 30
+        name: name
+        type: string
+      - in: formData
+        maxLength: 30
+        name: rewardType
+        type: string
+      - in: formData
+        maxLength: 30
+        name: symbol
+        type: string
+      - description: Course Image File
+        in: formData
+        name: imageFile
+        type: file
       produces:
       - application/json
       responses:
@@ -629,12 +596,29 @@ paths:
       - application/json
       description: Adds Reward Into DB.
       parameters:
-      - description: New Reward
-        in: body
-        name: newReward
+      - description: Reward Image File
+        in: formData
+        name: imageFile
         required: true
-        schema:
-          $ref: '#/definitions/dto.AddRewardDTO'
+        type: file
+      - in: formData
+        name: Description
+        type: string
+      - in: formData
+        maxLength: 30
+        name: name
+        required: true
+        type: string
+      - in: formData
+        maxLength: 30
+        name: rewardType
+        required: true
+        type: string
+      - in: formData
+        maxLength: 30
+        name: symbol
+        required: true
+        type: string
       produces:
       - application/json
       responses:

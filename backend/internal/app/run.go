@@ -47,14 +47,14 @@ func Run(cfg *config.Config) {
 		validatorService,
 		queries,
 		conn,
-		&cfg.Defaults,
+		cfg,
 	)
 
 	// First Run & Creating Default Admin
 	firstRun(queries, allServices.RoleService(), allServices.UserService(), cfg.Defaults.Roles.RoleAdmin)
 
 	// Handler Initialize
-	handlers := http.NewHandler(allServices, &cfg.Defaults)
+	handlers := http.NewHandler(allServices, cfg)
 
 	// Fiber İnitialize
 	fiberServer := server.NewServer(cfg, response.ResponseHandler)

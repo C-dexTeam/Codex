@@ -1,8 +1,11 @@
 package private
 
 import (
+	"path/filepath"
+
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
+	"github.com/C-dexTeam/codex/pkg/paths"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -77,7 +80,8 @@ func (h *PrivateHandler) GetReward(c *fiber.Ctx) error {
 // @Description Adds Reward Into DB.
 // @Accept json
 // @Produce json
-// @Param newReward body dto.AddRewardDTO true "New Reward"
+// @Param imageFile formData file true "Reward Image File"
+// @Param rewardInformation formData dto.AddRewardDTO true "New Reward"
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/admin/rewards/ [post]
 func (h *PrivateHandler) AddReward(c *fiber.Ctx) error {
@@ -89,16 +93,32 @@ func (h *PrivateHandler) AddReward(c *fiber.Ctx) error {
 		return err
 	}
 
+	// Dosya alanını alıyoruz (sadece imageFile)
+	imageFile, err := c.FormFile("imageFile")
+	if err != nil {
+		return err
+	}
+
 	id, err := h.services.RewardService().AddReward(
 		c.Context(),
 		newReward.RewardType,
 		newReward.Symbol,
 		newReward.Name,
 		newReward.Description,
-		newReward.ImagePath,
-		newReward.URI,
 	)
 	if err != nil {
+		return err
+	}
+
+	// Save Image
+	extention := filepath.Ext(imageFile.Filename)
+	imagePath := h.services.UploadService().Web3Dir() + "/" + id.String() + extention
+	if err := h.services.UploadService().SaveImage(imageFile, imagePath); err != nil {
+		return err
+	}
+	uri := paths.CreateURI(h.config.Application.Https, id.String(), h.config.Application.Site)
+
+	if err := h.services.RewardService().UpdateReward(c.Context(), id.String(), "", "", "", "", imagePath, uri); err != nil {
 		return err
 	}
 
@@ -110,7 +130,8 @@ func (h *PrivateHandler) AddReward(c *fiber.Ctx) error {
 // @Description Updates Reward Into DB.
 // @Accept json
 // @Produce json
-// @Param updateReward body dto.UpdateRewardDTO true "Update Reward"
+// @Param updateReward formData dto.UpdateRewardDTO true "Update Reward"
+// @Param imageFile formData file false "Course Image File"
 // @Success 200 {object} response.BaseResponse{}
 // @Router /private/admin/rewards/ [patch]
 func (h *PrivateHandler) UpdateReward(c *fiber.Ctx) error {
@@ -122,15 +143,30 @@ func (h *PrivateHandler) UpdateReward(c *fiber.Ctx) error {
 		return err
 	}
 
-	err := h.services.RewardService().UpdateReward(
+	// Dosya alanını alıyoruz (sadece imageFile)
+	imageFile, err := c.FormFile("imageFile")
+	if err != nil {
+		return err
+	}
+
+	var newImagePath string
+	if imageFile != nil {
+		extention := filepath.Ext(imageFile.Filename)
+		newImagePath = h.services.UploadService().Web3Dir() + "/" + updateReward.ID + extention
+		if err := h.services.UploadService().SaveImage(imageFile, newImagePath); err != nil {
+			return err
+		}
+	}
+
+	err = h.services.RewardService().UpdateReward(
 		c.Context(),
 		updateReward.ID,
 		updateReward.RewardType,
 		updateReward.Symbol,
 		updateReward.Name,
 		updateReward.Description,
-		updateReward.ImagePath,
-		updateReward.URI,
+		newImagePath,
+		"",
 	)
 	if err != nil {
 		return err
