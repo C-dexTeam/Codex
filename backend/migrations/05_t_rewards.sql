@@ -6,8 +6,9 @@ CREATE TABLE IF NOT EXISTS t_rewards (
     symbol VARCHAR(30) NOT NULL,
     name VARCHAR(30) NOT NULL,
     description TEXT NOT NULL,
-    image_path VARCHAR(60) NOT NULL,
-    uri VARCHAR(120) NOT NULL
+    seller_fee INT NOT NULL,
+    image_path VARCHAR(60) DEFAULT NULL,
+    uri VARCHAR(120) DEFAULT NULL
 );
 
 -- +goose StatementEnd

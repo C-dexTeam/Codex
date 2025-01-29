@@ -15,16 +15,16 @@ import (
 
 type Handler struct {
 	services *services.Services
-	defaults *models.Defaults
+	config   *config.Config
 }
 
 func NewHandler(
 	services *services.Services,
-	defaults *models.Defaults,
+	config *config.Config,
 ) *Handler {
 	return &Handler{
 		services: services,
-		defaults: defaults,
+		config:   config,
 	}
 }
 
@@ -43,12 +43,14 @@ func (h *Handler) Init(devMode bool, RedisConfig *models.RedisConfig, middleware
 		}))
 	}
 
+	app.Static("/uploads", "./uploads")
+
 	root := app.Group("/api")
 	sessionStore := sessionStore.NewSessionStore(RedisConfig)
 	dtoManager := dto.CreateNewDTOManager()
 
 	// init routes
-	v1.NewV1Handler(h.services, dtoManager, h.defaults).Init(root, sessionStore)
+	v1.NewV1Handler(h.services, dtoManager, h.config).Init(root, sessionStore)
 
 	return app
 }

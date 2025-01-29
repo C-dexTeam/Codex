@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"github.com/C-dexTeam/codex/internal/config/models"
+	"github.com/C-dexTeam/codex/internal/config"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/v1/private"
@@ -15,18 +15,18 @@ import (
 type V1Handler struct {
 	services   *services.Services
 	dtoManager dto.IDTOManager
-	defaults   *models.Defaults
+	config     *config.Config
 }
 
 func NewV1Handler(
 	services *services.Services,
 	dtoManager dto.IDTOManager,
-	defaults *models.Defaults,
+	config *config.Config,
 ) *V1Handler {
 	return &V1Handler{
 		services:   services,
 		dtoManager: dtoManager,
-		defaults:   defaults,
+		config:     config,
 	}
 }
 
@@ -40,11 +40,11 @@ func (h *V1Handler) Init(router fiber.Router, sessionStore *session.Store) {
 	public.NewPublicHandler(h.services,
 		sessionStore,
 		h.dtoManager,
-		h.defaults,
+		h.config,
 	).Init(root)
 	private.NewPrivateHandler(h.services,
 		sessionStore,
 		h.dtoManager,
-		h.defaults,
+		h.config,
 	).Init(root)
 }

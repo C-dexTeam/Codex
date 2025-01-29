@@ -14,6 +14,8 @@ import (
 type uploadService struct {
 	utilService IUtilService
 	uploadDir   string
+	courseDir   string
+	web3Dir     string
 }
 
 func newUploadService(
@@ -22,11 +24,13 @@ func newUploadService(
 	return &uploadService{
 		utilService: utilService,
 		uploadDir:   "uploads",
+		courseDir:   "uploads/courses",
+		web3Dir:     "uploads/web3",
 	}
 }
 
 func (s *uploadService) SaveImage(file *multipart.FileHeader, filePath string) error {
-	if err := s.checkDirectory(); err != nil {
+	if err := s.createDirectories(); err != nil {
 		return err
 	}
 
@@ -59,22 +63,41 @@ func (s *uploadService) SaveImage(file *multipart.FileHeader, filePath string) e
 	return nil
 }
 
-func (s *uploadService) MainDir() string {
+func (s *uploadService) createDirectories() error {
+	if err := file.CheckDir(s.uploadDir); err != nil {
+		if err := file.CreateDir(s.uploadDir); err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCreateDirectoryError)
+		}
+	}
+	if err := file.CheckDir(s.courseDir); err != nil {
+		if err := file.CreateDir(s.courseDir); err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCreateDirectoryError)
+		}
+	}
+	if err := file.CheckDir(s.web3Dir); err != nil {
+		if err := file.CreateDir(s.web3Dir); err != nil {
+			return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCreateDirectoryError)
+		}
+	}
+
+	return nil
+}
+
+func (s *uploadService) UploadDir() string {
 	return s.uploadDir
+}
+
+func (s *uploadService) CourseDir() string {
+	return s.courseDir
+}
+
+func (s *uploadService) Web3Dir() string {
+	return s.web3Dir
 }
 
 func (s *uploadService) DeleteFile(path string) error {
 	if err := os.Remove(path); err != nil {
 		return err
-	}
-
-	return nil
-}
-func (s *uploadService) checkDirectory() error {
-	if err := file.CheckDir(s.uploadDir); err != nil {
-		if err := file.CreateDir(s.uploadDir); err != nil {
-			return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCreateDirectoryError)
-		}
 	}
 
 	return nil

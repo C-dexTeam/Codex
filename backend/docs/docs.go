@@ -486,13 +486,37 @@ const docTemplate = `{
                 "summary": "Add Reward",
                 "parameters": [
                     {
-                        "description": "New Reward",
-                        "name": "newReward",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.AddRewardDTO"
-                        }
+                        "type": "file",
+                        "description": "Reward Image File",
+                        "name": "imageFile",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "Description",
+                        "in": "formData"
+                    },
+                    {
+                        "maxLength": 30,
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 30,
+                        "type": "string",
+                        "name": "rewardType",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 30,
+                        "type": "string",
+                        "name": "symbol",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -518,13 +542,39 @@ const docTemplate = `{
                 "summary": "Update Reward",
                 "parameters": [
                     {
-                        "description": "Update Reward",
-                        "name": "updateReward",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateRewardDTO"
-                        }
+                        "type": "string",
+                        "name": "Description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 30,
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "maxLength": 30,
+                        "type": "string",
+                        "name": "rewardType",
+                        "in": "formData"
+                    },
+                    {
+                        "maxLength": 30,
+                        "type": "string",
+                        "name": "symbol",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Course Image File",
+                        "name": "imageFile",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -1767,41 +1817,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.AddRewardDTO": {
-            "type": "object",
-            "required": [
-                "imagePath",
-                "name",
-                "rewardType",
-                "symbol",
-                "uri"
-            ],
-            "properties": {
-                "Description": {
-                    "type": "string"
-                },
-                "imagePath": {
-                    "type": "string",
-                    "maxLength": 60
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 30
-                },
-                "rewardType": {
-                    "type": "string",
-                    "maxLength": 30
-                },
-                "symbol": {
-                    "type": "string",
-                    "maxLength": 30
-                },
-                "uri": {
-                    "type": "string",
-                    "maxLength": 120
-                }
-            }
-        },
         "dto.AddTestDTO": {
             "type": "object",
             "required": [
@@ -1940,40 +1955,6 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
-                }
-            }
-        },
-        "dto.UpdateRewardDTO": {
-            "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "Description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "imagePath": {
-                    "type": "string",
-                    "maxLength": 60
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 30
-                },
-                "rewardType": {
-                    "type": "string",
-                    "maxLength": 30
-                },
-                "symbol": {
-                    "type": "string",
-                    "maxLength": 30
-                },
-                "uri": {
-                    "type": "string",
-                    "maxLength": 120
                 }
             }
         },

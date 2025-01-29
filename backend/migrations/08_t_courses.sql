@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS t_courses (
     reward_amount INT NOT NULL DEFAULT 1,
     title VARCHAR(30) NOT NULL,
     description TEXT NOT NULL,
-    image_path varchar(60) NOT NULL,
+    image_path varchar(60) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 
