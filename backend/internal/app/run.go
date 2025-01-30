@@ -35,7 +35,6 @@ func Run(cfg *config.Config) {
 	if err := goose.Up(conn, cfg.Application.MigrationsPath); err != nil {
 		panic(err)
 	}
-
 	// Repos
 	queries := repo.New(conn)
 

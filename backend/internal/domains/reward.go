@@ -14,6 +14,7 @@ type Reward struct {
 	ImagePath   string
 	URI         string
 	Attributes  []Attribute
+	SellerFee   int
 }
 
 type Attribute struct {
@@ -34,9 +35,10 @@ func NewReward(reward *repo.TReward, attributes []repo.TAttribute) *Reward {
 		Name:        reward.Name,
 		Symbol:      reward.Symbol,
 		Description: reward.Description,
-		ImagePath:   reward.ImagePath,
-		URI:         reward.Uri,
+		ImagePath:   reward.ImagePath.String,
+		URI:         reward.Uri.String,
 		Attributes:  NewAttributes(attributes),
+		SellerFee:   int(reward.SellerFee),
 	}
 }
 

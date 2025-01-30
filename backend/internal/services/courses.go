@@ -180,7 +180,7 @@ func (s *courseService) AddCourse(
 		RewardAmount:          int32(rewardAmount),
 		Title:                 title,
 		Description:           description,
-		ImagePath:             imagePath,
+		ImagePath:             s.utilService.ParseString(imagePath),
 	})
 	if err != nil {
 		return uuid.Nil, err

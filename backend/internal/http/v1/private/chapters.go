@@ -117,7 +117,7 @@ func (h *PrivateHandler) AddChapter(c *fiber.Ctx) error {
 	}
 
 	if newChapter.RewardID != "" {
-		if _, _, err := h.services.RewardService().GetReward(c.Context(), newChapter.RewardID, "1", "1"); err != nil {
+		if _, err := h.services.RewardService().GetReward(c.Context(), newChapter.RewardID, "1", "1"); err != nil {
 			return err
 		}
 	}
@@ -214,6 +214,7 @@ func (h *PrivateHandler) DeleteChapter(c *fiber.Ctx) error {
 // @Router /private/chapters/run [post]
 func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 	sessionID := c.Cookies("session_id")
+	userSession := sessionStore.GetSessionData(c)
 	var runChapter dto.RunChapter
 	if err := c.BodyParser(&runChapter); err != nil {
 		return err
@@ -229,12 +230,19 @@ func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 	quest := h.dtoManager.QuestManager().ToQuestDTO(chapter, tests, pLanguage, runChapter.UserCode)
 
 	// Request the Run endpoint from Codex-Compiler
-	err = h.services.ChapterService().Run(c.Context(), sessionID, *quest)
-	if err.Error() != "" {
+	codeResponse, err := h.services.ChapterService().Run(c.Context(), sessionID, *quest)
+	if err != nil {
 		return err
 	}
 
-	// TODO: look the err:logs if the test is wrong return de correct answer
+	// CodeResponse will come from compiler-api
+	if codeResponse.Correct {
+		if chapter.RewardID.Valid {
+			if err := h.services.RewardService().AddRewardIntoUser(c.Context(), userSession.UserID, runChapter.ChapterID, runChapter.CourseID, chapter.RewardID.UUID.String()); err != nil {
+				return err
+			}
+		}
+	}
 
-	return response.Response(200, "Status OK", err)
+	return response.Response(200, "Status OK", codeResponse)
 }

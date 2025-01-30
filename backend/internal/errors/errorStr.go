@@ -87,6 +87,8 @@ const (
 
 	ErrStreakAlreadyIncreased = "STREAK_ALREADY_INCREASED"
 
+	ErrCourseIDorChapterIDReq = "COURSE_ID_OR_CHAPTER_ID_REQUIRED"
+
 	// General
 	ErrInvalidID               = "INVALID_ID"
 	ErrInvalidBoolean          = "INVALID_BOOLEAN"
@@ -120,4 +122,6 @@ const (
 	ErrCompilerRunError     = "COMPILER_RUN_ERROR"
 	ErrCompilerCreateError  = "COMPILER_CREATE_ERROR"
 	ErrCreateDirectoryError = "DIRECTORY_CREATE_ERROR"
+
+	ErrInvalidDataType = "ERROR_INVALID_DATA_TYPE"
 )
