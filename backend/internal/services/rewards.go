@@ -3,9 +3,11 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"strings"
 
+	"github.com/C-dexTeam/codex/internal/domains"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -32,7 +34,7 @@ func newRewardService(
 func (s *rewardService) GetRewards(
 	ctx context.Context,
 	id, name, symbol, rewardType, page, limit string,
-) ([]repo.TReward, error) {
+) ([]domains.Reward, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -63,13 +65,15 @@ func (s *rewardService) GetRewards(
 		)
 	}
 
-	return rewards, nil
+	rewardDomains := domains.NewRewards(rewards, nil)
+
+	return rewardDomains, nil
 }
 
 func (s *rewardService) GetReward(
 	ctx context.Context,
 	id, page, limit string,
-) (*repo.TReward, []repo.TAttribute, error) {
+) (*domains.Reward, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -82,18 +86,18 @@ func (s *rewardService) GetReward(
 
 	rewardUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	reward, err := s.queries.GetReward(ctx, rewardUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "sql: no rows in result set") {
-			return nil, nil, serviceErrors.NewServiceErrorWithMessage(
+			return nil, serviceErrors.NewServiceErrorWithMessage(
 				serviceErrors.StatusBadRequest,
 				serviceErrors.ErrRewardNotFound,
 			)
 		}
-		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
 	}
 
 	rewardAttbitures, err := s.queries.GetAttributes(ctx, repo.GetAttributesParams{
@@ -102,21 +106,25 @@ func (s *rewardService) GetReward(
 		Off:      (int32(pageNum) - 1) * int32(limitNum),
 	})
 	if err != nil {
-		return nil, nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringRewardsAttributes, err)
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringRewardsAttributes, err)
 	}
 
-	return &reward, rewardAttbitures, nil
+	domainsReward := domains.NewReward(&reward, rewardAttbitures)
+
+	return domainsReward, nil
 }
 
 func (s *rewardService) AddReward(
 	ctx context.Context,
 	rewardType, symbol, name, description string,
+	sellerFee int,
 ) (uuid.UUID, error) {
 	id, err := s.queries.CreateReward(ctx, repo.CreateRewardParams{
 		RewardType:  rewardType,
 		Symbol:      symbol,
 		Name:        name,
 		Description: description,
+		SellerFee:   int32(sellerFee),
 	})
 	if err != nil {
 		return uuid.Nil, err
@@ -192,4 +200,93 @@ func (s *rewardService) DeleteReward(
 		return err
 	}
 	return
+}
+
+func (s *rewardService) AddRewardIntoUser(
+	ctx context.Context,
+	userAuthID, chapterID, courseID, rewardID string,
+) error {
+	userAuthUUID, err := s.utilService.NParseUUID(userAuthID)
+	if err != nil {
+		return err
+	}
+
+	if chapterID != "" && courseID != "" {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseIDorChapterIDReq)
+	}
+
+	chapterUUID, err := s.utilService.ParseUUID(chapterID)
+	if err != nil {
+		return err
+	}
+
+	if ok, err := s.queries.CheckChapterByID(ctx, chapterUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringChapter, err)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrChapterNotFound)
+	}
+
+	courseUUID, err := s.utilService.ParseUUID(courseID)
+	if err != nil {
+		return err
+	}
+
+	if ok, err := s.queries.CheckCourseByID(ctx, courseUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourse, err)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
+	}
+
+	rewardUUID, err := s.utilService.NParseUUID(rewardID)
+	if err != nil {
+		return err
+	}
+
+	if ok, err := s.queries.CheckRewardByID(ctx, rewardUUID); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringRewards, err)
+	} else if !ok {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrRewardNotFound)
+	}
+
+	s.queries.AddRewardToUser(ctx, repo.AddRewardToUserParams{
+		UserAuthID: userAuthUUID,
+		ChapterID:  chapterUUID,
+		CourseID:   courseUUID,
+		RewardID:   rewardUUID,
+	})
+
+	return nil
+}
+
+func (s *rewardService) GetUserRewards(
+	ctx context.Context,
+	userAuthID, page, limit string,
+) ([]repo.UserRewardsRow, error) {
+	pageNum, err := strconv.Atoi(page)
+	if err != nil || page == "" {
+		pageNum = 1
+	}
+
+	limitNum, err := strconv.Atoi(limit)
+	if err != nil || limit == "" {
+		limitNum = s.utilService.D().Limits.DefaultRewardLimit
+	}
+
+	userAuthUUID, err := s.utilService.NParseUUID(userAuthID)
+	if err != nil {
+		return nil, err
+	}
+
+	userRewards, err := s.queries.UserRewards(ctx, repo.UserRewardsParams{
+		UserAuthID: userAuthUUID,
+		Lim:        int32(limitNum),
+		Off:        (int32(pageNum) - 1) * int32(limitNum),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(userRewards, "selam")
+
+	return userRewards, nil
 }

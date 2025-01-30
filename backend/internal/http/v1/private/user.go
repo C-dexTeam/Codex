@@ -34,7 +34,12 @@ func (h *PrivateHandler) Profile(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	userProfileDTO := h.dtoManager.UserManager().ToUserProfile(*userSession, statistic, userSession.Streak)
+	userRewards, err := h.services.RewardService().GetUserRewards(c.Context(), userSession.UserID, "", "")
+	if err != nil {
+		return err
+	}
+
+	userProfileDTO := h.dtoManager.UserManager().ToUserProfile(*userSession, statistic, userRewards, userSession.Streak)
 
 	return response.Response(200, "Status OK", userProfileDTO)
 }

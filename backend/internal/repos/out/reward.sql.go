@@ -12,11 +12,30 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkRewardByID = `-- name: CheckRewardByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_rewards AS l
+        WHERE l.id = $1 
+    ) THEN true
+    ELSE false
+END AS exists
+`
+
+func (q *Queries) CheckRewardByID(ctx context.Context, rewardID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkRewardByID, rewardID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createReward = `-- name: CreateReward :one
 INSERT INTO
-    t_rewards (reward_type, symbol, name, description, image_path, uri)
+    t_rewards (reward_type, symbol, name, description, image_path, uri, seller_fee)
 VALUES
-    ($1, $2, $3, $4, $5, $6)
+    ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id
 `
 
@@ -25,8 +44,9 @@ type CreateRewardParams struct {
 	Symbol      string
 	Name        string
 	Description string
-	ImagePath   string
-	Uri         string
+	ImagePath   sql.NullString
+	Uri         sql.NullString
+	SellerFee   int32
 }
 
 func (q *Queries) CreateReward(ctx context.Context, arg CreateRewardParams) (uuid.UUID, error) {
@@ -37,6 +57,7 @@ func (q *Queries) CreateReward(ctx context.Context, arg CreateRewardParams) (uui
 		arg.Description,
 		arg.ImagePath,
 		arg.Uri,
+		arg.SellerFee,
 	)
 	var id uuid.UUID
 	err := row.Scan(&id)
@@ -57,7 +78,7 @@ func (q *Queries) DeleteReward(ctx context.Context, rewardID uuid.UUID) error {
 
 const getReward = `-- name: GetReward :one
 SELECT 
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri
+    r.id, r.reward_type, r.symbol, r.name, r.description, r.seller_fee, r.image_path, r.uri
 FROM 
     t_rewards as r
 WHERE
@@ -73,6 +94,7 @@ func (q *Queries) GetReward(ctx context.Context, rewardID uuid.UUID) (TReward, e
 		&i.Symbol,
 		&i.Name,
 		&i.Description,
+		&i.SellerFee,
 		&i.ImagePath,
 		&i.Uri,
 	)
@@ -81,7 +103,7 @@ func (q *Queries) GetReward(ctx context.Context, rewardID uuid.UUID) (TReward, e
 
 const getRewards = `-- name: GetRewards :many
 SELECT 
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri
+    r.id, r.reward_type, r.symbol, r.name, r.description, r.seller_fee, r.image_path, r.uri 
 FROM 
     t_rewards as r
 WHERE
@@ -126,6 +148,7 @@ func (q *Queries) GetRewards(ctx context.Context, arg GetRewardsParams) ([]TRewa
 			&i.Symbol,
 			&i.Name,
 			&i.Description,
+			&i.SellerFee,
 			&i.ImagePath,
 			&i.Uri,
 		); err != nil {
@@ -151,9 +174,10 @@ SET
     name =  COALESCE($3::TEXT, name),
     description =  COALESCE($4::TEXT, description),
     image_path =  COALESCE($5::TEXT, image_path),
-    uri =  COALESCE($6::TEXT, uri)
+    uri =  COALESCE($6::TEXT, uri),
+    seller_fee =  COALESCE($7::INTEGER, seller_fee)
 WHERE
-    id = $7
+    id = $8
 `
 
 type UpdateRewardParams struct {
@@ -163,6 +187,7 @@ type UpdateRewardParams struct {
 	Description sql.NullString
 	ImagePath   sql.NullString
 	Uri         sql.NullString
+	SellerFee   sql.NullInt32
 	RewardID    uuid.UUID
 }
 
@@ -174,6 +199,7 @@ func (q *Queries) UpdateReward(ctx context.Context, arg UpdateRewardParams) erro
 		arg.Description,
 		arg.ImagePath,
 		arg.Uri,
+		arg.SellerFee,
 		arg.RewardID,
 	)
 	return err

@@ -46,7 +46,7 @@ type CreateCourseParams struct {
 	RewardAmount          int32
 	Title                 string
 	Description           string
-	ImagePath             string
+	ImagePath             sql.NullString
 }
 
 func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (uuid.UUID, error) {
@@ -96,7 +96,7 @@ type GetCourseRow struct {
 	RewardAmount          int32
 	Title                 string
 	Description           string
-	ImagePath             string
+	ImagePath             sql.NullString
 	ChapterCount          int64
 	CreatedAt             sql.NullTime
 	DeletedAt             sql.NullTime
@@ -158,7 +158,7 @@ type GetCoursesRow struct {
 	RewardAmount          int32
 	Title                 string
 	Description           string
-	ImagePath             string
+	ImagePath             sql.NullString
 	ChapterCount          int64
 	CreatedAt             sql.NullTime
 	DeletedAt             sql.NullTime
@@ -247,7 +247,7 @@ type GetTopCoursesRow struct {
 	RewardAmount          int32
 	Title                 string
 	Description           string
-	ImagePath             string
+	ImagePath             sql.NullString
 	ChapterCount          int64
 	CreatedAt             sql.NullTime
 	DeletedAt             sql.NullTime

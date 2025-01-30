@@ -70,17 +70,18 @@ func (m *UserDTOManager) ToUserAuthViews(users []repo.TUsersAuth) []UserAuthView
 }
 
 type UserProfileView struct {
-	PublicKey           string         `json:"publicKey"`
-	UserID              string         `json:"userAuthID"`
-	RoleName            string         `json:"role"`
-	Username            string         `json:"username"`
-	Email               string         `json:"email"`
-	Name                string         `json:"name"`
-	Surname             string         `json:"surname"`
-	Level               int            `json:"level"`
-	Experience          int            `json:"experience"`
-	NextLevelExperience int            `json:"nextLevelExperience"`
-	Statistic           *StatisticView `json:"statistic"`
+	PublicKey           string           `json:"publicKey"`
+	UserID              string           `json:"userAuthID"`
+	RoleName            string           `json:"role"`
+	Username            string           `json:"username"`
+	Email               string           `json:"email"`
+	Name                string           `json:"name"`
+	Surname             string           `json:"surname"`
+	Level               int              `json:"level"`
+	Experience          int              `json:"experience"`
+	NextLevelExperience int              `json:"nextLevelExperience"`
+	Statistic           *StatisticView   `json:"statistic"`
+	UserRewards         []UserRewardView `json:"rewards"`
 }
 
 type StatisticView struct {
@@ -91,7 +92,9 @@ type StatisticView struct {
 	Streak                int   `json:"streak"`
 }
 
-func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData, statistic *repo.UserStatisticRow, streak int) UserProfileView {
+func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData, statistic *repo.UserStatisticRow, userRewards []repo.UserRewardsRow, streak int) UserProfileView {
+	rewardManager := new(RewardDTOManager)
+
 	var stat StatisticView
 	if statistic != nil {
 		stat = StatisticView{
@@ -115,6 +118,7 @@ func (UserDTOManager) ToUserProfile(userData sessionStore.SessionData, statistic
 		Experience:          userData.Experience,
 		NextLevelExperience: userData.NextLevelExp,
 		Statistic:           &stat,
+		UserRewards:         rewardManager.ToUserRewardDTOs(userRewards),
 	}
 }
 

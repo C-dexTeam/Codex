@@ -46,7 +46,7 @@ type TCourse struct {
 	RewardAmount          int32
 	Title                 string
 	Description           string
-	ImagePath             string
+	ImagePath             sql.NullString
 	CreatedAt             sql.NullTime
 	DeletedAt             sql.NullTime
 }
@@ -74,8 +74,9 @@ type TReward struct {
 	Symbol      string
 	Name        string
 	Description string
-	ImagePath   string
-	Uri         string
+	SellerFee   int32
+	ImagePath   sql.NullString
+	Uri         sql.NullString
 }
 
 type TRole struct {
@@ -102,6 +103,14 @@ type TUserCourse struct {
 	UserAuthID uuid.UUID
 	CourseID   uuid.UUID
 	Progress   sql.NullInt32
+	CreatedAt  sql.NullTime
+}
+
+type TUserReward struct {
+	UserAuthID uuid.UUID
+	CourseID   uuid.UUID
+	ChapterID  uuid.UUID
+	RewardID   uuid.UUID
 	CreatedAt  sql.NullTime
 }
 

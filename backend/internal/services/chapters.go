@@ -268,16 +268,21 @@ func (s *chapterService) DeleteChapter(
 	return
 }
 
-func (s *chapterService) Run(ctx context.Context, sessionID string, questView dto.QuestView) error {
-	data, err := s.requestCompiler(sessionID, questView)
+func (s *chapterService) Run(ctx context.Context, sessionID string, questView dto.QuestView) (*domains.CodeResponse, error) {
+	data, err := s.runRequest(sessionID, questView)
 	if err != nil {
-		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCompilerRunError)
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCompilerRunError)
 	}
 
-	return data
+	codeResponse, ok := data.Data.(domains.CodeResponse)
+	if !ok {
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrInvalidDataType)
+	}
+
+	return &codeResponse, nil
 }
 
-func (s *chapterService) requestCompiler(sessionID string, questView dto.QuestView) (*response.BaseResponse, error) {
+func (s *chapterService) runRequest(sessionID string, questView dto.QuestView) (*response.BaseResponse, error) {
 	// nginx domain because we are inside of docker & i'm going to do load balancer.
 	url := "http://nginx/compiler-api/v1/private/run"
 
