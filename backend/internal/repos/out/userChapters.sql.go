@@ -28,3 +28,23 @@ func (q *Queries) AddChapterToUser(ctx context.Context, arg AddChapterToUserPara
 	_, err := q.db.ExecContext(ctx, addChapterToUser, arg.UserAuthID, arg.CourseID, arg.ChapterID)
 	return err
 }
+
+const updateUserChapter = `-- name: UpdateUserChapter :exec
+UPDATE
+    t_user_chapters
+SET
+    isFinished = TRUE
+WHERE
+    user_auth_id = $1 AND course_id = $2 AND chapter_id =  $3
+`
+
+type UpdateUserChapterParams struct {
+	UserAuthID uuid.UUID
+	CourseID   uuid.UUID
+	ChapterID  uuid.UUID
+}
+
+func (q *Queries) UpdateUserChapter(ctx context.Context, arg UpdateUserChapterParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserChapter, arg.UserAuthID, arg.CourseID, arg.ChapterID)
+	return err
+}

@@ -4,6 +4,18 @@ INSERT INTO t_user_rewards
 VALUES
     (@user_auth_id, @course_id, @chapter_id, @reward_id);
 
+-- name: CheckUserReward :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_user_rewards AS l
+        WHERE
+            l.user_auth_id = @user_auth_id AND course_id = @course_id AND chapter_id = @chapter_id AND reward_id = @reward_id
+    ) THEN true
+    ELSE false
+END AS exists;
+
 -- name: UserRewards :many
 SELECT
     r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri, 

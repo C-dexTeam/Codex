@@ -4,11 +4,15 @@ INSERT INTO t_user_courses
 VALUES 
     (@user_auth_id, @course_id, 
      (
-        SELECT 
-            ROUND(100.0 * COUNT(*) / NULLIF((SELECT COUNT(*) FROM t_user_chapters WHERE course_id = @course_id), 0), 2)
-        FROM t_user_chapters
-        WHERE course_id = @course_id AND isFinished = true
-     ));
+        SELECT COALESCE(
+               (COUNT(CASE WHEN isFinished = TRUE THEN 1 END) * 100.0 / 
+                NULLIF((SELECT COUNT(*) FROM t_chapters as c WHERE c.course_id = @course_id AND c.deleted_at IS NULL), 0)
+               ), 0
+           )
+        FROM t_user_chapters as uc
+        WHERE uc.user_auth_id = @user_auth_id AND uc.course_id = @course_id
+     )
+    );
 
 -- name: UserCourses :many
 SELECT 
@@ -29,3 +33,25 @@ WHERE
     uc.user_auth_id = @user_auth_id AND c.deleted_at IS NULL
 GROUP BY 
     uc.user_auth_id, uc.course_id, c.title, c.description, uc.progress;
+
+-- name: UserCourse :one
+SELECT 
+    user_auth_id, course_id, progress, created_at
+FROM 
+    t_user_courses
+WHERE course_id = @course_id AND user_auth_id = @user_auth_id;
+
+-- name: UpdateUserCourseProgress :one
+UPDATE t_user_courses
+SET progress = (
+    SELECT COALESCE(
+               (COUNT(CASE WHEN isFinished = TRUE THEN 1 END) * 100.0 / 
+                (SELECT COUNT(*) FROM t_chapters as c WHERE c.course_id = @course_id AND c.deleted_at IS NULL)
+               ), 0
+           )
+    FROM t_user_chapters as uc
+    WHERE uc.user_auth_id = @user_auth_id AND uc.course_id = @course_id
+)
+WHERE 
+    user_auth_id = @user_auth_id AND course_id = @course_id
+RETURNING progress;

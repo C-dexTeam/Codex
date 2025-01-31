@@ -113,7 +113,6 @@ func (s *chapterService) GetChapter(
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringChapter, err)
 	}
 
-	// TODO: Return tests with input and output by chapter id
 	chapterTests, err := s.queries.GetTests(ctx, repo.GetTestsParams{
 		ChapterID: s.utilService.ParseNullUUID(id),
 		Lim:       int32(limitNum),
@@ -247,6 +246,25 @@ func (s *chapterService) UpdateChapter(
 	return nil
 }
 
+func (s *chapterService) UpdateIsFinished(
+	ctx context.Context,
+	userAuthID, chapterID, courseID string,
+) error {
+	userAuthUUID := uuid.MustParse(userAuthID)
+	chapterUUID := uuid.MustParse(chapterID)
+	courseUUID := uuid.MustParse(courseID)
+
+	if err := s.queries.UpdateUserChapter(ctx, repo.UpdateUserChapterParams{
+		UserAuthID: userAuthUUID,
+		ChapterID:  chapterUUID,
+		CourseID:   courseUUID,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *chapterService) DeleteChapter(
 	ctx context.Context,
 	id string,
@@ -274,8 +292,19 @@ func (s *chapterService) Run(ctx context.Context, sessionID string, questView dt
 		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCompilerRunError)
 	}
 
-	codeResponse, ok := data.Data.(domains.CodeResponse)
+	dataMap, ok := data.Data.(map[string]interface{})
 	if !ok {
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrInvalidDataType)
+	}
+
+	jsonData, err := json.Marshal(dataMap)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrInvalidDataType)
+	}
+
+	var codeResponse domains.CodeResponse
+	err = json.Unmarshal(jsonData, &codeResponse)
+	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrInvalidDataType)
 	}
 

@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -206,35 +205,10 @@ func (s *rewardService) AddRewardIntoUser(
 	ctx context.Context,
 	userAuthID, chapterID, courseID, rewardID string,
 ) error {
-	userAuthUUID, err := s.utilService.NParseUUID(userAuthID)
-	if err != nil {
+	userAuthUUID := uuid.MustParse(userAuthID)
+	courseUUID := uuid.MustParse(courseID)
+	if _, err := s.utilService.ParseUUID(chapterID); err != nil {
 		return err
-	}
-
-	if chapterID != "" && courseID != "" {
-		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseIDorChapterIDReq)
-	}
-
-	chapterUUID, err := s.utilService.ParseUUID(chapterID)
-	if err != nil {
-		return err
-	}
-
-	if ok, err := s.queries.CheckChapterByID(ctx, chapterUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringChapter, err)
-	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrChapterNotFound)
-	}
-
-	courseUUID, err := s.utilService.ParseUUID(courseID)
-	if err != nil {
-		return err
-	}
-
-	if ok, err := s.queries.CheckCourseByID(ctx, courseUUID); err != nil {
-		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourse, err)
-	} else if !ok {
-		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
 	}
 
 	rewardUUID, err := s.utilService.NParseUUID(rewardID)
@@ -248,12 +222,28 @@ func (s *rewardService) AddRewardIntoUser(
 		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrRewardNotFound)
 	}
 
-	s.queries.AddRewardToUser(ctx, repo.AddRewardToUserParams{
+	// If the reward already added. Than dont add.
+	ok, err := s.queries.CheckUserReward(ctx, repo.CheckUserRewardParams{
 		UserAuthID: userAuthUUID,
-		ChapterID:  chapterUUID,
 		CourseID:   courseUUID,
+		ChapterID:  s.utilService.ParseNullUUID(chapterID),
 		RewardID:   rewardUUID,
 	})
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil
+	}
+
+	if err := s.queries.AddRewardToUser(ctx, repo.AddRewardToUserParams{
+		UserAuthID: userAuthUUID,
+		ChapterID:  s.utilService.ParseNullUUID(chapterID),
+		CourseID:   courseUUID,
+		RewardID:   rewardUUID,
+	}); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -285,8 +275,6 @@ func (s *rewardService) GetUserRewards(
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(userRewards, "selam")
 
 	return userRewards, nil
 }

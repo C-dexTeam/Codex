@@ -22,7 +22,7 @@ VALUES
 type AddRewardToUserParams struct {
 	UserAuthID uuid.UUID
 	CourseID   uuid.UUID
-	ChapterID  uuid.UUID
+	ChapterID  uuid.NullUUID
 	RewardID   uuid.UUID
 }
 
@@ -34,6 +34,38 @@ func (q *Queries) AddRewardToUser(ctx context.Context, arg AddRewardToUserParams
 		arg.RewardID,
 	)
 	return err
+}
+
+const checkUserReward = `-- name: CheckUserReward :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_user_rewards AS l
+        WHERE
+            l.user_auth_id = $1 AND course_id = $2 AND chapter_id = $3 AND reward_id = $4
+    ) THEN true
+    ELSE false
+END AS exists
+`
+
+type CheckUserRewardParams struct {
+	UserAuthID uuid.UUID
+	CourseID   uuid.UUID
+	ChapterID  uuid.NullUUID
+	RewardID   uuid.UUID
+}
+
+func (q *Queries) CheckUserReward(ctx context.Context, arg CheckUserRewardParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkUserReward,
+		arg.UserAuthID,
+		arg.CourseID,
+		arg.ChapterID,
+		arg.RewardID,
+	)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }
 
 const userRewards = `-- name: UserRewards :many
