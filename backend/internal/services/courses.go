@@ -157,6 +157,31 @@ func (s *courseService) GetCourse(
 	return &domainCourse, nil
 }
 
+func (s *courseService) UserCourse(ctx context.Context, userAuthID, courseID string) (*repo.TUserCourse, error) {
+	userAuthUUID := uuid.MustParse(userAuthID)
+	courseUUID := uuid.MustParse(courseID)
+
+	userCourse, err := s.queries.UserCourse(ctx, repo.UserCourseParams{
+		CourseID:   courseUUID,
+		UserAuthID: userAuthUUID,
+	})
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, serviceErrors.NewServiceErrorWithMessage(
+				serviceErrors.StatusBadRequest,
+				serviceErrors.ErrUserCourseNotFound,
+			)
+		}
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrErrorWhileFilteringUserCourse,
+			err,
+		)
+	}
+
+	return &userCourse, nil
+}
+
 func (s *courseService) AddCourse(
 	ctx context.Context,
 	languageID, pLanguageID, rewardID, title, description, imagePath string,
@@ -276,4 +301,26 @@ func (s *courseService) StartCourse(
 	}
 
 	return userAuthUUID, nil
+}
+
+func (s *courseService) UpdateUserCourseProgress(
+	ctx context.Context,
+	userAuthID, courseID string,
+) (int32, error) {
+	userAuthUUD := uuid.MustParse(userAuthID)
+	courseUUID := uuid.MustParse(courseID)
+
+	progress, err := s.queries.UpdateUserCourseProgress(ctx, repo.UpdateUserCourseProgressParams{
+		UserAuthID: userAuthUUD,
+		CourseID:   courseUUID,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	if progress.Valid {
+		return progress.Int32, nil
+	}
+
+	return 0, nil
 }

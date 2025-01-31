@@ -1,6 +1,8 @@
 package private
 
 import (
+	"fmt"
+
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
@@ -223,6 +225,20 @@ func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 		return err
 	}
 
+	// Check if the ID's are correct.
+	if _, err := h.services.ChapterService().GetChapter(c.Context(), runChapter.ChapterID, "1", "1"); err != nil {
+		return err
+	}
+	course, err := h.services.CourseService().GetCourse(c.Context(), runChapter.CourseID, "1", "1")
+	if err != nil {
+		return err
+	}
+
+	// Check if the course started. If the user course exist than its started.
+	if _, err := h.services.CourseService().UserCourse(c.Context(), userSession.UserID, runChapter.CourseID); err != nil {
+		return err
+	}
+
 	chapter, tests, pLanguage, err := h.services.QuestService().GetQuest(c.Context(), runChapter.ChapterID, runChapter.CourseID)
 	if err != nil {
 		return err
@@ -242,6 +258,23 @@ func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 				return err
 			}
 		}
+		if err := h.services.ChapterService().UpdateIsFinished(c.Context(), userSession.UserID, runChapter.ChapterID, runChapter.CourseID); err != nil {
+			return err
+		}
+		progress, err := h.services.CourseService().UpdateUserCourseProgress(c.Context(), userSession.UserID, runChapter.CourseID)
+		if err != nil {
+			return err
+		}
+		// If the course finished. Than set course reward into user.
+		if progress == 100 {
+			if course.RewardID != nil {
+				// TODO: Check this. U change the migration. Before than it works
+				if err := h.services.RewardService().AddRewardIntoUser(c.Context(), userSession.UserID, "", runChapter.CourseID, course.RewardID.String()); err != nil {
+					return err
+				}
+			}
+		}
+		fmt.Println(progress, "Progrerress")
 	}
 
 	return response.Response(200, "Status OK", codeResponse)

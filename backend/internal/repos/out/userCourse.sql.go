@@ -18,11 +18,15 @@ INSERT INTO t_user_courses
 VALUES 
     ($1, $2, 
      (
-        SELECT 
-            ROUND(100.0 * COUNT(*) / NULLIF((SELECT COUNT(*) FROM t_user_chapters WHERE course_id = $2), 0), 2)
-        FROM t_user_chapters
-        WHERE course_id = $2 AND isFinished = true
-     ))
+        SELECT COALESCE(
+               (COUNT(CASE WHEN isFinished = TRUE THEN 1 END) * 100.0 / 
+                NULLIF((SELECT COUNT(*) FROM t_chapters as c WHERE c.course_id = $2 AND c.deleted_at IS NULL), 0)
+               ), 0
+           )
+        FROM t_user_chapters as uc
+        WHERE uc.user_auth_id = $1 AND uc.course_id = $2
+     )
+    )
 `
 
 type AddCourseToUserParams struct {
@@ -33,6 +37,59 @@ type AddCourseToUserParams struct {
 func (q *Queries) AddCourseToUser(ctx context.Context, arg AddCourseToUserParams) error {
 	_, err := q.db.ExecContext(ctx, addCourseToUser, arg.UserAuthID, arg.CourseID)
 	return err
+}
+
+const updateUserCourseProgress = `-- name: UpdateUserCourseProgress :one
+UPDATE t_user_courses
+SET progress = (
+    SELECT COALESCE(
+               (COUNT(CASE WHEN isFinished = TRUE THEN 1 END) * 100.0 / 
+                (SELECT COUNT(*) FROM t_chapters as c WHERE c.course_id = $1 AND c.deleted_at IS NULL)
+               ), 0
+           )
+    FROM t_user_chapters as uc
+    WHERE uc.user_auth_id = $2 AND uc.course_id = $1
+)
+WHERE 
+    user_auth_id = $2 AND course_id = $1
+RETURNING progress
+`
+
+type UpdateUserCourseProgressParams struct {
+	CourseID   uuid.UUID
+	UserAuthID uuid.UUID
+}
+
+func (q *Queries) UpdateUserCourseProgress(ctx context.Context, arg UpdateUserCourseProgressParams) (sql.NullInt32, error) {
+	row := q.db.QueryRowContext(ctx, updateUserCourseProgress, arg.CourseID, arg.UserAuthID)
+	var progress sql.NullInt32
+	err := row.Scan(&progress)
+	return progress, err
+}
+
+const userCourse = `-- name: UserCourse :one
+SELECT 
+    user_auth_id, course_id, progress, created_at
+FROM 
+    t_user_courses
+WHERE course_id = $1 AND user_auth_id = $2
+`
+
+type UserCourseParams struct {
+	CourseID   uuid.UUID
+	UserAuthID uuid.UUID
+}
+
+func (q *Queries) UserCourse(ctx context.Context, arg UserCourseParams) (TUserCourse, error) {
+	row := q.db.QueryRowContext(ctx, userCourse, arg.CourseID, arg.UserAuthID)
+	var i TUserCourse
+	err := row.Scan(
+		&i.UserAuthID,
+		&i.CourseID,
+		&i.Progress,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const userCourses = `-- name: UserCourses :many

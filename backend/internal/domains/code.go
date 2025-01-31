@@ -4,7 +4,7 @@ type CodeResponse struct {
 	Correct        bool
 	Output         string
 	BuildError     string
-	Err            error
+	Err            string
 	CorrectTestsID []string
 	WrongTestID    string
 }

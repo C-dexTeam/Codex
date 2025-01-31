@@ -22,6 +22,7 @@ const (
 	ErrTestNotFound                = "TEST_NOT_FOUND"
 	ErrInputNotFound               = "INPUT_NOT_FOUND"
 	ErrOutputNotFound              = "OUTPUT_NOT_FOUND"
+	ErrUserCourseNotFound          = "USER_COURSE_NOT_FOUND"
 )
 
 // 400
@@ -104,6 +105,7 @@ const (
 	ErrErrorWhileFilteringUserProfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
 	ErrErrorWhileFilteringRole                 = "ERROR_WHILE_FILTERING_ROLES"
 	ErrErrorWhileFilteringCourse               = "ERROR_WHILE_FILTERING_COURSES"
+	ErrErrorWhileFilteringUserCourse           = "ERROR_WHILE_FILTERING_USER_COURSES"
 	ErrErrorWhileFilteringChapter              = "ERROR_WHILE_FILTERING_CHAPTERS"
 	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"
 	ErrErrorWhileCreatingUserAuth              = "ERROR_WHILE_CREATING_USER_AUTH"

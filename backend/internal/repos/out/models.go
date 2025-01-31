@@ -109,7 +109,7 @@ type TUserCourse struct {
 type TUserReward struct {
 	UserAuthID uuid.UUID
 	CourseID   uuid.UUID
-	ChapterID  uuid.UUID
+	ChapterID  uuid.NullUUID
 	RewardID   uuid.UUID
 	CreatedAt  sql.NullTime
 }
