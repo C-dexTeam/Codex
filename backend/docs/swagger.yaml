@@ -256,7 +256,7 @@ info:
   description: API Service for Codex
   title: API Service
 paths:
-  /private/admin/attributes/:
+  /admin/attributes/:
     patch:
       consumes:
       - application/json
@@ -299,7 +299,7 @@ paths:
       summary: Add Attribute
       tags:
       - Attributes
-  /private/admin/attributes/:id:
+  /admin/attributes/:id:
     delete:
       consumes:
       - application/json
@@ -319,7 +319,7 @@ paths:
       summary: Delete Attribute
       tags:
       - Attributes
-  /private/admin/chapters/:
+  /admin/chapters/:
     patch:
       consumes:
       - application/json
@@ -362,7 +362,7 @@ paths:
       summary: Add Chapter
       tags:
       - Chapters
-  /private/admin/chapters/{id}:
+  /admin/chapters/{id}:
     delete:
       consumes:
       - application/json
@@ -382,7 +382,7 @@ paths:
       summary: Delete Chapter
       tags:
       - Chapters
-  /private/admin/courses/:
+  /admin/courses/:
     patch:
       consumes:
       - multipart/form-data
@@ -468,7 +468,7 @@ paths:
       summary: Add Course
       tags:
       - Courses
-  /private/admin/courses/{id}:
+  /admin/courses/{id}:
     delete:
       consumes:
       - application/json
@@ -489,7 +489,7 @@ paths:
       summary: Delete Course
       tags:
       - Courses
-  /private/admin/planguages/:
+  /admin/planguages/:
     patch:
       consumes:
       - application/json
@@ -532,7 +532,7 @@ paths:
       summary: Add Programming Language
       tags:
       - Programming Language
-  /private/admin/planguages/{id}:
+  /admin/planguages/{id}:
     delete:
       consumes:
       - application/json
@@ -552,7 +552,7 @@ paths:
       summary: Delete Programming Language
       tags:
       - Programming Language
-  /private/admin/rewards/:
+  /admin/rewards/:
     patch:
       consumes:
       - application/json
@@ -615,6 +615,9 @@ paths:
         required: true
         type: string
       - in: formData
+        name: sellerFee
+        type: integer
+      - in: formData
         maxLength: 30
         name: symbol
         required: true
@@ -629,7 +632,7 @@ paths:
       summary: Add Reward
       tags:
       - Reward
-  /private/admin/rewards/{id}:
+  /admin/rewards/{id}:
     delete:
       consumes:
       - application/json
@@ -649,7 +652,7 @@ paths:
       summary: Delete Reward
       tags:
       - Reward
-  /private/admin/tests/:
+  /admin/tests/:
     patch:
       consumes:
       - application/json
@@ -692,7 +695,7 @@ paths:
       summary: Add Test
       tags:
       - Test
-  /private/admin/tests/{id}:
+  /admin/tests/{id}:
     delete:
       consumes:
       - application/json
@@ -712,7 +715,7 @@ paths:
       summary: Delete Test
       tags:
       - Test
-  /private/admin/user:
+  /admin/user:
     get:
       consumes:
       - application/json
