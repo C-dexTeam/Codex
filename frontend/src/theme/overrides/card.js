@@ -118,7 +118,7 @@ const card = theme => {
     MuiCardContent: {
       styleOverrides: {
         root: ({ ownerState }) => ({
-          padding: "2rem 1rem",
+          padding: "2rem 1rem !important",
 
           ...(ownerState.size == "small" ? {
             padding: "0.75rem",
