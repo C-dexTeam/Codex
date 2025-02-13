@@ -1,7 +1,7 @@
 package paths
 
 func CreateURI(http bool, id, domain string) string {
-	return CreateURL(http, domain) + id
+	return CreateURL(http, domain) + "metadata/" + id
 }
 
 func CreateURL(http bool, domain string) string {

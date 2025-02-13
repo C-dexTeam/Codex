@@ -44,6 +44,14 @@ SET
 WHERE
     id = @user_auth_id;
 
+-- name: SetPublicKey :exec
+UPDATE
+    t_users_auth
+SET
+    public_key = @public_key
+WHERE
+    id = @user_auth_id;
+
 -- name: SoftDeleteUser :exec
 UPDATE
     t_users_auth

@@ -1485,6 +1485,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/user/mint/{rewardID}": {
+            "post": {
+                "description": "Mint your NFT.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Mint NFT",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "rewardID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/user/profile": {
             "get": {
                 "description": "Retrieves users profile.",

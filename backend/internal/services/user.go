@@ -1,12 +1,19 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"strconv"
 	"strings"
 
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
+	dto "github.com/C-dexTeam/codex/internal/http/dtos"
+	"github.com/C-dexTeam/codex/internal/http/response"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	hasherService "github.com/C-dexTeam/codex/pkg/hasher"
 
@@ -124,6 +131,34 @@ func (s *UserService) Register(ctx context.Context, username, email, password, c
 	return nil
 }
 
+func (s *UserService) SetPublicKey(ctx context.Context, userID, publicKey string) error {
+	// Checking if the user already has an account
+	users, err := s.queries.GetUsersAuth(ctx, repo.GetUsersAuthParams{
+		ID:  s.utilService.ParseNullUUID(userID),
+		Lim: 1,
+		Off: 0,
+	})
+	if err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
+	}
+	if len(users) == 0 {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound, err)
+	}
+
+	if publicKey == "" {
+		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrPublicKeyEmpty)
+	}
+
+	if err := s.queries.SetPublicKey(ctx, repo.SetPublicKeyParams{
+		UserAuthID: uuid.MustParse(userID),
+		PublicKey:  s.utilService.ParseString(publicKey),
+	}); err != nil {
+		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileSettingPublicKey, err)
+	}
+
+	return nil
+}
+
 func (s *UserService) AuthWallet(ctx context.Context, publicKey, message, signature string) (*repo.TUsersAuth, error) {
 	ok, err := hasherService.VerifySignature(publicKey, message, signature)
 	if err != nil {
@@ -211,4 +246,74 @@ func (s *UserService) GetUsers(ctx context.Context, id, username, email, page, l
 	}
 
 	return users, nil
+}
+
+func (s *UserService) MintNFT(sessionID, publcKey, name, symbol, uri string, sellerFree int) (*response.BaseResponse, error) {
+	data, err := s.mintRequest(sessionID, publcKey, name, sessionID, uri, sellerFree)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrWeb3RunError)
+	}
+
+	return data, nil
+}
+
+func (s *UserService) mintRequest(sessionID string, publicKeyStr, name, symbol, uri string, sellerFree int) (*response.BaseResponse, error) {
+	// nginx domain because we are inside of docker & i'm going to do load balancer.
+	url := "http://nginx/web3-api/nft/mint"
+
+	// Create a mintDTO
+	mintDTO := dto.MintNFTDTO{
+		PublicKeyStr: publicKeyStr,
+		Name:         name,
+		Symbol:       symbol,
+		URI:          uri,
+		SellerFee:    int64(sellerFree),
+	}
+
+	// Serialize mintDTO to JSON
+	requestBody, err := json.Marshal(mintDTO)
+	if err != nil {
+		return nil, response.Response(500, "Error marshalling mintDTO", err)
+	}
+
+	// Create a new POST request with the JSON body
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return nil, response.Response(500, "Error creating POST request", err)
+	}
+
+	// Set the Content-Type header to application/json
+	req.Header.Add("Content-Type", "application/json")
+
+	// Add the Codex-Compiler header
+	req.Header.Add("Codex-Web3", hasherService.MD5Hash(s.utilService.D().Secret))
+
+	// Add the session_id cookie to the request
+	req.AddCookie(&http.Cookie{
+		Name:  "session_id",
+		Value: sessionID,
+	})
+
+	// Create an HTTP client and execute the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, response.Response(500, "Error making POST request", err)
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, response.Response(500, "Error reading response body", nil)
+	}
+
+	fmt.Println(string(body))
+
+	var data response.BaseResponse
+	if err := json.Unmarshal(body, &data); err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(500, "Error decoding session data", err)
+	}
+
+	return &data, nil
 }

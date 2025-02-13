@@ -126,3 +126,11 @@ type UserProfileUpdateDTO struct {
 	Name    string `json:"name" validate:"omitempty,max=30"`
 	Surname string `json:"surname" validate:"omitempty,max=30"`
 }
+
+type MintNFTDTO struct {
+	PublicKeyStr string `json:"publicKey" validate:"required"`
+	Name         string `json:"name" validate:"required"`
+	Symbol       string `json:"symbol" validate:"required"`
+	URI          string `json:"uri" validate:"required"`
+	SellerFee    int64  `json:"sellerFee" validate:"required"`
+}
