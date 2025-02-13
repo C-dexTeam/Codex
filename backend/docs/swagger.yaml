@@ -1217,6 +1217,27 @@ paths:
       summary: Connect Wallet To User
       tags:
       - User
+  /private/user/mint/{rewardID}:
+    post:
+      consumes:
+      - application/json
+      description: Mint your NFT.
+      parameters:
+      - description: Reward ID
+        in: path
+        name: rewardID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Mint NFT
+      tags:
+      - User
   /private/user/profile:
     get:
       consumes:

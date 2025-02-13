@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"path/filepath"
 
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
@@ -59,6 +60,7 @@ func (h *AdminHandler) AddReward(c *fiber.Ctx) error {
 		return err
 	}
 	uri := paths.CreateURI(h.config.Application.Https, id.String(), h.config.Application.Site)
+	fmt.Println(uri, "psaokdapğsok")
 
 	if err := h.services.RewardService().UpdateReward(c.Context(), id.String(), "", "", "", "", imagePath, uri); err != nil {
 		return err

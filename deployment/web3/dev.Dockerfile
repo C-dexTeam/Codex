@@ -11,8 +11,5 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-# Expose the application port
-EXPOSE 3000
-
 # Use nodemon for development
 CMD ["npm", "run", "dev"]

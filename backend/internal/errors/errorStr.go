@@ -121,7 +121,11 @@ const (
 	ErrTransactionError                        = "ERROR_WHILE_COMMITING"
 	ErrWalletVerificationError                 = "ERROR_WHILE_VERIFICATON_WALLET"
 
+	ErrPublicKeyEmpty             = "PUBLIC_KEY_EMPTY"
+	ErrErrorWhileSettingPublicKey = "ERROR_WHILE_SETTING_PUBLIC_KEY"
+
 	ErrCompilerRunError     = "COMPILER_RUN_ERROR"
+	ErrWeb3RunError         = "WEB3_RUN_ERROR"
 	ErrCompilerCreateError  = "COMPILER_CREATE_ERROR"
 	ErrCreateDirectoryError = "DIRECTORY_CREATE_ERROR"
 
