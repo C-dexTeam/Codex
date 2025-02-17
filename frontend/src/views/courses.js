@@ -39,7 +39,7 @@ const statistics = [
     },
     {
         id: 2,
-        title: "Strike",
+        title: "Streak",
         value: 5,
         img: "/images/fire.png",
     }
@@ -72,8 +72,8 @@ const Courses = () => {
     }
 
     return (
-        <Grid container spacing={6}>
-            <Grid item container xs={12} md={8} spacing={6}>
+        <Grid container spacing={6} sx={{ pt: "0px !important", mt: 0 }}>
+            <Grid item container xs={12} md={8} spacing={6} sx={{ pt: "0px !important" }}>
                 <Grid item xs={12}>
                     <Box
                         sx={{
@@ -250,7 +250,7 @@ const Courses = () => {
                 </Grid>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={4} sx={{ pt: "0px !important" }}>
                 <Card sx={{ position: "sticky", top: "1rem" }}>
                     <CardContent>
                         <Grid container spacing={4}>
