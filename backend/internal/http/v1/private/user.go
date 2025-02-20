@@ -1,8 +1,6 @@
 package private
 
 import (
-	"fmt"
-
 	"github.com/C-dexTeam/codex/internal/domains"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
@@ -197,8 +195,6 @@ func (h *PrivateHandler) MintNFT(c *fiber.Ctx) error {
 		return response.Response(400, "Public Key Required", nil)
 	}
 
-	fmt.Println("MintNFT", reward.Name, reward.Symbol, reward.URI, reward.SellerFee)
-	fmt.Println(userSession.PublicKey)
 	data, err := h.services.UserService().MintNFT(sessionID, userSession.PublicKey, reward.Name, reward.Symbol, reward.URI, reward.SellerFee)
 	if err != nil {
 		return err

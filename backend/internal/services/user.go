@@ -249,7 +249,7 @@ func (s *UserService) GetUsers(ctx context.Context, id, username, email, page, l
 }
 
 func (s *UserService) MintNFT(sessionID, publcKey, name, symbol, uri string, sellerFree int) (*response.BaseResponse, error) {
-	data, err := s.mintRequest(sessionID, publcKey, name, sessionID, uri, sellerFree)
+	data, err := s.mintRequest(sessionID, publcKey, name, symbol, uri, sellerFree)
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrWeb3RunError)
 	}
