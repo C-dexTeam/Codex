@@ -50,6 +50,7 @@ const Layout = ({ children }) => {
 
             <Box sx={{
                 width: '100%', display: 'flex', 
+                // mt: "96px",
                 py: '40px',
                 minHeight: `calc(100vh - 80px)`,
                 gap: '40px',

@@ -7,11 +7,22 @@ const chip = theme => {
   return {
     MuiChip: {
       styleOverrides: {
-        root: {
-          '&.MuiChip-rounded': {
-            borderRadius: '1.25rem'
-          }
-        },
+        root: ({ ownerState }) =>
+        (
+          {
+            "&.MuiChip-root": {
+              color: ownerState.color == "default" ? theme.palette.text.primary : theme.palette[ownerState.color].contrastText,
+              background: ownerState.color == "default" ? theme.palette.background.paper : theme.palette[ownerState.color].main,
+              letterSpacing: "0.5px",
+            },
+            '&.MuiChip-rounded': {
+              borderRadius: '0.5rem'
+            },
+            "&.MuiChip-light": {
+              backgroundColor: ownerState.color == "default" ? theme.palette.background.paper : hexToRGBA(theme.palette[ownerState.color].main, 0.15),
+              color: ownerState.color == "default" ? theme.palette.text.primary : theme.palette[ownerState.color].main,
+            }
+          }),
         outlined: {
           '&.MuiChip-colorDefault': {
             borderColor: `rgba(${theme.palette.mainColor}, 0.22)`

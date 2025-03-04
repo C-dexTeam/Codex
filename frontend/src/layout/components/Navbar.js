@@ -1,5 +1,4 @@
 import { Box, Button, Container } from "@mui/material";
-import themeConfig from "@/configs/themeConfig";
 import NavigationList from "./navigation";
 
 const Navbar = () => {
@@ -23,7 +22,9 @@ const Navbar = () => {
           }}
         >
           <Box component="div" sx={{ borderRadius: '1.25rem 0rem 1.25rem 0rem', mb: '0.5rem', textAlign: 'center' }}>
-            {themeConfig.templateName}
+            <Box sx={{ height: "2.5rem" }}>
+              <img src="/images/logo/logo-horizontal.png" alt="Codex Logo" />
+            </Box>
           </Box>
 
           <Box sx={{
