@@ -175,6 +175,25 @@ func (q *Queries) GetUsersAuth(ctx context.Context, arg GetUsersAuthParams) ([]T
 	return items, nil
 }
 
+const setPublicKey = `-- name: SetPublicKey :exec
+UPDATE
+    t_users_auth
+SET
+    public_key = $1
+WHERE
+    id = $2
+`
+
+type SetPublicKeyParams struct {
+	PublicKey  sql.NullString
+	UserAuthID uuid.UUID
+}
+
+func (q *Queries) SetPublicKey(ctx context.Context, arg SetPublicKeyParams) error {
+	_, err := q.db.ExecContext(ctx, setPublicKey, arg.PublicKey, arg.UserAuthID)
+	return err
+}
+
 const softDeleteUser = `-- name: SoftDeleteUser :exec
 UPDATE
     t_users_auth

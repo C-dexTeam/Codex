@@ -1,4 +1,4 @@
-import { Box, keyframes, Typography, useTheme } from "@mui/material"
+import { Box, Typography, useTheme } from "@mui/material"
 import Image from "next/image"
 import { Fragment } from "react"
 
@@ -11,9 +11,8 @@ const LevelText = ({ proggress, level, variant, disable = false }) => {
             return (
                 <Fragment>
                     <Box sx={{
-                        animation: `${smoothFloatAndSway3D} 50s cubic-bezier(0.42, 0, 0.58, 1) infinite`
+                        animation: `smoothFloatAndSway3D 50s cubic-bezier(0.42, 0, 0.58, 1) infinite`
                     }}>
-
                         <Image
                             src="/images/astronout/astronout-sitting.png"
                             alt="Astronout sitting"
@@ -25,7 +24,7 @@ const LevelText = ({ proggress, level, variant, disable = false }) => {
                                 right: "0.25rem",
                                 bottom: "calc(100% - 0.375rem)",
                                 width: "auto",
-                                height: "2rem",
+                                minHeight: "2rem",
                             }}
                         />
                     </Box>
@@ -143,27 +142,5 @@ const LevelBar = ({ level = 0, proggress = 0, free = false, variant = "default" 
         </Box>
     )
 }
-
-const smoothFloatAndSway3D = keyframes`
-  0% {
-    transform: perspective(1000px) translate3d(0px, 0px, 0px) rotate(0deg);
-  }
-  20% {
-    transform: perspective(900px) translate3d(8px, -12px, 20px) rotate(8deg);
-  }
-  40% {
-    transform: perspective(800px) translate3d(-4px, -16px, -40px) rotate(4deg);
-  }
-  60% {
-    transform: perspective(900px) translate3d(-8px, 0px, 40px) rotate(-4deg);
-  }
-  80% {
-    transform: perspective(1000px) translate3d(12px, -4px, -40px) rotate(8deg);
-  }
-  100% {
-    transform: perspective(1100px) translate3d(0px, 0px, 0px) rotate(0deg);
-  }
-`;
-
 
 export default LevelBar

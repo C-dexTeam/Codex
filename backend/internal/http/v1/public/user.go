@@ -46,7 +46,12 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	statistic, err := h.services.UserProfileService().UserStatistic(c.Context(), userProfile.ID.String())
+	statistic, err := h.services.UserProfileService().UserStatistic(c.Context(), userAuthData.ID.String())
+	if err != nil {
+		return err
+	}
+
+	userRewards, err := h.services.RewardService().GetUserRewards(c.Context(), userAuthData.ID.String(), "", "")
 	if err != nil {
 		return err
 	}
@@ -61,7 +66,7 @@ func (h *PublicHandler) Login(c *fiber.Ctx) error {
 	if err := sess.Save(); err != nil {
 		return err
 	}
-	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData, statistic, sessionData.Streak)
+	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData, statistic, userRewards, sessionData.Streak)
 
 	return response.Response(200, "Login successful", profileResponse)
 }
@@ -98,7 +103,12 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	statistic, err := h.services.UserProfileService().UserStatistic(c.Context(), userProfile.ID.String())
+	statistic, err := h.services.UserProfileService().UserStatistic(c.Context(), userAuthData.ID.String())
+	if err != nil {
+		return err
+	}
+
+	userRewards, err := h.services.RewardService().GetUserRewards(c.Context(), userAuthData.ID.String(), "", "")
 	if err != nil {
 		return err
 	}
@@ -118,7 +128,7 @@ func (h *PublicHandler) AuthWallet(c *fiber.Ctx) error {
 	if err := sess.Save(); err != nil {
 		return err
 	}
-	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData, statistic, sessionData.Streak)
+	profileResponse := h.dtoManager.UserManager().ToUserProfile(sessionData, statistic, userRewards, sessionData.Streak)
 
 	return response.Response(200, "Login successful", profileResponse)
 }

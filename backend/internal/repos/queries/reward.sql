@@ -1,6 +1,6 @@
 -- name: GetRewards :many
 SELECT 
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri
+    r.id, r.reward_type, r.symbol, r.name, r.description, r.seller_fee, r.image_path, r.uri 
 FROM 
     t_rewards as r
 WHERE
@@ -13,7 +13,7 @@ LIMIT @lim OFFSET @off;
 
 -- name: GetReward :one
 SELECT 
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri
+    r.id, r.reward_type, r.symbol, r.name, r.description, r.seller_fee, r.image_path, r.uri
 FROM 
     t_rewards as r
 WHERE
@@ -21,9 +21,9 @@ WHERE
 
 -- name: CreateReward :one
 INSERT INTO
-    t_rewards (reward_type, symbol, name, description, image_path, uri)
+    t_rewards (reward_type, symbol, name, description, image_path, uri, seller_fee)
 VALUES
-    (@reward_type, @symbol, @name, @description, @image_path, @uri)
+    (@reward_type, @symbol, @name, @description, @image_path, @uri, @seller_fee)
 RETURNING id;
 
 -- name: UpdateReward :exec
@@ -35,7 +35,8 @@ SET
     name =  COALESCE(sqlc.narg(name)::TEXT, name),
     description =  COALESCE(sqlc.narg(description)::TEXT, description),
     image_path =  COALESCE(sqlc.narg(image_path)::TEXT, image_path),
-    uri =  COALESCE(sqlc.narg(uri)::TEXT, uri)
+    uri =  COALESCE(sqlc.narg(uri)::TEXT, uri),
+    seller_fee =  COALESCE(sqlc.narg(seller_fee)::INTEGER, seller_fee)
 WHERE
     id = @reward_id;
 
@@ -44,3 +45,14 @@ DELETE FROM
     t_rewards
 WHERE
     id = @reward_id;
+
+-- name: CheckRewardByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_rewards AS l
+        WHERE l.id = @reward_id 
+    ) THEN true
+    ELSE false
+END AS exists;

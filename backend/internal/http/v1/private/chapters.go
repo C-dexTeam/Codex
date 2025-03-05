@@ -12,12 +12,6 @@ func (h *PrivateHandler) initChaptersRoutes(root fiber.Router) {
 	chapterRoutes.Get("/", h.GetChapters)
 	chapterRoutes.Get("/:id", h.GetChapter)
 	chapterRoutes.Post("/run", h.RunChapter)
-
-	chapterAdminRoutes := root.Group("/admin/chapters")
-	chapterAdminRoutes.Use(h.adminRoleMiddleware)
-	chapterAdminRoutes.Post("/", h.AddChapter)
-	chapterAdminRoutes.Patch("/", h.UpdateChapter)
-	chapterAdminRoutes.Delete("/:id", h.DeleteChapter)
 }
 
 // @Tags Chapters
@@ -84,127 +78,6 @@ func (h *PrivateHandler) GetChapter(c *fiber.Ctx) error {
 }
 
 // @Tags Chapters
-// @Summary Add Chapter
-// @Description Adds Chapter Into DB.
-// @Accept json
-// @Produce json
-// @Param newChapter body dto.AddChapterDTO true "New Chapter"
-// @Success 200 {object} response.BaseResponse{}
-// @Router /private/admin/chapters/ [post]
-func (h *PrivateHandler) AddChapter(c *fiber.Ctx) error {
-	var newChapter dto.AddChapterDTO
-	if err := c.BodyParser(&newChapter); err != nil {
-		return err
-	}
-	if err := h.services.UtilService().Validator().ValidateStruct(newChapter); err != nil {
-		return err
-	}
-
-	// Default Language if the languageID is ""
-	var languageID string
-	if newChapter.LanguageID == "" {
-		defaultLanguage, err := h.services.LanguageService().GetDefault(c.Context())
-		if err != nil {
-			return err
-		}
-		languageID = defaultLanguage.ID.String()
-	} else {
-		languageID = newChapter.LanguageID
-	}
-
-	if _, err := h.services.CourseService().GetCourse(c.Context(), newChapter.CourseID, "1", "1"); err != nil {
-		return err
-	}
-
-	if newChapter.RewardID != "" {
-		if _, _, err := h.services.RewardService().GetReward(c.Context(), newChapter.RewardID, "1", "1"); err != nil {
-			return err
-		}
-	}
-
-	id, err := h.services.ChapterService().AddChapter(
-		c.Context(),
-		newChapter.CourseID,
-		languageID,
-		newChapter.RewardID,
-		newChapter.Title,
-		newChapter.Description,
-		newChapter.Content,
-		newChapter.FuncName,
-		newChapter.FrontendTmp,
-		newChapter.DockerTmp,
-		newChapter.CheckTmp,
-		newChapter.GrantsExperience,
-		newChapter.Active,
-		newChapter.RewardAmount,
-		newChapter.Order,
-	)
-	if err != nil {
-		return err
-	}
-
-	return response.Response(200, "Status OK", id)
-}
-
-// @Tags Chapters
-// @Summary Update Chapter
-// @Description Updates Chapter Into DB.
-// @Accept json
-// @Produce json
-// @Param updateChapter body dto.UpdateChapterDTO true "Update Chapters"
-// @Success 200 {object} response.BaseResponse{}
-// @Router /private/admin/chapters/ [patch]
-func (h *PrivateHandler) UpdateChapter(c *fiber.Ctx) error {
-	var updateChapter dto.UpdateChapterDTO
-	if err := c.BodyParser(&updateChapter); err != nil {
-		return err
-	}
-	if err := h.services.UtilService().Validator().ValidateStruct(updateChapter); err != nil {
-		return err
-	}
-
-	err := h.services.ChapterService().UpdateChapter(
-		c.Context(),
-		updateChapter.ID,
-		updateChapter.CourseID,
-		updateChapter.LanguageID,
-		updateChapter.RewardID,
-		updateChapter.Title,
-		updateChapter.Description,
-		updateChapter.Content,
-		updateChapter.FuncName,
-		updateChapter.FrontendTmp,
-		updateChapter.DockerTmp,
-		updateChapter.CheckTmp,
-		updateChapter.GrantsExperience,
-		updateChapter.Active,
-		updateChapter.RewardAmount,
-	)
-	if err != nil {
-		return err
-	}
-
-	return response.Response(200, "Status OK", nil)
-}
-
-// @Tags Chapters
-// @Summary Delete Chapter
-// @Description Delete Chapters from DB.
-// @Accept json
-// @Produce json
-// @Param id path string false "Chapter ID"
-// @Success 200 {object} response.BaseResponse{}
-// @Router /private/admin/chapters/{id} [delete]
-func (h *PrivateHandler) DeleteChapter(c *fiber.Ctx) error {
-	id := c.Params("id")
-
-	if err := h.services.ChapterService().DeleteChapter(c.Context(), id); err != nil {
-		return err
-	}
-	return response.Response(200, "Status OK", nil)
-}
-
-// @Tags Chapters
 // @Summary Run Chapter
 // @Description Runs Chapter Code.
 // @Accept json
@@ -214,11 +87,26 @@ func (h *PrivateHandler) DeleteChapter(c *fiber.Ctx) error {
 // @Router /private/chapters/run [post]
 func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 	sessionID := c.Cookies("session_id")
+	userSession := sessionStore.GetSessionData(c)
 	var runChapter dto.RunChapter
 	if err := c.BodyParser(&runChapter); err != nil {
 		return err
 	}
 	if err := h.services.UtilService().Validator().ValidateStruct(runChapter); err != nil {
+		return err
+	}
+
+	// Check if the ID's are correct.
+	if _, err := h.services.ChapterService().GetChapter(c.Context(), runChapter.ChapterID, "1", "1"); err != nil {
+		return err
+	}
+	course, err := h.services.CourseService().GetCourse(c.Context(), runChapter.CourseID, "1", "1")
+	if err != nil {
+		return err
+	}
+
+	// Check if the course started. If the user course exist than its started.
+	if _, err := h.services.CourseService().UserCourse(c.Context(), userSession.UserID, runChapter.CourseID); err != nil {
 		return err
 	}
 
@@ -229,12 +117,35 @@ func (h *PrivateHandler) RunChapter(c *fiber.Ctx) error {
 	quest := h.dtoManager.QuestManager().ToQuestDTO(chapter, tests, pLanguage, runChapter.UserCode)
 
 	// Request the Run endpoint from Codex-Compiler
-	err = h.services.ChapterService().Run(c.Context(), sessionID, *quest)
-	if err.Error() != "" {
+	codeResponse, err := h.services.ChapterService().Run(c.Context(), sessionID, *quest)
+	if err != nil {
 		return err
 	}
 
-	// TODO: look the err:logs if the test is wrong return de correct answer
+	// CodeResponse will come from compiler-api
+	if codeResponse.Correct {
+		if chapter.RewardID.Valid {
+			if err := h.services.RewardService().AddRewardIntoUser(c.Context(), userSession.UserID, runChapter.ChapterID, runChapter.CourseID, chapter.RewardID.UUID.String()); err != nil {
+				return err
+			}
+		}
+		if err := h.services.ChapterService().UpdateIsFinished(c.Context(), userSession.UserID, runChapter.ChapterID, runChapter.CourseID); err != nil {
+			return err
+		}
+		progress, err := h.services.CourseService().UpdateUserCourseProgress(c.Context(), userSession.UserID, runChapter.CourseID)
+		if err != nil {
+			return err
+		}
+		// If the course finished. Than set course reward into user.
+		if progress == 100 {
+			if course.RewardID != nil {
+				// TODO: Check this. U change the migration. Before than it works
+				if err := h.services.RewardService().AddRewardIntoUser(c.Context(), userSession.UserID, "", runChapter.CourseID, course.RewardID.String()); err != nil {
+					return err
+				}
+			}
+		}
+	}
 
-	return response.Response(200, "Status OK", err)
+	return response.Response(200, "Status OK", codeResponse)
 }

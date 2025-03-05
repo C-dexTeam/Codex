@@ -11,7 +11,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - codex
-  
+
   compiler-api:
     container_name: compiler-api
     build:
@@ -30,10 +30,10 @@ services:
       context: ../web3/.
       dockerfile: ../deployment/web3/dev.Dockerfile
     ports:
-      - "8082:8082"
+      - 8082:8082
     volumes:
-      - ../web3:/app
-    command: npm run dev
+      - ../web3:/usr/src/app
+      - ../../Wallet:/usr/src/Wallet # Yoksa Kendin Doldur.
     networks:
       - codex
 

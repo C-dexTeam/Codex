@@ -23,6 +23,9 @@ import GuestGuard from '@/layout/auth/GuestGuard'
 import AuthGuard from '@/layout/auth/AuthGuard'
 // ** Global css styles
 import '../styles/main.css'
+import "keen-slider/keen-slider.min.css"
+
+// ** Theme Components
 import ThemeComponent from '@/layout/ThemeComponent'
 import WindowWrapper from '@/components/window-wrapper'
 import AclGuard from '@/layout/auth/AclGuard'

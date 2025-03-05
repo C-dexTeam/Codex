@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/C-dexTeam/codex/internal/domains"
 	serviceErrors "github.com/C-dexTeam/codex/internal/errors"
 	repo "github.com/C-dexTeam/codex/internal/repos/out"
 	"github.com/google/uuid"
@@ -32,7 +33,7 @@ func NewAttributeService(
 func (s *attributeService) GetAttributes(
 	ctx context.Context,
 	id, rewardID, traitType, page, limit string,
-) ([]repo.TAttribute, error) {
+) ([]domains.Attribute, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -64,8 +65,9 @@ func (s *attributeService) GetAttributes(
 			err,
 		)
 	}
+	domainsAttr := domains.NewAttributes(attributes)
 
-	return attributes, nil
+	return domainsAttr, nil
 }
 
 func (s *attributeService) AddAttribute(

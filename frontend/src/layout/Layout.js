@@ -49,7 +49,9 @@ const Layout = ({ children }) => {
             <Navbar />
 
             <Box sx={{
-                width: '100%', display: 'flex', py: '40px',
+                width: '100%', display: 'flex', 
+                // mt: "96px",
+                py: '40px',
                 minHeight: `calc(100vh - 80px)`,
                 gap: '40px',
             }}>
@@ -66,7 +68,7 @@ const Layout = ({ children }) => {
                     >
                         {/* <CustomBreadcrumbs titles={titles} /> */}
 
-                        <Box sx={{ mt: '1rem' }}>
+                        <Box sx={{}}>
                             {children}
                         </Box>
                     </Box>

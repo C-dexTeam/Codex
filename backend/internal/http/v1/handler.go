@@ -4,6 +4,7 @@ import (
 	"github.com/C-dexTeam/codex/internal/config"
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
+	"github.com/C-dexTeam/codex/internal/http/v1/admin"
 	"github.com/C-dexTeam/codex/internal/http/v1/private"
 	"github.com/C-dexTeam/codex/internal/http/v1/public"
 	"github.com/C-dexTeam/codex/internal/services"
@@ -37,6 +38,12 @@ func (h *V1Handler) Init(router fiber.Router, sessionStore *session.Store) {
 	})
 
 	// Init Fiber Session Store
+	admin.NewAdminHandler(
+		h.services,
+		sessionStore,
+		h.dtoManager,
+		h.config,
+	).Init(root)
 	public.NewPublicHandler(h.services,
 		sessionStore,
 		h.dtoManager,

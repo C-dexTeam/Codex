@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/private/admin/attributes/": {
+        "/admin/attributes/": {
             "post": {
                 "description": "Adds Attribute Into DB.",
                 "consumes": [
@@ -81,7 +81,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/attributes/:id": {
+        "/admin/attributes/:id": {
             "delete": {
                 "description": "Delete Attributes from DB.",
                 "consumes": [
@@ -112,7 +112,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/chapters/": {
+        "/admin/chapters/": {
             "post": {
                 "description": "Adds Chapter Into DB.",
                 "consumes": [
@@ -178,7 +178,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/chapters/{id}": {
+        "/admin/chapters/{id}": {
             "delete": {
                 "description": "Delete Chapters from DB.",
                 "consumes": [
@@ -209,7 +209,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/courses/": {
+        "/admin/courses/": {
             "post": {
                 "description": "Adds Course Into DB.",
                 "consumes": [
@@ -342,7 +342,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/courses/{id}": {
+        "/admin/courses/{id}": {
             "delete": {
                 "description": "Delete Courses from DB.",
                 "consumes": [
@@ -374,7 +374,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/planguages/": {
+        "/admin/planguages/": {
             "post": {
                 "description": "Adds Programming Language Into DB.",
                 "consumes": [
@@ -440,7 +440,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/planguages/{id}": {
+        "/admin/planguages/{id}": {
             "delete": {
                 "description": "Delete Programming Languages from DB.",
                 "consumes": [
@@ -471,7 +471,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/rewards/": {
+        "/admin/rewards/": {
             "post": {
                 "description": "Adds Reward Into DB.",
                 "consumes": [
@@ -510,6 +510,11 @@ const docTemplate = `{
                         "name": "rewardType",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "sellerFee",
+                        "in": "formData"
                     },
                     {
                         "maxLength": 30,
@@ -587,7 +592,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/rewards/{id}": {
+        "/admin/rewards/{id}": {
             "delete": {
                 "description": "Delete Rewards from DB.",
                 "consumes": [
@@ -618,7 +623,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/tests/": {
+        "/admin/tests/": {
             "post": {
                 "description": "Adds Test Into DB.",
                 "consumes": [
@@ -684,7 +689,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/tests/{id}": {
+        "/admin/tests/{id}": {
             "delete": {
                 "description": "Delete tests from DB.",
                 "consumes": [
@@ -715,7 +720,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/admin/user": {
+        "/admin/user": {
             "get": {
                 "description": "Retrieves all users based on the provided query parameters.",
                 "consumes": [
@@ -1468,6 +1473,38 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.UserAuthWallet"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/user/mint/{rewardID}": {
+            "post": {
+                "description": "Mint your NFT.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Mint NFT",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reward ID",
+                        "name": "rewardID",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {

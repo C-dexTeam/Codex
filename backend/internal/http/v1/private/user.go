@@ -14,10 +14,7 @@ func (h *PrivateHandler) initUserRoutes(root fiber.Router) {
 	user.Post("/profile", h.UpdateProfile)
 	user.Post("/connect", h.ConnectWallet)
 	user.Post("/streak", h.StreakUp)
-
-	userAdminRoutes := root.Group("/admin/user")
-	userAdminRoutes.Use(h.adminRoleMiddleware)
-	userAdminRoutes.Get("/", h.GetUsers)
+	user.Post("/mint/:rewardID", h.MintNFT)
 }
 
 // @Tags User
@@ -34,7 +31,12 @@ func (h *PrivateHandler) Profile(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	userProfileDTO := h.dtoManager.UserManager().ToUserProfile(*userSession, statistic, userSession.Streak)
+	userRewards, err := h.services.RewardService().GetUserRewards(c.Context(), userSession.UserID, "", "")
+	if err != nil {
+		return err
+	}
+
+	userProfileDTO := h.dtoManager.UserManager().ToUserProfile(*userSession, statistic, userRewards, userSession.Streak)
 
 	return response.Response(200, "Status OK", userProfileDTO)
 }
@@ -96,9 +98,9 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := h.services.UserService().ConnectWallet(c.Context(), userSession.UserID, newWallet.PublicKeyBase58, newWallet.Message, newWallet.Signature); err != nil {
-		return err
-	}
+	// if err := h.services.UserService().ConnectWallet(c.Context(), userSession.UserID, newWallet.PublicKeyBase58, newWallet.Message, newWallet.Signature); err != nil {
+	// 	return err
+	// }
 
 	// Mevcut session'ı alıyoruz
 	sess, err := h.sess_store.Get(c)
@@ -124,35 +126,11 @@ func (h *PrivateHandler) ConnectWallet(c *fiber.Ctx) error {
 		}
 	}
 
-	return response.Response(200, "Status OK", nil)
-}
-
-// @Tags User
-// @Summary Get All Users
-// @Description Retrieves all users based on the provided query parameters.
-// @Accept json
-// @Produce json
-// @Param id query string false "User ID"
-// @Param username query string false "Username"
-// @Param email query string false "User's Email"
-// @Param page query string false "Page"
-// @Param limit query string false "Limit"
-// @Success 200 {object} response.BaseResponse{}
-// @Router /private/admin/user [get]
-func (h *PrivateHandler) GetUsers(c *fiber.Ctx) error {
-	id := c.Query("id")
-	username := c.Query("username")
-	email := c.Query("email")
-	page := c.Query("page")
-	limit := c.Query("limit")
-
-	users, err := h.services.UserService().GetUsers(c.Context(), id, username, email, page, limit)
-	if err != nil {
+	if err := h.services.UserService().SetPublicKey(c.Context(), userSession.UserID, newWallet.PublicKeyBase58); err != nil {
 		return err
 	}
-	userAuthDTOs := h.dtoManager.UserManager().ToUserAuthViews(users)
 
-	return response.Response(200, "Status OK", userAuthDTOs)
+	return response.Response(200, "Status OK", nil)
 }
 
 // @Tags User
@@ -192,4 +170,35 @@ func (h *PrivateHandler) StreakUp(c *fiber.Ctx) error {
 	}
 
 	return response.Response(200, "Status OK", streak)
+}
+
+// @Tags User
+// @Summary Mint NFT
+// @Description Mint your NFT.
+// @Accept json
+// @Produce json
+// @Param rewardID path string true "Reward ID"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/user/mint/{rewardID} [post]
+func (h *PrivateHandler) MintNFT(c *fiber.Ctx) error {
+	sessionID := c.Cookies("session_id")
+	userSession := sessionStore.GetSessionData(c)
+
+	rewardID := c.Params("rewardID")
+
+	reward, err := h.services.RewardService().GetReward(c.Context(), rewardID, "1", "1")
+	if err != nil {
+		return err
+	}
+
+	if userSession.PublicKey == "" {
+		return response.Response(400, "Public Key Required", nil)
+	}
+
+	data, err := h.services.UserService().MintNFT(sessionID, userSession.PublicKey, reward.Name, reward.Symbol, reward.URI, reward.SellerFee)
+	if err != nil {
+		return err
+	}
+
+	return response.Response(200, "Status OK", data)
 }

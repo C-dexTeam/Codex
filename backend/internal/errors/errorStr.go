@@ -22,6 +22,7 @@ const (
 	ErrTestNotFound                = "TEST_NOT_FOUND"
 	ErrInputNotFound               = "INPUT_NOT_FOUND"
 	ErrOutputNotFound              = "OUTPUT_NOT_FOUND"
+	ErrUserCourseNotFound          = "USER_COURSE_NOT_FOUND"
 )
 
 // 400
@@ -87,6 +88,8 @@ const (
 
 	ErrStreakAlreadyIncreased = "STREAK_ALREADY_INCREASED"
 
+	ErrCourseIDorChapterIDReq = "COURSE_ID_OR_CHAPTER_ID_REQUIRED"
+
 	// General
 	ErrInvalidID               = "INVALID_ID"
 	ErrInvalidBoolean          = "INVALID_BOOLEAN"
@@ -102,6 +105,7 @@ const (
 	ErrErrorWhileFilteringUserProfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
 	ErrErrorWhileFilteringRole                 = "ERROR_WHILE_FILTERING_ROLES"
 	ErrErrorWhileFilteringCourse               = "ERROR_WHILE_FILTERING_COURSES"
+	ErrErrorWhileFilteringUserCourse           = "ERROR_WHILE_FILTERING_USER_COURSES"
 	ErrErrorWhileFilteringChapter              = "ERROR_WHILE_FILTERING_CHAPTERS"
 	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"
 	ErrErrorWhileCreatingUserAuth              = "ERROR_WHILE_CREATING_USER_AUTH"
@@ -117,7 +121,13 @@ const (
 	ErrTransactionError                        = "ERROR_WHILE_COMMITING"
 	ErrWalletVerificationError                 = "ERROR_WHILE_VERIFICATON_WALLET"
 
+	ErrPublicKeyEmpty             = "PUBLIC_KEY_EMPTY"
+	ErrErrorWhileSettingPublicKey = "ERROR_WHILE_SETTING_PUBLIC_KEY"
+
 	ErrCompilerRunError     = "COMPILER_RUN_ERROR"
+	ErrWeb3RunError         = "WEB3_RUN_ERROR"
 	ErrCompilerCreateError  = "COMPILER_CREATE_ERROR"
 	ErrCreateDirectoryError = "DIRECTORY_CREATE_ERROR"
+
+	ErrInvalidDataType = "ERROR_INVALID_DATA_TYPE"
 )

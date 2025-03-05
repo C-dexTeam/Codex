@@ -16,13 +16,13 @@ const Chapters = () => {
 
     return (
         <Grid container spacing={6}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={{ pt: "0px !important" }}>
                 <Box
                     sx={{
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        height: _md ? "calc(100vh - 12rem)" : "auto"
+                        height: _md ? "calc(100vh - 8.5rem)" : "auto"
                     }}
                 >
                     <Box sx={{ display: "flex", flexDirection: "column", height: "100%", gap: "5rem", justifyContent: "center" }}>
@@ -49,7 +49,7 @@ const Chapters = () => {
                         </Box>
 
                         <Box sx={{
-                            maxWidth: "36rem"
+                            maxWidth: "36rem",
                         }}>
                             <LevelBar
                                 variant="astronout"
