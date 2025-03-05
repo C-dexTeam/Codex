@@ -48,6 +48,7 @@ const GradientCard = (props) => {
             <Button
                 ref={btnRef}
                 variant='contained'
+                onClick={props.onLocate}
                 sx={{
                     position: "absolute",
                     right: "0px",
