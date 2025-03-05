@@ -181,42 +181,6 @@ const Profile = () => {
         </Box>
       </Grid>
 
-      <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <Box
-          sx={{
-            position: "relative",
-            width: 200,
-            height: 200,
-            borderRadius: "50%",
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            
-          }}
-        >
-          {[1, 2, 3].map((index) => (
-            <Box
-              key={index}
-              sx={{
-                position: "absolute",
-                width: `${100 + index * 15}px`,
-                height: `${100 + index * 15}px`,
-                borderRadius: "50%",
-                border: `1px solid rgba(255, 255, 255, 0.${10 + index * 3})`,
-                animation: "pulse 2s infinite alternate ease-in-out",
-              }}
-            />
-          ))}
-
-          <Typography
-            variant="h6"
-            sx={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}
-          >
-            🚀
-          </Typography>
-        </Box>
-      </Grid>
     </Grid>
   );
 };
