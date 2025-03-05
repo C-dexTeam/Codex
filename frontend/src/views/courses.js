@@ -25,46 +25,10 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { Fragment, useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { FlashOn } from "@mui/icons-material"; // Strike icon
+import { getStrike } from "@/store/profile/profileSlice";
 
-const popularCourses = [
-  {
-    id: 1,
-    image: "/images/card1.jpg",
-    title: "Wormhole Tooling",
-    description:
-      "Regardless of which network development environment you are using.",
-    chapters: 8,
-  },
-  {
-    id: 2,
-    image: "/images/card2.jpg",
-    title: "Wormhole Tooling",
-    description:
-      "Regardless of which network development environment you are using.",
-    chapters: 2,
-  },
-  {
-    id: 3,
-    image: "/images/card3.jpg",
-    title: "Phantom SDK",
-    description:
-      "Regardless of which network development environment you are using.",
-    chapters: 12,
-  },
-];
 
-const navigationData = [
-  {
-    icon: <Shield />,
-    label: "Security",
-    path: "/security",
-  },
-  {
-    icon: <Web />,
-    label: "Best Courses",
-    path: "/best-courses",
-  },
-];
 
 const Courses = () => {
   const [value, setValue] = useState(0);
@@ -103,6 +67,10 @@ const Courses = () => {
     dispatch(getPopularCourses());
   }, [dispatch, search, selectedLanguage]);
 
+   const handleStrikeClick = () => {
+    dispatch(getStrike());
+  };
+
   const router = useRouter();
 
   const statistics = [
@@ -117,6 +85,25 @@ const Courses = () => {
       title: "Streak",
       value: user?.streak || 0,
       img: "/images/fire.png",
+    },
+  ];
+
+  const navigationData = [
+    {
+      icon: <Shield />,
+      label: "Security",
+      path: "/security",
+    },
+    {
+      icon: <Web />,
+      label: "Best Courses",
+      path: "/best-courses",
+    },
+    {
+      icon: <FlashOn />, 
+      label: "Strike",
+      path: "/strike", 
+      onClick: handleStrikeClick, // Trigger API request on click
     },
   ];
 
@@ -507,7 +494,7 @@ const Courses = () => {
               <Grid item container xs={12} spacing={1}>
                 {navigationData.map((item) => (
                   <Grid item xs={12}>
-                    <ListItemButton key={item.label} variant="btn">
+                    <ListItemButton key={item.label} variant="btn" onClick={item.onClick}>
                       <ListItemIcon sx={{ color: "inherit" }}>
                         {item.icon}
                       </ListItemIcon>

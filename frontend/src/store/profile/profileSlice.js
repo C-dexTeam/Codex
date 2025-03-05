@@ -1,0 +1,58 @@
+import { showToast } from "@/utils/showToast";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+
+
+const initialState = {
+  loading: false,
+  error: false,
+  data: [],
+};
+
+export const getStrike = createAsyncThunk(
+  "prfile/getStrike",
+  async (_, { rejectWithValue,dispatch }) => {
+    try {
+      const response = await axios({
+        method: "POST",
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}/private/user/streak`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        
+      });
+      if (response.status === 200) {
+
+        return response.data;
+      }
+    } catch (error) {
+      return rejectWithValue(response.message || error.message);
+    }
+  }
+);
+
+
+const profileSlice = createSlice({
+  name: "profile",
+  initialState: initialState,
+  extraReducers: (builder) => {
+    builder
+        .addCase(getStrike.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(getStrike.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+            showToast("dissmiss")
+            showToast("success", "Congratulations! You take a step forward to your goal.");
+        })
+        .addCase(getStrike.rejected, (state) => {
+            state.loading = false;
+            state.error = true;
+            showToast("dissmiss")
+            showToast("error", "Opss, I think you have already taken a step today.");
+        })
+  },
+});
+
+export default profileSlice.reducer;
