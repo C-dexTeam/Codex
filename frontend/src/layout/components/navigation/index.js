@@ -1,8 +1,9 @@
 import List from '@mui/material/List';
 import navigation from '@/navigation';
+import adminNavigation from '@/navigation/admin';
 import NavItem from './item/NavItem';
 
-const NavigationList = () => {
+const NavigationList = ({ admin }) => {
     return (
         <List
             sx={{
@@ -14,7 +15,7 @@ const NavigationList = () => {
             component="nav"
         >
             {
-                navigation.map((item, index) => <NavItem key={index} {...item} />)
+                (admin ? adminNavigation : navigation).map((item, index) => <NavItem key={index} {...item} />)
             }
         </List >
     );

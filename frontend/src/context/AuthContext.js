@@ -11,7 +11,6 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { SigninMessage } from '@/layout/auth/Wallet/SignInMessage'
 import { binary_to_base58 } from 'base58-js'
 
-
 // ** Defaults
 const defaultProvider = {
   user: {

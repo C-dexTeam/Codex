@@ -11,7 +11,9 @@ import MuiListItem from './listitem'
 import MuiTypography from './typography'
 import MuiTab from './tab'
 import MuiTooltip from './tooltip'
-import Accordion from './accordion'
+import MuiAccordion from './accordion'
+import MuiDataGrid from './dataGrid'
+
 
 const Overrides = (theme) => {
   const chip = MuiChip(theme)
@@ -26,7 +28,8 @@ const Overrides = (theme) => {
   const typography = MuiTypography(theme)
   const tab = MuiTab(theme)
   const tooltip = MuiTooltip(theme)
-  const accordion = Accordion(theme)
+  const accordion = MuiAccordion(theme)
+  const dataGrid = MuiDataGrid(theme)
 
   return Object.assign(
     chip,
@@ -41,7 +44,8 @@ const Overrides = (theme) => {
     typography,
     tab,
     tooltip,
-    accordion
+    accordion,
+    dataGrid
   )
 }
 

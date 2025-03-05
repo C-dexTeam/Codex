@@ -31,6 +31,7 @@ import WindowWrapper from '@/components/window-wrapper'
 import AclGuard from '@/layout/auth/AclGuard'
 import { Wallet } from '@/layout/auth/Wallet'
 import { useEffect } from 'react'
+import AdminLayout from '@/layout/admin/AdminLayout'
 
 // ** Pace Loader
 if (themeConfig.routingLoader) {
@@ -60,7 +61,7 @@ const App = props => {
   const { Component, pageProps } = props
 
   // Variables
-  const getLayout = Component.getLayout ?? (page => <Layout>{page}</Layout>)
+  const getLayout = Component.admin ? (page => <AdminLayout>{page}</AdminLayout>) : Component.getLayout ?? (page => <Layout>{page}</Layout>)
   const authGuard = Component.authGuard ?? true
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj

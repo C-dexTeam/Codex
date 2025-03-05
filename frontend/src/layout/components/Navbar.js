@@ -21,7 +21,7 @@ const Navbar = () => {
             maxHeight: 'calc(80px)',
           }}
         >
-          <Box component="div" sx={{ borderRadius: '1.25rem 0rem 1.25rem 0rem', mb: '0.5rem', textAlign: 'center' }}>
+          <Box component="div" sx={{ borderRadius: '1.25rem 0rem 1.25rem 0rem', textAlign: 'center' }}>
             <Box sx={{ height: "2.5rem" }}>
               <img src="/images/logo/logo-horizontal.png" alt="Codex Logo" />
             </Box>

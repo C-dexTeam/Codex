@@ -23,11 +23,11 @@ const accordion = (theme) => {
             borderBottomRightRadius: "12px",
           },
         },
-        expanded: {
-          margin: "8px 0", 
-          transition: "none",
-          scrollBehavior: "auto",
-        },
+        // expanded: {
+        //   margin: "8px 0", 
+        //   transition: "none",
+        //   scrollBehavior: "auto",
+        // },
       },
     },
   };
