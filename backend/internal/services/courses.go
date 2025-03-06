@@ -279,6 +279,7 @@ func (s *courseService) StartCourse(
 	ctx context.Context,
 	id, userAuthID string,
 ) (uuid.UUID, error) {
+
 	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
 		return uuid.Nil, err
@@ -291,6 +292,16 @@ func (s *courseService) StartCourse(
 		return uuid.Nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourse, err)
 	} else if !ok {
 		return uuid.Nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
+	}
+
+	// Check if the course already started. If its return an error.
+	if ok, err := s.queries.CheckUserCourseByID(ctx, repo.CheckUserCourseByIDParams{
+		CourseID:   idUUID,
+		UserAuthID: userAuthUUID,
+	}); err != nil {
+		return uuid.Nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourse, err)
+	} else if ok {
+		return uuid.Nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseAlreadyStarted)
 	}
 
 	if err := s.queries.AddCourseToUser(ctx, repo.AddCourseToUserParams{

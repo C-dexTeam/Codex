@@ -94,7 +94,7 @@ SELECT
     COUNT(DISTINCT ch.chapter_id) FILTER (WHERE ch.isFinished = TRUE) AS completed_chapters
 FROM 
     t_user_courses uc
-INNER JOIN 
+LEFT JOIN 
     t_user_chapters ch ON uc.user_auth_id = ch.user_auth_id
 WHERE 
     uc.user_auth_id = @user_auth_id;

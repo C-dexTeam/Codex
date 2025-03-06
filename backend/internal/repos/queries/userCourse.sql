@@ -55,3 +55,14 @@ SET progress = (
 WHERE 
     user_auth_id = @user_auth_id AND course_id = @course_id
 RETURNING progress;
+
+-- name: CheckUserCourseByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_user_courses AS l
+        WHERE l.course_id = @course_id AND l.user_auth_id = @user_auth_id
+    ) THEN true
+    ELSE false
+END AS exists;
