@@ -43,7 +43,7 @@ func (h *Handler) Init(devMode bool, RedisConfig *models.RedisConfig, middleware
 		}))
 	}
 
-	app.Static("/uploads", "./uploads")
+	app.Static("/api/uploads", "./uploads")
 
 	root := app.Group("/api")
 	sessionStore := sessionStore.NewSessionStore(RedisConfig)
