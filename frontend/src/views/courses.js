@@ -103,7 +103,7 @@ const Courses = () => {
       icon: <FlashOn />, 
       label: "Strike",
       path: "/strike", 
-      onClick: handleStrikeClick, // Trigger API request on click
+      onClick: handleStrikeClick,
     },
   ];
 
@@ -213,7 +213,7 @@ const Courses = () => {
                   <CardContent>
                     <Box className="CardImage">
                       <Image
-                        src={course.imagePath}
+                        src={"api/"+course.imagePath}
                         alt={course.title}
                         width={80}
                         height={80}
@@ -333,7 +333,7 @@ const Courses = () => {
                   <CardContent>
                     <Box className="CardImage">
                       <img
-                        src={course.imagePath}
+                        src={"api/"+course.imagePath}
                         alt={course.title}
                         width={80}
                         height={80}

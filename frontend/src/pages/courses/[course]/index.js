@@ -3,7 +3,8 @@ import Chapters from "@/views/chapters"
 
 
 const ChaptersPage = () => {
-    return <Chapters />
+
+    return <Chapters  />
 }
 
 ChaptersPage.acl = {

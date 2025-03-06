@@ -9,8 +9,30 @@ const initialState = {
   data: [],
 };
 
+export const getProfile = createAsyncThunk(
+  "profile/getProfile",
+  async (_, { rejectWithValue,dispatch }) => {
+    try {
+      const response = await axios({
+        method: "GET",
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}/private/user/profile`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        
+      });
+      if (response.status === 200) {
+        dispatch(getProfile());
+        return response.data;
+      }
+    } catch (error) {
+      return rejectWithValue(response.message || error.message);
+    }
+  }
+);
+
 export const getStrike = createAsyncThunk(
-  "prfile/getStrike",
+  "profile/getStrike",
   async (_, { rejectWithValue,dispatch }) => {
     try {
       const response = await axios({
@@ -22,7 +44,7 @@ export const getStrike = createAsyncThunk(
         
       });
       if (response.status === 200) {
-
+        dispatch(getProfile());
         return response.data;
       }
     } catch (error) {
@@ -52,6 +74,17 @@ const profileSlice = createSlice({
             showToast("dissmiss")
             showToast("error", "Opss, I think you have already taken a step today.");
         })
+        .addCase(getProfile.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(getProfile.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+        })
+        .addCase(getProfile.rejected, (state) => {
+            state.loading = false;
+            state.error = true;
+        });
   },
 });
 
