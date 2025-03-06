@@ -33,7 +33,6 @@ export const getAllCourses = createAsyncThunk(
 export const getCoursesByID = createAsyncThunk(
   "courses/getCoursesByID",
   async (data, { rejectWithValue }) => {
-    console.log(data);
     try {
       const response = await axios({
         method: "GET",
