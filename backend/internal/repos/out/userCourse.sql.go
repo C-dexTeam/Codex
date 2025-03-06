@@ -39,6 +39,30 @@ func (q *Queries) AddCourseToUser(ctx context.Context, arg AddCourseToUserParams
 	return err
 }
 
+const checkUserCourseByID = `-- name: CheckUserCourseByID :one
+SELECT 
+CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM t_user_courses AS l
+        WHERE l.course_id = $1 AND l.user_auth_id = $2
+    ) THEN true
+    ELSE false
+END AS exists
+`
+
+type CheckUserCourseByIDParams struct {
+	CourseID   uuid.UUID
+	UserAuthID uuid.UUID
+}
+
+func (q *Queries) CheckUserCourseByID(ctx context.Context, arg CheckUserCourseByIDParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkUserCourseByID, arg.CourseID, arg.UserAuthID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const updateUserCourseProgress = `-- name: UpdateUserCourseProgress :one
 UPDATE t_user_courses
 SET progress = (

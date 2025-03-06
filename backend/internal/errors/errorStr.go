@@ -90,6 +90,8 @@ const (
 
 	ErrCourseIDorChapterIDReq = "COURSE_ID_OR_CHAPTER_ID_REQUIRED"
 
+	ErrCourseAlreadyStarted = "COURSE_ALREADY_STARTED"
+
 	// General
 	ErrInvalidID               = "INVALID_ID"
 	ErrInvalidBoolean          = "INVALID_BOOLEAN"
