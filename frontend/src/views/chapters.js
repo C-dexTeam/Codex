@@ -242,7 +242,12 @@ const Chapters = () => {
                   flat
                   sx={{ display: "flex", justifyContent: "flex-end" }}
                 >
-                  <Button color="primary" bgc sx={{ minWidth: "8rem" }}>
+                  <Button color="primary" bgc sx={{ minWidth: "8rem" }}
+                    onClick={() => {
+                      router.push(`/courses/${router.query.course}/${chapter.id}`);
+                    }
+                    }
+                  >
                     Start
                   </Button>
                 </CardActions>
