@@ -70,6 +70,28 @@ export const getPopularCourses = createAsyncThunk(
   }
 );
 
+export const startCourse = createAsyncThunk(
+  "courses/startCourse",
+  async (id, { rejectWithValue }) => {  
+    try {
+      const response = await axios({
+        method: "POST",
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}/private/courses/start`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: id,
+      });
+      if (response.status === 200) {
+        return response.data; 
+      }
+    } catch (error) {
+      return rejectWithValue(response.message || error.message);
+    }
+  }
+);
+
+
 const coursesSlice = createSlice({
   name: "courses",
   initialState: initialState,
@@ -105,6 +127,16 @@ const coursesSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(getCoursesByID.rejected, (state) => {
+        state.loading = false;
+        state.error;
+      })
+      .addCase(startCourse.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(startCourse.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(startCourse.rejected, (state) => {
         state.loading = false;
         state.error;
       });

@@ -28,8 +28,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { FlashOn } from "@mui/icons-material"; // Strike icon
 import { getStrike } from "@/store/profile/profileSlice";
 
-
-
 const Courses = () => {
   const [value, setValue] = useState(0);
   const [copy, setCopy] = useState(false);
@@ -67,7 +65,7 @@ const Courses = () => {
     dispatch(getPopularCourses());
   }, [dispatch, search, selectedLanguage]);
 
-   const handleStrikeClick = () => {
+  const handleStrikeClick = () => {
     dispatch(getStrike());
   };
 
@@ -76,12 +74,18 @@ const Courses = () => {
   const statistics = [
     {
       id: 1,
+      title: "Started",
+      value: user?.enrolledCourses || 0,
+      img: "/images/rocket.png",
+    },
+    {
+      id: 2,
       title: "Finished",
       value: user?.completedCourses || 0,
       img: "/images/finished.png",
     },
     {
-      id: 2,
+      id: 3,
       title: "Streak",
       value: user?.streak || 0,
       img: "/images/fire.png",
@@ -100,9 +104,9 @@ const Courses = () => {
       path: "/best-courses",
     },
     {
-      icon: <FlashOn />, 
+      icon: <FlashOn />,
       label: "Strike",
-      path: "/strike", 
+      path: "/strike",
       onClick: handleStrikeClick,
     },
   ];
@@ -191,7 +195,7 @@ const Courses = () => {
 
         <Grid item container sx={12} spacing={4}>
           {coursesSlice?.popoularData?.data?.length > 0 ? (
-            coursesSlice.popoularData.data.map((course) => (
+            coursesSlice?.popoularData?.data?.map((course) => (
               <Grid item xs={12} md={4} key={course.id}>
                 <GradientCard
                   description={
@@ -212,8 +216,8 @@ const Courses = () => {
                 >
                   <CardContent>
                     <Box className="CardImage">
-                      <Image
-                        src={"api/"+course.imagePath}
+                      <img
+                        src={"api/" + course.imagePath}
                         alt={course.title}
                         width={80}
                         height={80}
@@ -310,7 +314,8 @@ const Courses = () => {
         </Grid>
 
         <Grid item container sx={12} spacing={10}>
-          {coursesSlice?.data?.data?.length > 0 ? (
+          {Array.isArray(coursesSlice?.data?.data) &&
+          coursesSlice?.data?.data.length > 0 ? (
             coursesSlice.data.data.map((course) => (
               <Grid item xs={12} md={6} key={course.id}>
                 <GradientCard
@@ -333,7 +338,7 @@ const Courses = () => {
                   <CardContent>
                     <Box className="CardImage">
                       <img
-                        src={"api/"+course.imagePath}
+                        src={"api/" + course.imagePath}
                         alt={course.title}
                         width={80}
                         height={80}
@@ -453,15 +458,14 @@ const Courses = () => {
 
               <Grid item container xs={12} spacing={1}>
                 {statistics.map((stat) => (
-                  <Grid item xs={6}>
+                  <Grid
+                    item
+                    xs={stat.title === "Streak" ? 12 : 6}
+                    key={stat.id}
+                  >
                     <Card variant="outlined" mode="dark" round="lg">
                       <CardContent size="small">
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
                           <img
                             src={stat.img}
                             alt={stat.title}
@@ -473,7 +477,6 @@ const Courses = () => {
                               marginRight: "0.5rem",
                             }}
                           />
-
                           <Box>
                             <Typography variant="body1" color={"secondary"}>
                               {stat.title}
@@ -494,7 +497,11 @@ const Courses = () => {
               <Grid item container xs={12} spacing={1}>
                 {navigationData.map((item) => (
                   <Grid item xs={12}>
-                    <ListItemButton key={item.label} variant="btn" onClick={item.onClick}>
+                    <ListItemButton
+                      key={item.label}
+                      variant="btn"
+                      onClick={item.onClick}
+                    >
                       <ListItemIcon sx={{ color: "inherit" }}>
                         {item.icon}
                       </ListItemIcon>

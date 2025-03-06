@@ -1,5 +1,5 @@
 import LevelBar from "@/components/bar/LevelBar";
-import { getCoursesByID } from "@/store/courses/coursesSlice";
+import { getCoursesByID, startCourse } from "@/store/courses/coursesSlice";
 import { SchoolOutlined } from "@mui/icons-material";
 import {
   Box,
@@ -21,9 +21,13 @@ const Chapters = () => {
   const { courses: coursesSlice } = useSelector((state) => state);
 
   useEffect(() => {
-    dispatch(getCoursesByID({ id: router.query.course }));
-    console.log(router.query.course);
-  }, [router.isReady]);
+    if (router.isReady && router.query.course) {
+      dispatch(startCourse({ id: router.query.course })).then(() => {
+        dispatch(getCoursesByID({ id: router.query.course }));
+      });
+    }
+  }, [router.isReady, router.query.course, dispatch]);
+  
 
   const _md = useMediaQuery((theme) => theme.breakpoints.down("lgPlus"));
 
@@ -154,7 +158,7 @@ const Chapters = () => {
         sx={{ display: "flex", flexDirection: "column", gap: "2rem" }}
       >
         {coursesSlice?.data?.data?.chapters?.length > 0 ? (
-          coursesSlice.data.data.chapters.map((chapter, index) => (
+          coursesSlice?.data?.data?.chapters?.map((chapter, index) => (
             <Box
               key={chapter.id}
               sx={{
