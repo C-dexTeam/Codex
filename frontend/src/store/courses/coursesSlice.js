@@ -1,3 +1,4 @@
+import { showToast } from "@/utils/showToast";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -135,10 +136,14 @@ const coursesSlice = createSlice({
       })
       .addCase(startCourse.fulfilled, (state, action) => {
         state.loading = false;
+        showToast("dismiss")
+        showToast("success", "Course started successfully");
       })
       .addCase(startCourse.rejected, (state) => {
         state.loading = false;
         state.error;
+        showToast("dismiss")
+        showToast("error", "Failed to start course");
       });
   },
 });

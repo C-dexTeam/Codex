@@ -65,13 +65,13 @@ const profileSlice = createSlice({
         .addCase(getStrike.fulfilled, (state, action) => {
             state.loading = false;
             state.data = action.payload;
-            showToast("dissmiss")
+            showToast("dismiss")
             showToast("success", "Congratulations! You take a step forward to your goal.");
         })
         .addCase(getStrike.rejected, (state) => {
             state.loading = false;
             state.error = true;
-            showToast("dissmiss")
+            showToast("dismiss")
             showToast("error", "Opss, I think you have already taken a step today.");
         })
         .addCase(getProfile.pending, (state) => {
