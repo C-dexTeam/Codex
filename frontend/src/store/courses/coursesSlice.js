@@ -1,3 +1,4 @@
+import { showToast } from "@/utils/showToast";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -70,6 +71,28 @@ export const getPopularCourses = createAsyncThunk(
   }
 );
 
+export const startCourse = createAsyncThunk(
+  "courses/startCourse",
+  async (id, { rejectWithValue }) => {  
+    try {
+      const response = await axios({
+        method: "POST",
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}/private/courses/start`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: id,
+      });
+      if (response.status === 200) {
+        return response.data; 
+      }
+    } catch (error) {
+      return rejectWithValue(response.message || error.message);
+    }
+  }
+);
+
+
 const coursesSlice = createSlice({
   name: "courses",
   initialState: initialState,
@@ -107,6 +130,20 @@ const coursesSlice = createSlice({
       .addCase(getCoursesByID.rejected, (state) => {
         state.loading = false;
         state.error;
+      })
+      .addCase(startCourse.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(startCourse.fulfilled, (state, action) => {
+        state.loading = false;
+        showToast("dismiss")
+        showToast("success", "Course started successfully");
+      })
+      .addCase(startCourse.rejected, (state) => {
+        state.loading = false;
+        state.error;
+        showToast("dismiss")
+        showToast("error", "Failed to start course");
       });
   },
 });
