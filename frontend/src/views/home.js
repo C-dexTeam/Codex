@@ -4,7 +4,7 @@ import { theme } from "@/configs/theme";
 import WalletConnectionButton from "@/layout/auth/Wallet/WalletConnectionButton"
 import Can from "@/layout/components/acl/Can"
 import { hexToRGBA } from "@/utils/hex-to-rgba";
-import { Box, Button, Card, CardContent, Divider, Typography, useTheme } from "@mui/material"
+import { Box, Button, Card, CardContent, Divider, Typography, useTheme, useMediaQuery } from "@mui/material"
 import { useKeenSlider } from "keen-slider/react"
 import { useState } from "react";
 
@@ -27,15 +27,16 @@ const PartnersBox = () => {
 }
 
 const Home = () => {
-
     const [currentSlide, setCurrentSlide] = useState(0)
     const [loaded, setLoaded] = useState(false)
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+    const isTablet = useMediaQuery(theme.breakpoints.down('lg'))
 
     const [sliderRef, instanceRef] = useKeenSlider({
-        // loop: true,
         mode: "free",
         slides: {
-            perView: 6,
+            perView: isMobile ? 2 : isTablet ? 4 : 6,
             spacing: 16,
         },
         initial: 0,
@@ -54,9 +55,9 @@ const Home = () => {
                 <Box
                     sx={{
                         position: "relative",
-                        height: "calc(100vh - 16rem)",
+                        height: isMobile ? "calc(100vh - 8rem)" : "calc(100vh - 16rem)",
                         background: theme => hexToRGBA(theme.palette.background.default, 1),
-                        padding: "2rem 1rem",
+                        padding: isMobile ? "1rem" : "2rem 1rem",
                         backdropFilter: "blur(3px)",
                         borderRadius: "1rem",
                     }}
@@ -68,21 +69,33 @@ const Home = () => {
                     </Button>
 
                     <Box sx={{ mt: "1.5rem" }}>
-                        {/* <Typography variant="h1" sx={{ letterSpacing: "0.25rem" }}>BUILD WITH</Typography> */}
                         <Box
                             sx={{
-                                height: "9rem",
+                                height: isMobile ? "6rem" : "9rem",
                                 width: "auto",
                             }}
                         >
-                            <img src="/images/logo/logo-build-with.png" alt="Solana Logo" />
+                            <img 
+                                src="/images/logo/logo-build-with.png" 
+                                alt="Solana Logo"
+                                style={{
+                                    maxWidth: "100%",
+                                    height: "auto"
+                                }}
+                            />
                         </Box>
                     </Box>
 
-                    <Box sx={{ display: "flex", gap: "1rem", mt: "1rem" }}>
-                        <Button variant="gradient">Course</Button>
-                        <Button>Docs</Button>
-                        <Button>Read Doc</Button>
+                    <Box sx={{ 
+                        display: "flex", 
+                        gap: "1rem", 
+                        mt: "1rem",
+                        flexDirection: isMobile ? "column" : "row",
+                        width: isMobile ? "100%" : "auto"
+                    }}>
+                        <Button variant="gradient" fullWidth={isMobile}>Course</Button>
+                        <Button fullWidth={isMobile}>Docs</Button>
+                        <Button fullWidth={isMobile}>Read Doc</Button>
                     </Box>
 
                     <Box
@@ -91,11 +104,13 @@ const Home = () => {
                             top: "0",
                             right: "0",
                             zIndex: "-1",
-                            width: "auto",
+                            width: isMobile ? "80%" : "auto",
                             height: "100%",
+                            opacity: isMobile ? 0.5 : 1
                         }}
                     >
-                        <img src="/images/ellipse-solana.png"
+                        <img 
+                            src="/images/ellipse-solana.png"
                             style={{
                                 width: "100%",
                                 height: "auto",
@@ -174,26 +189,28 @@ const Home = () => {
             {/* Statistics */}
             <Card sx={{ background: theme => hexToRGBA(theme.palette.background.default, 0.8) }}>
                 <CardContent>
-                    <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
+                    <Box sx={{ 
+                        display: "flex", 
+                        flexDirection: isMobile ? "column" : "row",
+                        justifyContent: "space-evenly",
+                        gap: isMobile ? "2rem" : "0"
+                    }}>
                         <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", alignItems: "center" }}>
                             <CustomChip label="Users" color="secondary" sx={{ width: "5rem" }} />
-
                             <Typography variant="h3">5.2M</Typography>
                         </Box>
 
-                        <Box><Divider orientation="vertical" sx={{ width: "1px", height: "100%", background: theme.palette.text.primary }} /></Box>
+                        {!isMobile && <Box><Divider orientation="vertical" sx={{ width: "1px", height: "100%", background: theme.palette.text.primary }} /></Box>}
 
                         <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", alignItems: "center" }}>
                             <CustomChip label="Users" color="secondary" sx={{ width: "5rem" }} />
-
                             <Typography variant="h3">+330K</Typography>
                         </Box>
 
-                        <Box><Divider orientation="vertical" sx={{ width: "1px", height: "100%", background: theme.palette.text.primary }} /></Box>
+                        {!isMobile && <Box><Divider orientation="vertical" sx={{ width: "1px", height: "100%", background: theme.palette.text.primary }} /></Box>}
 
                         <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", alignItems: "center" }}>
                             <CustomChip label="Users" color="secondary" sx={{ width: "5rem" }} />
-
                             <Typography variant="h3">+10.1K</Typography>
                         </Box>
                     </Box>
@@ -205,8 +222,9 @@ const Home = () => {
                 <Box
                     sx={{
                         position: "relative",
-                        height: "calc(100vh)",
-                        padding: "2rem 1rem",
+                        height: isMobile ? "auto" : "calc(100vh)",
+                        minHeight: isMobile ? "calc(100vh - 4rem)" : "auto",
+                        padding: isMobile ? "2rem 0" : "2rem 1rem",
                         backdropFilter: "blur(3px)",
                         borderRadius: "1rem",
                         display: "flex",
@@ -223,9 +241,15 @@ const Home = () => {
                         </Button>
                     </Box>
 
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4rem" }}>
-                        <Box>
-                            <Typography variant="h2">
+                    <Box sx={{ 
+                        display: "flex", 
+                        flexDirection: isMobile ? "column" : "row",
+                        justifyContent: "space-between", 
+                        alignItems: isMobile ? "flex-start" : "center", 
+                        gap: isMobile ? "2rem" : "4rem" 
+                    }}>
+                        <Box sx={{ width: isMobile ? "100%" : "50%" }}>
+                            <Typography variant="h2" sx={{ fontSize: isMobile ? "1.75rem" : "2.125rem" }}>
                                 Why you should use Codex to learn Solana?
                             </Typography>
 
@@ -237,18 +261,23 @@ const Home = () => {
                         <Box
                             sx={{
                                 animation: `smoothFloatAndSway3D 50s cubic-bezier(0.42, 0, 0.58, 1) infinite`,
-                                position: "absolute",
-                                right: "5rem",
+                                position: isMobile ? "relative" : "absolute",
+                                right: isMobile ? "auto" : "5rem",
                                 zIndex: "-1",
-                                width: "auto",
-                                height: "calc(20rem)",
+                                width: isMobile ? "100%" : "auto",
+                                height: isMobile ? "15rem" : "calc(20rem)",
+                                display: "flex",
+                                justifyContent: "center"
                             }}
                         >
-                            <img src="/images/space/rocket.png" />
-                        </Box>
-
-                        <Box sx={{ zIndex: "-2", width: "100%" }}>
-                            <img src="/images/space/worm-hole.svg" />
+                            <img 
+                                src="/images/space/rocket.png"
+                                style={{
+                                    maxWidth: "100%",
+                                    height: "100%",
+                                    objectFit: "contain"
+                                }}
+                            />
                         </Box>
                     </Box>
                 </Box>
@@ -271,8 +300,9 @@ const Home = () => {
                 <Box
                     sx={{
                         position: "relative",
-                        height: "calc(100vh)",
-                        padding: "2rem 1rem",
+                        height: isMobile ? "auto" : "calc(100vh)",
+                        minHeight: isMobile ? "calc(100vh - 4rem)" : "auto",
+                        padding: isMobile ? "2rem 0" : "2rem 1rem",
                         backdropFilter: "blur(3px)",
                         borderRadius: "1rem",
                         display: "flex",
@@ -281,35 +311,44 @@ const Home = () => {
                         gap: "2rem",
                     }}
                 >
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4rem" }}>
+                    <Box sx={{ 
+                        display: "flex", 
+                        flexDirection: isMobile ? "column-reverse" : "row",
+                        justifyContent: "space-between", 
+                        alignItems: "center", 
+                        gap: isMobile ? "2rem" : "4rem" 
+                    }}>
                         <Box
                             sx={{
-                                position: "absolute",
-                                left: "2.5rem",
+                                position: isMobile ? "relative" : "absolute",
+                                left: isMobile ? "auto" : "2.5rem",
                                 zIndex: "-1",
-                                width: "auto",
-                                height: "calc(20rem)",
+                                width: isMobile ? "100%" : "auto",
+                                height: isMobile ? "15rem" : "calc(20rem)",
+                                display: "flex",
+                                justifyContent: "center"
                             }}
                         >
-                            <img src="/images/code-ide.png" />
+                            <img 
+                                src="/images/code-ide.png"
+                                style={{
+                                    maxWidth: "100%",
+                                    height: "100%",
+                                    objectFit: "contain"
+                                }}
+                            />
                         </Box>
 
-                        <Box
-                            sx={{
-                                zIndex: "-2",
-                                width: "100%",
-                            }}
-                        >
-                            <img src="/images/space/square-bg.png" />
-                        </Box>
-
-                        <Box>
-                            <Typography variant="h2">
+                        <Box sx={{ 
+                            width: isMobile ? "100%" : "50%",
+                            marginLeft: isMobile ? "0" : "auto"
+                        }}>
+                            <Typography variant="h2" sx={{ fontSize: isMobile ? "1.75rem" : "2.125rem" }}>
                                 Interactive Coding Lessons
                             </Typography>
 
                             <Typography variant="caption2" sx={{ mt: "1rem", textAlign: "justify" }}>
-                                CryptoZombies is the largest education platform for blockchain development, it’s been around for 4+ years, with over 400k registered users that have finished multiple courses.
+                                CryptoZombies is the largest education platform for blockchain development, it's been around for 4+ years, with over 400k registered users that have finished multiple courses.
                                 <br />
                                 <br />
                                 CryptoZombies was the first tutorial on the internet for NFTs, and is still very relevant to the new crop of web3 developers looking to enter the industry today. Currently the CryptoZombies curriculum is mostly focused on Ethereum and Solidity development, but is a lot of demand for content targeting other chains such as Binance, TRON, and even projects like Chainlink.
@@ -337,8 +376,9 @@ const Home = () => {
                 <Box
                     sx={{
                         position: "relative",
-                        height: "calc(100vh)",
-                        padding: "2rem 1rem",
+                        height: isMobile ? "auto" : "calc(100vh)",
+                        minHeight: isMobile ? "calc(100vh - 4rem)" : "auto",
+                        padding: isMobile ? "2rem 0" : "2rem 1rem",
                         backdropFilter: "blur(3px)",
                         borderRadius: "1rem",
                         display: "flex",
@@ -347,13 +387,30 @@ const Home = () => {
                         gap: "2rem",
                     }}
                 >
-                    <Box sx={{ display: "flex", justifyContent: "space-between", gap: "4rem" }}>
-                        <Box sx={{ zIndex: "-2", width: "40rem" }}>
-                            <img src="/images/nft-cards.png" />
+                    <Box sx={{ 
+                        display: "flex", 
+                        flexDirection: isMobile ? "column" : "row",
+                        justifyContent: "space-between", 
+                        gap: isMobile ? "2rem" : "4rem",
+                        alignItems: "center"
+                    }}>
+                        <Box sx={{ 
+                            zIndex: "-2", 
+                            width: isMobile ? "100%" : "40rem",
+                            display: "flex",
+                            justifyContent: "center"
+                        }}>
+                            <img 
+                                src="/images/nft-cards.png"
+                                style={{
+                                    maxWidth: "100%",
+                                    height: "auto"
+                                }}
+                            />
                         </Box>
 
-                        <Box sx={{ mt: "1.5rem" }}>
-                            <Typography variant="h2">
+                        <Box sx={{ mt: isMobile ? "0" : "1.5rem", width: isMobile ? "100%" : "auto" }}>
+                            <Typography variant="h2" sx={{ fontSize: isMobile ? "1.75rem" : "2.125rem" }}>
                                 You can earn NFT by completing the trainings!
                             </Typography>
 
@@ -361,7 +418,7 @@ const Home = () => {
                                 You can become the owner of these cool NFTs by completing the roadmaps and lab samples on the platform. So lets start 🚀
                             </Typography>
 
-                            <Button sx={{ mt: "1rem" }}>
+                            <Button sx={{ mt: "1rem" }} fullWidth={isMobile}>
                                 Start Course
                             </Button>
                         </Box>
