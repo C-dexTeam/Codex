@@ -8,11 +8,16 @@ import HintDialog from "@/components/code-change/hint/Hint";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { getChaptersByID } from "@/store/chapters/chaptersSlice";
+import CodeEditorComponent from "@/components/code-editor";
 
 function Code() {
   const [code, setCode] = useState("");
   const [isCorrect, setIsCorrect] = useState(true);
   const [activeTab, setActiveTab] = useState("description");
+  
+  const [isFailed, setIsFailed] = useState(false);
+  const [output, setOutput] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [hintOpen, setHintOpen] = useState(false);
   const hintText = "No hint available at the moment. Try again later 🌌";
@@ -26,7 +31,6 @@ function Code() {
     }
   }, [router.isReady, router.query.code]);
 
-  console.log(chaptersSlice.data.data);
 
   const testsExist = chaptersSlice?.data?.data?.tests?.length > 0;
 
@@ -41,6 +45,15 @@ function Code() {
       '    string public message = "Hello, Blockchain!";\n' +
       "}\n" +
       "```";
+
+      console.log("markdownContent", chaptersSlice.data.data);
+
+      const handleRun = (outputData) => {
+        setOutput(outputData?.data);
+        setIsSubmitted(true);
+      };
+
+    
 
   return (
     <Box maxWidth="lg">
@@ -123,154 +136,25 @@ function Code() {
               {activeTab === "description" ? (
                 <Description markdownContent={markdownContent} />
               ) : (
-                <Template /> //this code will updated when the test template added
+                <Template /> 
               )}
             </Box>
           </Box>
         </Grid>
 
         <Grid item xs={12} md={7}>
-          <Box
-            sx={{
-              border: `2px solid ${theme.palette.secondary.light}`,
-              borderRadius: "16px",
-              padding: "16px",
-              height: "80vh",
-              overflow: "auto",
-              display: "flex",
-              flexDirection: "column",
+        <CodeEditorComponent
+            fileName="HelloWorld.sol"
+            language="solidity"
+            val={chaptersSlice?.data?.data?.frontendTemplate || ""}
+            onChange={setCode}
+            onRun={handleRun}
+            chapterID={router.query.code}
+            courseID={router.query.course}
+            apiData={{
+              programmingId: router.query.code,
             }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                color: "white",
-              }}
-            >
-              <Box sx={{ display: "flex", gap: "6px" }}>
-                {["red", "yellow", "green"].map((color, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      width: "20px",
-                      height: "20px",
-                      borderRadius: "50%",
-                      backgroundColor: color,
-                    }}
-                  />
-                ))}
-              </Box>
-
-              <Typography
-                variant="h6"
-                sx={{ color: `${theme.palette.primary.main}` }}
-              >
-                deneme.js
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                marginTop: "16px",
-              }}
-            >
-              <Divider />
-            </Box>
-
-            <Box
-              sx={{
-                marginTop: "16px",
-                flexGrow: 1,
-                borderRadius: "16px",
-                overflow: "hidden",
-              }}
-            >
-              <Editor
-                height="100%"
-                defaultLanguage="solidity"
-                language="solidity"
-                value={chaptersSlice?.data?.data?.frontendTemplate}
-                onChange={(value) => setCode(value)}
-                theme="vs-dark"
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  padding: { top: 10 },
-                  formatOnType: true,
-                  formatOnPaste: true,
-                  formatOnSave: true,
-                }}
-              />
-            </Box>
-
-            <Box
-              sx={{
-                marginTop: "16px",
-              }}
-            >
-              <Divider />
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "8px",
-                marginTop: "16px",
-              }}
-            >
-              <Box
-                sx={{
-                  flex: 1,
-                  border: `2px solid ${
-                    isCorrect
-                      ? theme.palette.success.main
-                      : theme.palette.error.main
-                  }`,
-                  borderRadius: "8px",
-                  height: "100%",
-                  backgroundColor: isCorrect
-                    ? "rgba(0, 255, 0, 0.1)"
-                    : "rgba(255, 0, 0, 0.1)",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <Typography
-                  variant="h5"
-                  sx={{
-                    color: isCorrect
-                      ? theme.palette.success.main
-                      : theme.palette.error.main,
-                    margin: "16px",
-                    display: "flex",
-                  }}
-                >
-                  {isCorrect
-                    ? "Congratulations, your solution is correct! You can proceed to other transactions!"
-                    : "Error: There is an issue with your code. Please try again."}
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "8px",
-                }}
-              >
-                <Button variant="text" color="primary">
-                  Run
-                </Button>
-                <Button variant="text" color="secondary">
-                  Next
-                </Button>
-              </Box>
-            </Box>
-          </Box>
+          />
           <HintDialog
             open={hintOpen}
             onClose={() => setHintOpen(false)}
