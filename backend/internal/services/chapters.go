@@ -165,6 +165,7 @@ func (s *chapterService) AddChapter(
 		LanguageID:       languageUUID,
 		CourseID:         courseUUID,
 		RewardID:         s.utilService.ParseNullUUID(rewardID),
+		Content:          content,
 		Title:            title,
 		Description:      description,
 		FuncName:         funcName,

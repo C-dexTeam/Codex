@@ -24,6 +24,7 @@ type UserChapterView struct {
 	Content          string     `json:"content"`
 	GrantsExperience bool       `json:"grantsExperience"`
 	Active           bool       `json:"active"`
+	FrontendTemplate string     `json:"frontendTemplate"`
 	Tests            []TestView `json:"tests,omitempty"`
 	CreatedAt        time.Time  `json:"createdAt"`
 }
@@ -51,6 +52,7 @@ func (d *ChapterDTOManager) ToChapterDTO(appModel *domains.Chapter) *UserChapter
 		Description:      appModel.Description,
 		Content:          appModel.Content,
 		GrantsExperience: appModel.GrantsExp,
+		FrontendTemplate: appModel.FrontTmp,
 		RewardImage:      imgPath,
 		Active:           appModel.Active,
 		Tests:            testManager.ToTestDTOs(appModel.Tests),

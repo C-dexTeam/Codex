@@ -55,6 +55,11 @@ const AuthProvider = ({ children }) => {
       level: data?.level || defaultProvider.user.level,
       nextLevelExperience: data?.nextLevelExperience || defaultProvider.user.nextLevelExperience,
       publicKey: data?.publicKey || defaultProvider.user.publicKey,
+      streak : data?.statistic?.streak || defaultProvider.user.streak,
+      compleredChapters : data?.statistic?.compleredChapters || defaultProvider.user.compleredChapters,
+      compleredChapters : data?.statistic?.compleredChapters || defaultProvider.user.compleredChapters,
+      completedCourses : data?.statistic?.completedCourses || defaultProvider.user.completedCourses,
+      enrolledCourses : data?.statistic?.enrolledCourses || defaultProvider.user.enrolledCourses,
     }
 
     return userData
