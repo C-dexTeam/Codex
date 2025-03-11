@@ -55,6 +55,7 @@ const defineRulesFor = (role, permission, permissions) => {
       can(['read'], "build")
       can(['read'], "community")
       can(['read'], "chapter")
+      can(['read'], "admin")
       break
 
     default:

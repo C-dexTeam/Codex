@@ -9,8 +9,9 @@ import { Box, Container } from "@mui/material";
 import { useRouter } from "next/router";
 import navigation from "@/navigation";
 import findParent from "@/utils/findParent";
+import AdminNavbar from "./components/Navbar";
 
-const Layout = ({ children }) => {
+const AdminLayout = ({ children }) => {
 
     const router = useRouter();
 
@@ -19,9 +20,6 @@ const Layout = ({ children }) => {
     useEffect(() => {
         setMounted(true);
     }, []);
-
-
-    const titles = findParent(navigation, router.pathname)
 
     if (!mounted) return <>{children}</>
 
@@ -35,11 +33,10 @@ const Layout = ({ children }) => {
                 showOnShallow={true}
                 options={{ easing: "ease-in-out", speed: 500 }}
             /> */}
-            {/* <Navbar /> */}
-            <Navbar />
+            <AdminNavbar />
 
             <Box sx={{
-                width: '100%', display: 'flex', 
+                width: '100%', display: 'flex',
                 // mt: "96px",
                 py: '40px',
                 minHeight: `calc(100vh - 80px)`,
@@ -72,4 +69,4 @@ const Layout = ({ children }) => {
     );
 };
 
-export default Layout;
+export default AdminLayout;

@@ -33,6 +33,7 @@ const MultiItem = (props) => {
         return () => { setOpen(false) }
     }, [router.pathname])
 
+
     return (
         <GroupAcl item={props}>
             <ListItemButton
@@ -41,7 +42,7 @@ const MultiItem = (props) => {
                     handleLocate(path)
                 }}
                 sx={{ ml: inside * 2 }}
-                active={checkPath(router.pathname, props, open ? true : false)}
+                active={checkPath(router.pathname, props, open ? true : false) ? 'true' : undefined}
             >
                 <ListItemIcon>
                     {icon}

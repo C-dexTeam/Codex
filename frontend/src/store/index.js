@@ -5,7 +5,7 @@ import coursesSlice from './courses/coursesSlice'
 import planguagesSlice from './planguages/planguagesSlice'
 import profileSlice from './profile/profileSlice'
 import chaptersSlice from './chapters/chaptersSlice'
-
+import admin from './admin'
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +13,7 @@ export const store = configureStore({
     planguages : planguagesSlice,
     profile : profileSlice,
     chapters : chaptersSlice,
+    admin,
   },
   
   middleware: getDefaultMiddleware =>

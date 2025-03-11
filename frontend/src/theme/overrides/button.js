@@ -113,6 +113,15 @@ const button = theme => {
           // color: `${theme.palette[ownerState.color || "primary"].contrastText} !important`,
         }),
       },
+    },
+
+    MuiIconButton: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          color: `${theme.palette.text.primary}`,
+        })
+
+      }
     }
   }
 }

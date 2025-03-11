@@ -17,7 +17,7 @@ const palette = {
         disabled: border.dark,
         disabledBackground: border.light,
         focus: border.light,
-        hover: hexToRGBA(border.main, 0.24),
+        hover: hexToRGBA(border.secondary, 0.5),
         selected: border.light,
     },
     common: {

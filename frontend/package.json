@@ -17,6 +17,7 @@
     "@mui/icons-material": "^5.15.3",
     "@mui/lab": "^5.0.0-alpha.158",
     "@mui/material": "^5.15.2",
+    "@mui/x-data-grid": "^7.27.2",
     "@reduxjs/toolkit": "^2.2.0",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-react": "^0.15.35",
