@@ -17,3 +17,10 @@ export const validation = async (schema, values) => {
 
     return { ...schemaErrors }
 }
+
+export const validate = async (schema, values, setIsSubmitted, setErrors) => {
+    const err = await validation(schema, { ...values });
+
+    if (Object.keys(err).length == 0) setIsSubmitted(false);
+    setErrors(err);
+};

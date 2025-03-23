@@ -4,7 +4,7 @@ const textfield = theme => {
     MuiTextField: {
       styleOverrides: {
         root: ({ ownerState }) => ({
-          width: "fit-content",
+          // width: "fit-content",
 
           "& .MuiButtonBase-root": {
             color: theme.palette.border.secondary,
@@ -43,6 +43,10 @@ const textfield = theme => {
             paddingRight: "0.5rem",
             paddingLeft: "0.5rem",
           },
+
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: theme.palette.error.main,
+          }
 
           // ...(ownerState.variant === "filled" && {
           //     borderRadius: "0.75rem",
