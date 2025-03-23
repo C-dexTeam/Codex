@@ -46,8 +46,8 @@ const DataGrid = theme => {
           }
         },
         columnHeaderCheckbox: {
-          maxWidth: '58px !important',
-          minWidth: '58px !important'
+          // maxWidth: '58px !important',
+          // minWidth: '58px !important'
         },
         columnHeaderTitleContainer: {
           padding: 0
@@ -65,23 +65,25 @@ const DataGrid = theme => {
         },
         virtualScrollerRenderZone: {
           '& .MuiDataGrid-row': {
-            maxHeight: '50px !important',
-            minHeight: '50px !important',
+            maxHeight: 'unset !important',
+            // minHeight: '50px !important',
             "&:hover": {
               backgroundColor: theme.palette.action.hover,
             }
           }
         },
         row: {
+          '& .MuiDataGrid-cell': {
+            height: "auto"
+          },
           '&:last-child': {
             '& .MuiDataGrid-cell': {
-              borderBottom: 0
+              borderBottom: 0,
             }
           }
         },
         cell: {
-          maxHeight: '50px !important',
-          minHeight: '50px !important',
+          // minHeight: '50px !important',
           lineHeight: '20px !important',
           display: "flex",
           alignItems: "center",
@@ -101,8 +103,8 @@ const DataGrid = theme => {
           }
         },
         cellCheckbox: {
-          maxWidth: '58px !important',
-          minWidth: '58px !important'
+          // maxWidth: '58px !important',
+          // minWidth: '58px !important'
         },
         editInputCell: {
           padding: 0,
@@ -112,10 +114,10 @@ const DataGrid = theme => {
           }
         },
         footerContainer: {
-          minHeight: '50px !important',
+          // minHeight: '50px !important',
           borderTop: `1px solid ${theme.palette.border.secondary}`,
           '& .MuiTablePagination-toolbar': {
-            minHeight: '50px !important'
+            // minHeight: '50px !important'
           },
           '& .MuiTablePagination-displayedRows, & .MuiTablePagination-selectLabel': {
             color: theme.palette.text.primary
@@ -123,7 +125,7 @@ const DataGrid = theme => {
         }
       },
       defaultProps: {
-        rowHeight: 50,
+        // rowHeight: 50,
         headerHeight: 54
       }
     }

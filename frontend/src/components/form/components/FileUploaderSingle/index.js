@@ -1,14 +1,14 @@
 // ** MUI Imports
-import { CircularProgress, Divider } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
-import { Upload } from 'mdi-material-ui'
 import { useState } from 'react'
 // ** Third Party Imports
 import { useDropzone } from 'react-dropzone'
 import { Img } from './styled'
+import { Upload } from '@mui/icons-material'
 
 const FileUploaderSingle = props => {
   const {
@@ -57,7 +57,7 @@ const FileUploaderSingle = props => {
     setFiles([...filtered])
   }
 
-  const img = files.map((file, index) => {
+  const img = files?.length > 0 && files?.map((file, index) => {
     return (
       <Box
         style={{
@@ -148,7 +148,7 @@ const FileUploaderSingle = props => {
       <Box {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
 
-        <Typography variant='bodyMedium' sx={{ width: '100%' }}>
+        <Typography variant='body' sx={{ width: '100%' }}>
           {
             isRequired
               ? (
@@ -173,21 +173,23 @@ const FileUploaderSingle = props => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: noText ? 'center' : 'start',
+            // border: '1px dashed',
+            backgroundImage: `url("data:image/svg+xml,%3csvg width='99%' height='100%' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='99%' height='100%' fill='none' rx='8' ry='8' stroke='%23DEE0E8FF' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
+            borderRadius: "8px",
             borderRadius: 1,
-            padding: '10px 20px',
+            padding: '1rem 2rem',
             cursor: 'alias',
-            gap: '8px',
-            backgroundColor: 'grey.100'
+            gap: '1rem',
           }}
         >
-          <Upload />
+          <Typography color='secondary'>
+            <Upload />
+          </Typography>
 
           {
             noText
               ? null
               : <>
-                <Divider orientation='vertical' flexItem />
-
                 <Box
                   sx={{
                     display: 'flex',
@@ -200,11 +202,11 @@ const FileUploaderSingle = props => {
                     text
                       ? <Typography color='secondary'>{text}</Typography>
                       : <Typography color='secondary'>
-                        Bilgisayarınızdan dosya yüklemek için sürükleyin veya{' '}
-
                         <Link href='/' onClick={handleLinkClick}>
-                          tıklayın
+                          Click
                         </Link>
+
+                        to upload a file from your computer
                       </Typography>
                   }
                 </Box>
@@ -222,7 +224,7 @@ const FileUploaderSingle = props => {
       {
         hiddenImg
           ? null
-          : <Box sx={{ position: 'relative' }}>{files.length && !imageUrl ? img : null}</Box>
+          : <Box sx={{ position: 'relative' }}>{files?.length && !imageUrl ? img : null}</Box>
       }
     </>
   )

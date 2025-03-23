@@ -139,9 +139,10 @@ const ClassicTable = (props) => {
                         "& .MuiDataGrid-columnHeaders": {
                             // backgroundColor: "unset",
                         },
-                        // "& .MuiDataGrid-columnHeaderTitle": {
-                        //     fontSize: "0.9rem",
-                        // },
+                        "& .MuiDataGrid-columnHeaderTitle": {
+                            textDecoration: "none",
+                            textTransform: "unset",
+                        },
                         // "& .MuiDataGrid-cell": {
                         //     maxHeight: "300px !important",
                         // },

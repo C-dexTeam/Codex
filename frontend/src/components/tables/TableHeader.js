@@ -23,10 +23,10 @@ const TableHeader = (props) => {
     const _sx = useMediaQuery(theme => theme.breakpoints.down('sm'))
 
     return (
-        <Grid sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: '20px' }} container spacing={2.5}>
+        <Grid sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: '1rem' }} container spacing={2}>
             <Grid item xs={12} md sm>
                 {
-                    title ? <Typography variant='h5' sx={{ fontWeight: '600' }}>  {title}</Typography> : null
+                    title ? <Typography variant='h2'>{title}</Typography> : null
                 }
             </Grid>
 
@@ -57,7 +57,7 @@ const TableHeader = (props) => {
                             ? <Button
                                 fullWidth={_sx}
                                 variant='outlined'
-                                color='primary'
+                                color='secondary'
                                 size='small'
                                 sx={{ textTransform: 'none' }}
                                 onClick={() => { btnClick() }}

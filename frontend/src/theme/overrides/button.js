@@ -24,6 +24,16 @@ const button = theme => {
           },
 
           ...(
+            ownerState.size === "small"
+              ? {
+                padding: "0.25em 0.5em",
+              }
+              : ownerState.size === "large" && {
+                padding: "0.75em 1.5em",
+              }
+          ),
+
+          ...(
             ownerState.variant === "outlined"
               ? { // outlined button
                 background: "inherit !important",
