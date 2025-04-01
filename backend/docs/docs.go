@@ -903,6 +903,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/chapters/compilerNames": {
+            "get": {
+                "description": "Gets Programming Names",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Codex-Compiler"
+                ],
+                "summary": "Gets Programming Names",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/chapters/run": {
             "post": {
                 "description": "Runs Chapter Code.",
@@ -1776,12 +1799,12 @@ const docTemplate = `{
         },
         "dto.AddChapterDTO": {
             "type": "object",
+            "required": [
+                "active"
+            ],
             "properties": {
                 "active": {
                     "type": "boolean"
-                },
-                "checkTemplate": {
-                    "type": "string"
                 },
                 "content": {
                     "type": "string"
@@ -1927,9 +1950,6 @@ const docTemplate = `{
             "properties": {
                 "active": {
                     "type": "boolean"
-                },
-                "checkTemplate": {
-                    "type": "string"
                 },
                 "content": {
                     "type": "string"

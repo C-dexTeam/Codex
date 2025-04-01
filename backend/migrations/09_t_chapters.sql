@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS t_chapters (
     func_name VARCHAR(30) NOT NULL,
     frontend_template TEXT NOT NULL,
     docker_template TEXT NOT NULL,
-    check_template TEXT NOT NULL,
     grants_experience BOOLEAN NOT NULL DEFAULT FALSE,
     active BOOLEAN NOT NULL DEFAULT FALSE,
     chapter_order INT NOT NULL DEFAULT 1,

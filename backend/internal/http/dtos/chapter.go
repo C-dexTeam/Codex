@@ -80,9 +80,8 @@ type AddChapterDTO struct {
 	FuncName         string `json:"fundName"`
 	FrontendTmp      string `json:"frontendTemplate"`
 	DockerTmp        string `json:"dockerTemplate"`
-	CheckTmp         string `json:"checkTemplate"`
 	GrantsExperience bool   `json:"grantsExperience"`
-	Active           bool   `json:"active"`
+	Active           bool   `json:"active" validate:"required"`
 	Order            int    `json:"order"`
 }
 
@@ -98,7 +97,6 @@ type UpdateChapterDTO struct {
 	FuncName         string `json:"fundName"`
 	FrontendTmp      string `json:"frontendTemplate"`
 	DockerTmp        string `json:"dockerTemplate"`
-	CheckTmp         string `json:"checkTemplate"`
 	GrantsExperience *bool  `json:"grantsExperience"`
 	Active           *bool  `json:"active"`
 }

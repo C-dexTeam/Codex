@@ -1,6 +1,8 @@
 package private
 
 import (
+	"fmt"
+
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/C-dexTeam/codex/internal/http/sessionStore"
@@ -10,6 +12,7 @@ import (
 func (h *PrivateHandler) initChaptersRoutes(root fiber.Router) {
 	chapterRoutes := root.Group("/chapters")
 	chapterRoutes.Get("/", h.GetChapters)
+	chapterRoutes.Get("/compilerNames", h.GetCompilerPNames)
 	chapterRoutes.Get("/:id", h.GetChapter)
 	chapterRoutes.Post("/run", h.RunChapter)
 }
@@ -75,6 +78,26 @@ func (h *PrivateHandler) GetChapter(c *fiber.Ctx) error {
 	chapterDTO := h.dtoManager.ChapterManager().ToChapterDTO(chapter)
 
 	return response.Response(200, "Status OK", chapterDTO)
+}
+
+// @Tags Codex-Compiler
+// @Summary Gets Programming Names
+// @Description Gets Programming Names
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/chapters/compilerNames [get]
+func (h *PrivateHandler) GetCompilerPNames(c *fiber.Ctx) error {
+	sessionID := c.Cookies("session_id")
+
+	// Request the Run endpoint from Codex-Compiler
+	codeResponse, err := h.services.ChapterService().CompilerNames(c.Context(), sessionID)
+	if err != nil {
+		return err
+	}
+	fmt.Println(sessionID, "oldjsaod")
+
+	return response.Response(200, "Status OK", codeResponse)
 }
 
 // @Tags Chapters
