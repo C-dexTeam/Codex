@@ -36,5 +36,7 @@ WORKDIR /app
 COPY --from=builder /go/bin/air /usr/local/bin/air
 COPY --from=builder /app /app
 
+EXPOSE 8081
+
 # Çalıştırma komutu (Air ile hot-reload)
 ENTRYPOINT ["air", "-c", "air.toml"]

@@ -22,7 +22,6 @@ type QuestChapter struct {
 	FuncName    string `json:"funcname"`
 	FrontendTmp string `json:"frontendTmp"`
 	DockerTmp   string `json:"dockerTmp"`
-	CheckTmp    string `json:"checkTmp"`
 }
 
 func (q *QuestDTOManager) QuestChapterDTO(chapter *repo.TChapter, userCode string) QuestChapter {
@@ -32,7 +31,6 @@ func (q *QuestDTOManager) QuestChapterDTO(chapter *repo.TChapter, userCode strin
 		FuncName:    chapter.FuncName,
 		FrontendTmp: chapter.FrontendTemplate,
 		DockerTmp:   chapter.DockerTemplate,
-		CheckTmp:    chapter.CheckTemplate,
 	}
 }
 

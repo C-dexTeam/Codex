@@ -30,7 +30,6 @@ type TChapter struct {
 	FuncName         string
 	FrontendTemplate string
 	DockerTemplate   string
-	CheckTemplate    string
 	GrantsExperience bool
 	Active           bool
 	ChapterOrder     int32

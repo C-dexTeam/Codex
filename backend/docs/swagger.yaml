@@ -19,8 +19,6 @@ definitions:
     properties:
       active:
         type: boolean
-      checkTemplate:
-        type: string
       content:
         type: string
       courseID:
@@ -45,6 +43,8 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - active
     type: object
   dto.AddPLanguageDTO:
     properties:
@@ -119,8 +119,6 @@ definitions:
     properties:
       active:
         type: boolean
-      checkTemplate:
-        type: string
       content:
         type: string
       courseID:
@@ -863,6 +861,21 @@ paths:
       summary: Get One Chapter
       tags:
       - Chapters
+  /private/chapters/compilerNames:
+    get:
+      consumes:
+      - application/json
+      description: Gets Programming Names
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Gets Programming Names
+      tags:
+      - Codex-Compiler
   /private/chapters/run:
     post:
       consumes:

@@ -1,7 +1,7 @@
 -- name: GetChapters :many
 SELECT 
     c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
-    c.func_name, c.frontend_template, c.docker_template, c.check_template, c.grants_experience, c.active,
+    c.func_name, c.frontend_template, c.docker_template, c.grants_experience, c.active,
     c.chapter_order, c.created_at, c.deleted_at
 FROM 
     t_chapters as c
@@ -20,7 +20,7 @@ LIMIT
 -- name: GetChapter :one
 SELECT
     c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
-    c.func_name, c.frontend_template, c.docker_template, c.check_template, c.grants_experience, c.active,
+    c.func_name, c.frontend_template, c.docker_template, c.grants_experience, c.active,
     c.chapter_order, c.created_at, c.deleted_at
 FROM
     t_chapters as c
@@ -31,10 +31,10 @@ WHERE
 -- name: CreateChapter :one
 INSERT INTO
     t_chapters (course_id, language_id, reward_id, reward_amount, title, description, content,
-    func_name, frontend_template, docker_template, check_template, grants_experience, active, chapter_order)
+    func_name, frontend_template, docker_template, grants_experience, active, chapter_order)
 VALUES
    (@course_id, @language_id, @reward_id, @reward_amount, @title, @description, @content,
-    @func_name, @frontend_template, @docker_template, @check_template, @grants_experience, @active, @chapter_order)
+    @func_name, @frontend_template, @docker_template, @grants_experience, @active, @chapter_order)
 RETURNING id;
 
 
@@ -52,7 +52,6 @@ SET
     func_name =  COALESCE(sqlc.narg(func_name), func_name),
     frontend_template =  COALESCE(sqlc.narg(frontend_template), frontend_template),
     docker_template =  COALESCE(sqlc.narg(docker_template), docker_template),
-    check_template =  COALESCE(sqlc.narg(check_template), check_template),
     grants_experience =  COALESCE(sqlc.narg(grants_experience)::BOOLEAN, grants_experience),
     active =  COALESCE(sqlc.narg(active)::BOOLEAN, active)
 WHERE

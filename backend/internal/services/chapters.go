@@ -145,7 +145,7 @@ func (s *chapterService) GetChapter(
 func (s *chapterService) AddChapter(
 	ctx context.Context,
 	courseID, languageID, rewardID, title, description, content, funcName string,
-	frontendTmp, dockerTmp, checkTmp string,
+	frontendTmp, dockerTmp string,
 	grantsExperience, active bool,
 	rewardAmount, order int,
 ) (uuid.UUID, error) {
@@ -171,7 +171,6 @@ func (s *chapterService) AddChapter(
 		FuncName:         funcName,
 		FrontendTemplate: frontendTmp,
 		DockerTemplate:   dockerTmp,
-		CheckTemplate:    checkTmp,
 		RewardAmount:     int32(rewardAmount),
 		GrantsExperience: grantsExperience,
 		Active:           active,
@@ -187,7 +186,7 @@ func (s *chapterService) AddChapter(
 func (s *chapterService) UpdateChapter(
 	ctx context.Context,
 	id, courseID, languageID, rewardID, title, description, content, funcName string,
-	frontendTmp, dockerTmp, checkTmp string,
+	frontendTmp, dockerTmp string,
 	grantsExperience, active *bool,
 	rewardAmount int,
 ) error {
@@ -236,7 +235,6 @@ func (s *chapterService) UpdateChapter(
 		FuncName:         s.utilService.ParseString(funcName),
 		FrontendTemplate: s.utilService.ParseString(frontendTmp),
 		DockerTemplate:   s.utilService.ParseString(dockerTmp),
-		CheckTemplate:    s.utilService.ParseString(checkTmp),
 		RewardAmount:     rewAmountNullInt,
 		GrantsExperience: grantsExpNullBool,
 		Active:           validNullBool,
@@ -345,6 +343,73 @@ func (s *chapterService) runRequest(sessionID string, questView dto.QuestView) (
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, response.Response(500, "Error making POST request", err)
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, response.Response(500, "Error reading response body", nil)
+	}
+
+	var data response.BaseResponse
+	if err := json.Unmarshal(body, &data); err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessage(500, "Error decoding session data")
+	}
+
+	return &data, nil
+}
+
+func (s *chapterService) CompilerNames(ctx context.Context, sessionID string) ([]string, error) {
+	data, err := s.compilerPNamesRequest(sessionID)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrCompilerRunError)
+	}
+
+	dataArray, ok := data.Data.([]interface{})
+	if !ok {
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrInvalidDataType)
+	}
+
+	var names []string
+	for _, item := range dataArray {
+		name, ok := item.(string)
+		if !ok {
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrInvalidDataType)
+		}
+		names = append(names, name)
+	}
+
+	return names, nil
+}
+
+func (s *chapterService) compilerPNamesRequest(sessionID string) (*response.BaseResponse, error) {
+	// nginx domain because we are inside of docker & i'm going to do load balancer.
+	url := "http://nginx/compiler-api/v1/private/getPLanguages"
+
+	// Create a new GET request
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, response.Response(500, "Error creating GET request", err)
+	}
+
+	// Set the Content-Type header to application/json
+	req.Header.Add("Content-Type", "application/json")
+
+	// Add the Codex-Compiler header
+	req.Header.Add("Codex-Compiler", hasherService.MD5Hash(s.utilService.D().Secret))
+
+	// Add the session_id cookie to the request
+	req.AddCookie(&http.Cookie{
+		Name:  "session_id",
+		Value: sessionID,
+	})
+
+	// Create an HTTP client and execute the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, response.Response(500, "Error making GET request", err)
 	}
 	defer resp.Body.Close()
 
