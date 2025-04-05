@@ -75,8 +75,8 @@ const Home = () => {
                                 width: "auto",
                             }}
                         >
-                            <img 
-                                src="/images/logo/logo-build-with.png" 
+                            <img
+                                src="/images/logo/logo-build-with.png"
                                 alt="Solana Logo"
                                 style={{
                                     maxWidth: "100%",
@@ -86,9 +86,9 @@ const Home = () => {
                         </Box>
                     </Box>
 
-                    <Box sx={{ 
-                        display: "flex", 
-                        gap: "1rem", 
+                    <Box sx={{
+                        display: "flex",
+                        gap: "1rem",
                         mt: "1rem",
                         flexDirection: isMobile ? "column" : "row",
                         width: isMobile ? "100%" : "auto"
@@ -109,7 +109,7 @@ const Home = () => {
                             opacity: isMobile ? 0.5 : 1
                         }}
                     >
-                        <img 
+                        <img
                             src="/images/ellipse-solana.png"
                             style={{
                                 width: "100%",
@@ -189,8 +189,8 @@ const Home = () => {
             {/* Statistics */}
             <Card sx={{ background: theme => hexToRGBA(theme.palette.background.default, 0.8) }}>
                 <CardContent>
-                    <Box sx={{ 
-                        display: "flex", 
+                    <Box sx={{
+                        display: "flex",
                         flexDirection: isMobile ? "column" : "row",
                         justifyContent: "space-evenly",
                         gap: isMobile ? "2rem" : "0"
@@ -241,12 +241,12 @@ const Home = () => {
                         </Button>
                     </Box>
 
-                    <Box sx={{ 
-                        display: "flex", 
+                    <Box sx={{
+                        display: "flex",
                         flexDirection: isMobile ? "column" : "row",
-                        justifyContent: "space-between", 
-                        alignItems: isMobile ? "flex-start" : "center", 
-                        gap: isMobile ? "2rem" : "4rem" 
+                        justifyContent: "space-between",
+                        alignItems: isMobile ? "flex-start" : "center",
+                        gap: isMobile ? "2rem" : "4rem"
                     }}>
                         <Box sx={{ width: isMobile ? "100%" : "50%" }}>
                             <Typography variant="h2" sx={{ fontSize: isMobile ? "1.75rem" : "2.125rem" }}>
@@ -270,7 +270,7 @@ const Home = () => {
                                 justifyContent: "center"
                             }}
                         >
-                            <img 
+                            <img
                                 src="/images/space/rocket.png"
                                 style={{
                                     maxWidth: "100%",
@@ -311,12 +311,12 @@ const Home = () => {
                         gap: "2rem",
                     }}
                 >
-                    <Box sx={{ 
-                        display: "flex", 
+                    <Box sx={{
+                        display: "flex",
                         flexDirection: isMobile ? "column-reverse" : "row",
-                        justifyContent: "space-between", 
-                        alignItems: "center", 
-                        gap: isMobile ? "2rem" : "4rem" 
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: isMobile ? "2rem" : "4rem"
                     }}>
                         <Box
                             sx={{
@@ -329,7 +329,7 @@ const Home = () => {
                                 justifyContent: "center"
                             }}
                         >
-                            <img 
+                            <img
                                 src="/images/code-ide.png"
                                 style={{
                                     maxWidth: "100%",
@@ -339,7 +339,7 @@ const Home = () => {
                             />
                         </Box>
 
-                        <Box sx={{ 
+                        <Box sx={{
                             width: isMobile ? "100%" : "50%",
                             marginLeft: isMobile ? "0" : "auto"
                         }}>
@@ -387,20 +387,20 @@ const Home = () => {
                         gap: "2rem",
                     }}
                 >
-                    <Box sx={{ 
-                        display: "flex", 
+                    <Box sx={{
+                        display: "flex",
                         flexDirection: isMobile ? "column" : "row",
-                        justifyContent: "space-between", 
+                        justifyContent: "space-between",
                         gap: isMobile ? "2rem" : "4rem",
                         alignItems: "center"
                     }}>
-                        <Box sx={{ 
-                            zIndex: "-2", 
+                        <Box sx={{
+                            zIndex: "-2",
                             width: isMobile ? "100%" : "40rem",
                             display: "flex",
                             justifyContent: "center"
                         }}>
-                            <img 
+                            <img
                                 src="/images/nft-cards.png"
                                 style={{
                                     maxWidth: "100%",
@@ -438,112 +438,13 @@ const Home = () => {
                 </Box>
             </Box>
 
-            <div>
-                <h1>Home</h1>
-
-                <Button>Test</Button>
-
-                <br />
-                <br />
-
-                <Button color="info" variant="outlined">Test</Button>
-
-                <br />
-                <br />
-
-                <Button color="warning" variant="gradient">Test</Button>
-
-                <br />
-                <br />
-
-                <Typography variant="h1">h1</Typography>
-                <Typography variant="h2">h2</Typography>
-                <Typography variant="h3">h3</Typography>
-                <Typography variant="h4">h4</Typography>
-                <Typography variant="h5">h5</Typography>
-                <Typography variant="h6">h6</Typography>
-                <Typography variant="subtitle">subtitle1</Typography>
-                <Typography variant="subtitle2">subtitle2</Typography>
-                <Typography variant="body">body1</Typography>
-                <Typography variant="body2">body2</Typography>
-                <Typography variant="caption">caption1</Typography>
-                <Typography variant="caption2">caption2</Typography>
-                <Typography variant="link">link1</Typography>
-                <Typography variant="link2">link2</Typography>
-
-                <br />
-                <br />
-
-
-                <Box sx={{ maxWidth: "300px" }}>
-
-                    <GradientCard>
-                        <CardContent>
-                            asdsadsad
-                            <br />
-                            <br />
-                            <br />
-                            asdsadsad
-                        </CardContent>
-                    </GradientCard>
-                </Box>
-                <br />
-                <br />
-                <Box sx={{ maxWidth: "300px" }}>
-
-                    <Card variant="special">
-                        <CardContent>
-                            asdsadsad
-                            <br />
-                            <br />
-                            <br />
-                            asdsadsad
-                        </CardContent>
-                    </Card>
-                </Box>
-
-                <br />
-                <br />
-                <Box sx={{ maxWidth: "300px" }}>
-
-                    <Card variant="flat">
-                        <CardContent>
-                            asdsadsad
-                            <br />
-                            <br />
-                            <br />
-                            asdsadsad
-                        </CardContent>
-                    </Card>
-                </Box>
-
-                <br />
-                <br />
-                <Box sx={{ maxWidth: "300px" }}>
-
-                    <Card>
-                        <CardContent>
-                            asdsadsad
-                            <br />
-                            <br />
-                            <br />
-                            asdsadsad
-                        </CardContent>
-                    </Card>
-                </Box>
-
-
-                <br />
-                <br />
-
-
-
+            {/* <div>
                 <WalletConnectionButton />
 
                 <Can I="read" a="wallet">
                     If you see this message. Your wallet has been connected
                 </Can>
-            </div>
+            </div> */}
         </>
     )
 }
