@@ -38,10 +38,13 @@ export const fetchCourses = createAsyncThunk('courses/fetchCourses', async (para
  * @param {string} [formData.rewardID] - Reward ID (optional).
  * @param {string} formData.title - Course Title (required).
  */
-export const createCourse = createAsyncThunk('courses/createCourse', async (formData, { dispatch, rejectWithValue }) => {
+export const createCourse = createAsyncThunk('courses/createCourse', async ({ formData, callback }, { dispatch, rejectWithValue }) => {
     try {
         const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses`, formData);
+
         dispatch(fetchCourses());
+        callback()
+
         return response.data?.data;
     } catch (error) {
         return rejectWithValue(error.response);

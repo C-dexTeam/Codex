@@ -6,6 +6,8 @@ const listitem = theme => {
       styleOverrides: {
         root: {
           padding: 0,
+          // border: "1px solid #fff",
+          // borderRadius: "0.5rem"
         },
       },
     },

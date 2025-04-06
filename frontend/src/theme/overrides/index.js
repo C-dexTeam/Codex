@@ -13,6 +13,7 @@ import MuiTab from './tab'
 import MuiTooltip from './tooltip'
 import MuiAccordion from './accordion'
 import MuiDataGrid from './dataGrid'
+import MuiSelect from './select'
 
 
 const Overrides = (theme) => {
@@ -30,6 +31,7 @@ const Overrides = (theme) => {
   const tooltip = MuiTooltip(theme)
   const accordion = MuiAccordion(theme)
   const dataGrid = MuiDataGrid(theme)
+  const select = MuiSelect(theme)
 
   return Object.assign(
     chip,
@@ -45,7 +47,8 @@ const Overrides = (theme) => {
     tab,
     tooltip,
     accordion,
-    dataGrid
+    dataGrid,
+    select
   )
 }
 

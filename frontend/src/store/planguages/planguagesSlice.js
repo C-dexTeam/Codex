@@ -10,7 +10,7 @@ const initialState = {
 
 export const getAllPlanguages = createAsyncThunk(
   "planguages/planguages",
-  async (data, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await axios({
         method: "GET",
@@ -18,7 +18,7 @@ export const getAllPlanguages = createAsyncThunk(
         headers: {
           "Content-Type": "application/json",
         },
-        
+
       });
       if (response.status === 200) {
         return response.data;
@@ -48,5 +48,7 @@ const planguagesSlice = createSlice({
       })
   },
 });
+
+export const getProgrammingLanguages = (state) => state.planguages.data.data;
 
 export default planguagesSlice.reducer;

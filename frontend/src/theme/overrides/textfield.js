@@ -68,6 +68,13 @@ const textfield = theme => {
         }),
       },
     },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          color: theme.palette.border.main,
+        })
+      }
+    }
   }
 }
 

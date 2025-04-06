@@ -2,6 +2,17 @@ import { hexToRGBA } from "@/utils/hex-to-rgba"
 
 const card = theme => {
   return {
+    MuiPaper: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          borderRadius: ownerState.round == "lg" ? "1rem" : "0.5rem",
+          border: `1px solid ${hexToRGBA(theme.palette.border.secondary, 1)}`,
+          "&.MuiMenu-paper": {
+            marginTop: "0.5rem"
+          }
+        })
+      }
+    },
     MuiCard: {
       styleOverrides: {
         root: ({ ownerState }) => ({
