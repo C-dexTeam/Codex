@@ -12,7 +12,7 @@ const CustomTooltip = styled(({ className, ...props }) => (
     },
     [`& .${tooltipClasses.tooltip}`]: {
         backgroundColor: theme.palette.background.default,
-        color: theme.palette.text.secondary,
+        color: theme.palette.text.primary,
         fontSize: theme.typography.pxToRem(12),
         padding: "0.5rem 0.75rem",
         fontFamily: "inherit",

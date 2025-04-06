@@ -3,12 +3,12 @@
 import * as yup from 'yup'
 
 export const courseValues = {
-    imageFile: null,
-    title: '',
+    imageFile: null, // *
+    title: '', // *
     description: '',
     languageID: '',
-    programmingLanguageID: '',
-    rewardAmount: '',
+    programmingLanguageID: '', // *
+    rewardAmount: 10,
     rewardID: '',
 }
 

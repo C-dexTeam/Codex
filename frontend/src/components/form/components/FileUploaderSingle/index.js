@@ -1,14 +1,14 @@
 // ** MUI Imports
-import { CircularProgress } from '@mui/material'
+import { CircularProgress, IconButton } from '@mui/material'
 import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 // ** Third Party Imports
 import { useDropzone } from 'react-dropzone'
 import { Img } from './styled'
-import { Upload } from '@mui/icons-material'
+import { HighlightOff, Upload } from '@mui/icons-material'
+import CustomTooltip from '@/components/tooltip'
 
 const FileUploaderSingle = props => {
   const {
@@ -79,24 +79,11 @@ const FileUploaderSingle = props => {
             alignItems: 'center',
           }}
         >
-          <Chip
-            color='error'
-            variant='outlined'
-            onDelete={() => handleRemoveFile(file)}
-            sx={{
-              marginLeft: 2.8,
-              display: 'flex',
-              justifyContent: 'center',
-              border: 0,
-              padding: 0,
-              '& .MuiChip-label': {
-                padding: 0
-              },
-              '& .MuiChip-deleteIcon': {
-                padding: 0
-              }
-            }}
-          />
+          <CustomTooltip title="Delete Uploaded File">
+            <IconButton color='error' onClick={() => handleRemoveFile(file)}>
+              <HighlightOff color='error' sx={{ width: "1.75rem", height: "1.75rem" }} />
+            </IconButton>
+          </CustomTooltip>
 
           <Box
             sx={{
@@ -219,13 +206,13 @@ const FileUploaderSingle = props => {
               : imageUrl && imageUrl != '' ? <Img alt='Logo' src={imageUrl} /> : null
           }
         </Box>
-      </Box>
 
-      {
-        hiddenImg
-          ? null
-          : <Box sx={{ position: 'relative' }}>{files?.length && !imageUrl ? img : null}</Box>
-      }
+        {
+          hiddenImg
+            ? null
+            : <Box sx={{ position: 'relative' }}>{files?.length && !imageUrl ? img : null}</Box>
+        }
+      </Box>
     </>
   )
 }

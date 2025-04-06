@@ -23,7 +23,7 @@ const CoursesAdminPage = () => {
             <ClassicTable
                 header={{
                     title: 'Courses',
-                    btnText: "Add Course",
+                    btnText: "Create Course",
                     btnClick: () => { router.push('/admin/courses/add') },
                 }}
                 // pagination={{

@@ -37,7 +37,7 @@ const Navbar = () => {
           </Box>
 
           <Box sx={{ display: "flex", gap: "1rem" }}>
-            <Button color="info" variant="outlined">En</Button>
+            {/* <Button color="info" variant="outlined">En</Button> */}
             <Button color="primary">Start Course</Button>
           </Box>
         </Box>

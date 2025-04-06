@@ -62,7 +62,7 @@ const AdminLayout = ({ children }) => {
                 </Container>
             </Box>
 
-            <Footer />
+            {/* <Footer /> */}
             {/* Other components */}
             <ScrollTop />
         </Fragment>
