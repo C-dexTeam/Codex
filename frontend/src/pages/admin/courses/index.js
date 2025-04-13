@@ -33,6 +33,7 @@ const CoursesAdminPage = () => {
                 // }}
                 rows={courses}
                 columns={coursesColumns}
+                getRowId={(row) => row._id || row.id || Math.random().toString(36).substr(2, 9)}
             />
         </div>
     )

@@ -14,7 +14,20 @@ const SingleItem = (props) => {
     const handleLocate = (p) => { if (p) return () => router.replace(p) }
 
     return (
-        <ListItemButton onClick={handleLocate(path)} active={router.asPath == path} sx={{ ml: inside * 2 }} special={path == "/courses/solana"}>
+        <ListItemButton 
+            onClick={handleLocate(path)} 
+            selected={router.asPath === path} 
+            sx={{ 
+                ml: inside * 2,
+                ...(path === "/courses/solana" && {
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    '&:hover': {
+                        backgroundColor: 'primary.dark',
+                    }
+                })
+            }}
+        >
             {
                 icon
                     ? <ListItemIcon>

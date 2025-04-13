@@ -15,15 +15,19 @@ const FileUploaderSingle = props => {
     title,
     files,
     setFiles,
-    imageUrl = null,
     isRequired = false,
     secure = true,
-    hiddenImg = false,
     text = null,
     noText = false,
+    imgConfig = {
+      url: null,
+      hidden: false,
+      size: "medium",
+    },
+    error = null
   } = props
 
-  if (files || typeof imageUrl !== 'string') {
+  if (files || typeof imgConfig?.url !== 'string') {
   } else {
     console.warn('Error in FileUploaderSingle: file exist')
     return null
@@ -57,14 +61,25 @@ const FileUploaderSingle = props => {
     setFiles([...filtered])
   }
 
+  const getImageSize = (size) => {
+    switch (size) {
+      case "small":
+        return { maxWidth: 80, maxHeight: 64 }
+      case "large":
+        return { maxWidth: 320, maxHeight: 160 }
+      default: // medium
+        return { maxWidth: 240, maxHeight: 80 }
+    }
+  }
+
   const img = files?.length > 0 && files?.map((file, index) => {
+    const imageSize = getImageSize(imgConfig?.size)
     return (
       <Box
         style={{
           width: 'auto',
           height: 'auto',
           right: 0,
-          //position: 'absolute',
           marginRight: 20,
           paddingTop: 10,
           paddingBottom: 10
@@ -91,8 +106,8 @@ const FileUploaderSingle = props => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              maxWidth: 250,
-              maxHeight: 70,
+              maxWidth: imageSize.maxWidth,
+              maxHeight: imageSize.maxHeight,
               padding: '0px 20px'
             }}
           >
@@ -102,10 +117,6 @@ const FileUploaderSingle = props => {
                 alt={file.name}
                 className='single-file-image'
                 src={URL.createObjectURL(file)}
-                style={{
-                  maxWidth: 250,
-                  maxHeight: 70
-                }}
               />
             )}
           </Box>
@@ -114,8 +125,7 @@ const FileUploaderSingle = props => {
             variant='span'
             sx={{
               color: 'grey.600',
-              maxWidth: 250,
-              // en fazla 2 satır göster kelime uzunsa ortasına ... koy
+              maxWidth: imageSize.maxWidth,
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
@@ -159,58 +169,67 @@ const FileUploaderSingle = props => {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: noText ? 'center' : 'start',
-            // border: '1px dashed',
-            backgroundImage: `url("data:image/svg+xml,%3csvg width='99%' height='100%' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='99%' height='100%' fill='none' rx='8' ry='8' stroke='%23DEE0E8FF' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
-            borderRadius: "8px",
-            borderRadius: 1,
+            justifyContent: noText ? 'center' : 'space-between',
+            backgroundImage: error ? `url("data:image/svg+xml,%3csvg width='99%' height='100%' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='99%' height='100%' fill='none' rx='8' ry='8' stroke='%23FF0000' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")` : `url("data:image/svg+xml,%3csvg width='99%' height='100%' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='99%' height='100%' fill='none' rx='8' ry='8' stroke='%23DEE0E8FF' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
             padding: '1rem 2rem',
             cursor: 'alias',
             gap: '1rem',
           }}
         >
-          <Typography color='secondary'>
-            <Upload />
-          </Typography>
+          <Box sx={{ display: "flex", gap: '1rem' }}>
+            <Typography color='secondary'>
+              <Upload />
+            </Typography>
 
-          {
-            noText
-              ? null
-              : <>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    wordBreak: 'break-word',
-                    alignItems: 'center',
-                    flexDirection: 'column',
-                  }}
-                >
-                  {
-                    text
-                      ? <Typography color='secondary'>{text}</Typography>
-                      : <Typography color='secondary'>
-                        <Link href='/' onClick={handleLinkClick}>
-                          Click
-                        </Link>
+            {
+              noText
+                ? null
+                : <>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      wordBreak: 'break-word',
+                      alignItems: 'center',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    {
+                      text
+                        ? <Typography color='secondary'>{text}</Typography>
+                        : <Typography color='secondary'>
+                          <Link href='/' onClick={handleLinkClick}>
+                            Click
+                          </Link>
 
-                        to upload a file from your computer
-                      </Typography>
-                  }
-                </Box>
-              </>
-          }
+                          to upload a file from your computer
+                        </Typography>
+                    }
+                  </Box>
+                </>
+            }
+          </Box>
 
           {
             Loading
               ? <CircularProgress />
-              : imageUrl && imageUrl != '' ? <Img alt='Logo' src={imageUrl} /> : null
+              : imgConfig?.url && imgConfig?.url != ''
+                ? <CustomTooltip title="Current Image">
+                  <Img alt='Logo' src={imgConfig?.url} style={{ ...getImageSize(imgConfig?.size) }} />
+                </CustomTooltip>
+                : null
           }
         </Box>
 
+        {error && (
+          <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+            {error}
+          </Typography>
+        )}
+
         {
-          hiddenImg
+          imgConfig?.hidden
             ? null
-            : <Box sx={{ position: 'relative' }}>{files?.length && !imageUrl ? img : null}</Box>
+            : <Box sx={{ position: 'relative' }}>{files?.length ? img : null}</Box>
         }
       </Box>
     </>

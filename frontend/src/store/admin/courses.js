@@ -1,9 +1,12 @@
+import { showToast } from '@/utils/showToast';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const initialState = {
     loading: false,
+    errors: null,
     data: null,
+    course: null,
 };
 
 /**
@@ -25,6 +28,16 @@ export const fetchCourses = createAsyncThunk('courses/fetchCourses', async (para
         return error.response.data;
     }
 });
+
+export const fetchCourse = createAsyncThunk('courses/fetchCourse', async (id, { rejectWithValue }) => {
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/courses/${id}`);
+        return response.data?.data;
+    } catch (error) {
+        return rejectWithValue(error.response);
+    }
+});
+
 
 /**
  * Create a new course.
@@ -69,6 +82,8 @@ export const updateCourse = createAsyncThunk('courses/updateCourse', async (form
         const response = await axios.patch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses`, formData);
         return response.data?.data;
     } catch (error) {
+        console.log("error", error);
+
         return rejectWithValue(error.response);
     }
 });
@@ -81,7 +96,7 @@ export const updateCourse = createAsyncThunk('courses/updateCourse', async (form
 export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id, { rejectWithValue }) => {
     try {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses/${id}`);
-        return response.data?.data;
+        return { id: id };
     } catch (error) {
         return rejectWithValue(error.response);
     }
@@ -115,6 +130,7 @@ const coursesSlice = createSlice({
             })
             .addCase(updateCourse.pending, (state) => {
                 state.loading = true;
+                state.errors = null;
             })
             .addCase(updateCourse.fulfilled, (state, action) => {
                 state.loading = false;
@@ -123,17 +139,37 @@ const coursesSlice = createSlice({
                     state.data[index] = action.payload;
                 }
             })
-            .addCase(updateCourse.rejected, (state) => {
+            .addCase(updateCourse.rejected, (state, action) => {
                 state.loading = false;
+                state.errors = action.payload?.data?.errors;
+                console.log("sdasda", action.payload?.data?.errors);
+
+                showToast("error", "Failed to update course");
             })
             .addCase(deleteCourse.pending, (state) => {
                 state.loading = true;
+                showToast("dismiss")
+                showToast("success", "Course deleting...");
             })
             .addCase(deleteCourse.fulfilled, (state, action) => {
                 state.loading = false;
                 state.data = state.data.filter(course => course.id !== action.payload.id);
+                showToast("dismiss")
+                showToast("success", "Course deleted successfully");
             })
             .addCase(deleteCourse.rejected, (state) => {
+                state.loading = false;
+                showToast("dismiss")
+                showToast("error", "Failed to delete course");
+            })
+            .addCase(fetchCourse.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchCourse.fulfilled, (state, action) => {
+                state.loading = false;
+                state.course = action.payload;
+            })
+            .addCase(fetchCourse.rejected, (state) => {
                 state.loading = false;
             });
     },
@@ -141,5 +177,7 @@ const coursesSlice = createSlice({
 
 export const getLoading = (state) => state.admin.courses.loading;
 export const getCourses = (state) => state.admin.courses.data;
+export const getCourse = (state) => state.admin.courses.course;
+export const getErrors = (state) => state.admin.courses.errors;
 
 export default coursesSlice.reducer;

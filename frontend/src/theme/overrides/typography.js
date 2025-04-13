@@ -9,6 +9,21 @@ const typography = theme => {
           // color: theme.palette.text.primary,
         }),
       }
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          fontSize: "1.5rem",
+          color: theme.palette.text.primary,
+        }
+      }
+    },
+    MuiDialogContentText: {
+      styleOverrides: {
+        root: {
+          color: theme.palette.text.primary,
+        }
+      }
     }
   }
 }

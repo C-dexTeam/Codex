@@ -14,10 +14,10 @@ const border = {
 const palette = {
     action: {
         active: hexToRGBA(border.main, 0.12),
-        disabled: border.light,
+        disabled: hexToRGBA(border.main, 0.25),
         disabledBackground: border.secondary,
         focus: hexToRGBA(border.secondary, 0.5),
-        hover: hexToRGBA(border.main, 0.25),
+        hover: hexToRGBA(border.light, 0.5),
         selected: border.light,
     },
     common: {
@@ -79,7 +79,7 @@ const palette = {
     text: {
         primary: text.primary,
         secondary: text.secondary,
-        disabled: border.dark,
+        disabled: border.main,
     },
 };
 

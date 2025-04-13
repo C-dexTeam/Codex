@@ -8,15 +8,13 @@ import {
 // Styled component for the upload image inside the dropzone area
 const Img = styled('img')(({ theme }) => ({
     [theme.breakpoints.up('md')]: {
-        marginRight: theme.spacing(15.75)
+        marginRight: theme.spacing(0)
     },
     [theme.breakpoints.down('md')]: {
         marginBottom: theme.spacing(4)
     },
     [theme.breakpoints.down('sm')]: {
-        width: 160
     },
-    height: 100,
 }))
 
 // Styled component for the heading inside the dropzone area
