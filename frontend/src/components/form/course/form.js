@@ -4,7 +4,7 @@ import DefaultTextField from "../components/DefaultTextField"
 import { useEffect, useState } from "react"
 import { validate } from "@/utils/validation"
 import { showToast } from "@/utils/showToast"
-import { courseSchema } from "@/@local/table/form-values/event/defaultValues"
+import { courseSchema, courseEditSchema } from "@/@local/table/form-values/event/defaultValues"
 import { useDispatch, useSelector } from "react-redux"
 import { getAllPlanguages, getProgrammingLanguages } from "@/store/planguages/planguagesSlice"
 import { fetchRewards, getRewards } from "@/store/admin/rewards"
@@ -52,8 +52,6 @@ const Slider = styled(MuiSlider)(({ theme }) => ({
         boxShadow: '0 3px 1px rgba(0,0,0,0.1),0 4px 8px rgba(0,0,0,0.13),0 0 0 1px rgba(0,0,0,0.02)',
         '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
             boxShadow: '0 3px 1px rgba(0,0,0,0.1),0 4px 8px rgba(0,0,0,0.3),0 0 0 1px rgba(0,0,0,0.02) !important',
-
-            // Reset on touch devices, it doesn't add specificity
             '@media (hover: none)': {
                 boxShadow: '0 3px 1px rgba(0,0,0,0.1),0 4px 8px rgba(0,0,0,0.13),0 0 0 1px rgba(0,0,0,0.02)'
             }
@@ -78,13 +76,14 @@ const Slider = styled(MuiSlider)(({ theme }) => ({
     }
 }))
 
-const AddCourseForm = ({
+const CourseForm = ({
     values,
     setValues,
-    edit = false,
+    isEdit = false,
     handleSubmit: _handleSubmit,
+    errors: propErrors
 }) => {
-    const [errors, setErrors] = useState(null);
+    const [localErrors, setLocalErrors] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [files, setFiles] = useState([])
 
@@ -95,15 +94,16 @@ const AddCourseForm = ({
 
     const handleSubmit = () => {
         setIsSubmitted(true);
-        console.log(files, values);
 
-        if (errors && Object.keys(errors)?.length) {
+        if (localErrors && Object.keys(localErrors)?.length) {
             showToast("dismiss");
             showToast("error", "Lütfen gerekli alanları kontrol edin.");
             return;
         }
 
         let data = new FormData()
+        console.log("sdfasd", values);
+
         data.append('title', values.title);
         data.append('description', values.description);
         data.append('languageID', values.languageID);
@@ -112,6 +112,8 @@ const AddCourseForm = ({
         data.append('rewardID', values.rewardID);
         if (files.length > 0) {
             data.append('imageFile', files[0]);
+        } else {
+            data.append('imageFile', null);
         }
         _handleSubmit(data);
     };
@@ -121,11 +123,20 @@ const AddCourseForm = ({
             ...values,
             imageFile: files[0]
         }
-        if (data) validate(courseSchema, data, setIsSubmitted, setErrors);
+        if (data) validate(isEdit ? courseEditSchema : courseSchema, data, setIsSubmitted, setLocalErrors);
 
         dispatch(getAllPlanguages())
         dispatch(fetchRewards())
     }, [values, files]);
+
+    const getError = (field) => {
+        if (propErrors?.length) {
+            const error = propErrors.find(err => err.field === field);
+            return error?.error;
+        }
+
+        return isSubmitted && localErrors?.[field] ? localErrors[field] : undefined;
+    };
 
     return (
         <Grid container spacing={0}>
@@ -134,9 +145,11 @@ const AddCourseForm = ({
                     files={files}
                     setFiles={setFiles}
                     text="Upload a cover image for the course"
+                    imgConfig={{ url: values?.imagePath ? "/api/" + values?.imagePath : null, size: "small" }}
+                    error={getError('imageFile')}
                 />
             </Grid>
-
+            {getError('imageFile')}
             <Grid item xs={12}>
                 <DefaultTextField
                     fullWidth
@@ -151,11 +164,7 @@ const AddCourseForm = ({
                         })
                     }
                     required
-                    error={
-                        isSubmitted && errors?.title
-                            ? errors?.title
-                            : undefined
-                    }
+                    error={getError('title')}
                 />
             </Grid>
 
@@ -172,17 +181,14 @@ const AddCourseForm = ({
                             description: e.target.value,
                         })
                     }
-                    error={
-                        isSubmitted && errors?.description
-                            ? errors?.description
-                            : undefined
-                    }
+                    error={getError('description')}
                 />
             </Grid>
 
             <Grid item xs={12}>
                 <DefaultSelect
                     required
+                    disabled={isEdit}
                     label="Programming Language"
                     id='programmingLanguageID'
                     firstSelect={"-- Select a programming language --"}
@@ -198,17 +204,13 @@ const AddCourseForm = ({
                             )
                         })
                     }
-                    error={
-                        isSubmitted && errors?.programmingLanguageID
-                            ? errors?.programmingLanguageID
-                            : undefined
-                    }
+                    error={getError('programmingLanguageID')}
                 />
             </Grid>
 
             <Grid item xs={12}>
                 <DefaultSelect
-                    required
+                    required={!isEdit}
                     label="Reward"
                     id='rewardID'
                     firstSelect={"-- Select a reward --"}
@@ -221,27 +223,22 @@ const AddCourseForm = ({
                                 <MenuItem key={item?.id} value={item?.id}>
                                     <Box sx={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                         <img src={"/api/" + item?.imagePath} style={{ maxHeight: "2rem" }} />
-
                                         {item?.name}
                                     </Box>
                                 </MenuItem>
                             )
                         })
                     }
-                    error={
-                        isSubmitted && errors?.rewardID
-                            ? errors?.rewardID
-                            : undefined
-                    }
+                    error={getError('rewardID')}
                 />
             </Grid>
 
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
                 <FormControl fullWidth sx={{ mb: 2 }}>
                     <Typography
                         variant='body1'
                         component="label"
-                        {...(isSubmitted && errors?.rewardAmount ? { color: "error" } : {})}
+                        {...(getError('rewardAmount') ? { color: "error" } : {})}
                         sx={{ mb: 2 }}
                     >
                         Reward Amount
@@ -255,7 +252,7 @@ const AddCourseForm = ({
                         aria-labelledby='customized-slider'
                     />
                 </FormControl>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12}>
                 <Box sx={{ textAlign: "end" }}>
@@ -263,7 +260,7 @@ const AddCourseForm = ({
                         variant="outlined"
                         onClick={handleSubmit}
                     >
-                        Create
+                        {isEdit ? "Update" : "Create"}
                     </Button>
                 </Box>
             </Grid>
@@ -271,4 +268,4 @@ const AddCourseForm = ({
     )
 }
 
-export default AddCourseForm
+export default CourseForm

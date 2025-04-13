@@ -1,7 +1,11 @@
 import NavigationList from "@/layout/components/navigation";
+import { Home, OpenInNew } from "@mui/icons-material";
 import { Box, Button, Container } from "@mui/material";
+import { useRouter } from "next/router";
 
 const AdminNavbar = () => {
+  const router = useRouter()
+
   return (
     <Box sx={{
       background: theme => theme.palette.background.paper,
@@ -28,8 +32,16 @@ const AdminNavbar = () => {
           <NavigationList admin />
 
           <Box sx={{ display: "flex", gap: "1rem" }}>
-            <Button color="info" variant="outlined">En</Button>
-            <Button color="primary" variant="outlined">Homepage</Button>
+            {/* <Button color="info" variant="outlined">En</Button> */}
+            <Button 
+              color="primary" 
+              variant="outlined" 
+              onClick={() => window.open('/', '_blank')}
+              startIcon={<Home />}
+              endIcon={<OpenInNew />}
+            >
+              Homepage
+            </Button>
           </Box>
         </Box>
       </Container>

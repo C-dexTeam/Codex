@@ -1,3 +1,4 @@
+import { hexToRGBA } from "@/utils/hex-to-rgba"
 
 const select = theme => {
   return {
@@ -23,6 +24,23 @@ const select = theme => {
 
           "& .MuiSelect-icon": {
             color: theme.palette.text.primary
+          },
+
+          "&.Mui-disabled": {
+            background: theme.palette.action.disabledBackground,
+            color: theme.palette.text.disabled,
+            cursor: "not-allowed",
+            opacity: 0.7,
+            pointerEvents: "none",
+            borderRadius: "0.5rem",
+
+            "& fieldset": {
+              borderColor: theme.palette.action.disabled + " !important",
+            },
+
+            "& .MuiSelect-icon": {
+              color: theme.palette.action.disabled
+            }
           }
         },
       },
@@ -34,14 +52,19 @@ const select = theme => {
           width: "100%",
 
           "&:hover": {
+            background: hexToRGBA(theme.palette.primary.main, 0.1),
           },
 
           "&.Mui-disabled": {
             background: theme.palette.action.disabledBackground,
-            color: theme.palette.action.disabled
+            color: theme.palette.text.disabled,
+            cursor: "not-allowed",
+            opacity: 0.7,
+            pointerEvents: "none"
           },
 
           "&.Mui-focusVisible": {
+            background: hexToRGBA(theme.palette.primary.main, 0.1),
           }
         }
       }

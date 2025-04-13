@@ -27,6 +27,7 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FlashOn } from "@mui/icons-material"; // Strike icon
 import { getStrike } from "@/store/profile/profileSlice";
+import CourseCard from "@/components/card/CourseCard";
 
 const Courses = () => {
   const [value, setValue] = useState(0);
@@ -40,8 +41,6 @@ const Courses = () => {
   );
 
   const { user, loading } = useContext(AuthContext);
-
-  console.log(user);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -197,48 +196,7 @@ const Courses = () => {
           {coursesSlice?.popoularData?.data?.length > 0 ? (
             coursesSlice?.popoularData?.data?.map((course) => (
               <Grid item xs={12} md={4} key={course.id}>
-                <GradientCard
-                  description={
-                    <Fragment>
-                      <Typography variant="body1" color={"primary"}>
-                        <Typography variant="subtitle1">
-                          {course.chapterCount}
-                        </Typography>
-                        Chapters
-                      </Typography>
-                    </Fragment>
-                  }
-                  btnText="Explore"
-                  dpos="center"
-                  onLocate={() => {
-                    router.push(`/courses/${course.id}`);
-                  }}
-                >
-                  <CardContent>
-                    <Box className="CardImage">
-                      <img
-                        src={"api/" + course.imagePath}
-                        alt={course.title}
-                        width={80}
-                        height={80}
-                        style={{
-                          width: "100%",
-                          height: "auto",
-                          maxHeight: "120px",
-                          objectFit: "cover",
-                          borderRadius: "1rem",
-                        }}
-                      />
-                    </Box>
-
-                    <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                      {course.title}
-                    </Typography>
-                    <Typography variant="caption1" sx={{ mt: 1 }}>
-                      {course.description}
-                    </Typography>
-                  </CardContent>
-                </GradientCard>
+                <CourseCard course={course} />
               </Grid>
             ))
           ) : (
@@ -315,51 +273,10 @@ const Courses = () => {
 
         <Grid item container sx={12} spacing={10}>
           {Array.isArray(coursesSlice?.data?.data) &&
-          coursesSlice?.data?.data.length > 0 ? (
+            coursesSlice?.data?.data.length > 0 ? (
             coursesSlice.data.data.map((course) => (
               <Grid item xs={12} md={6} key={course.id}>
-                <GradientCard
-                  description={
-                    <Fragment>
-                      <Typography variant="body1" color={"primary"}>
-                        <Typography variant="subtitle1">
-                          {course.chapterCount}
-                        </Typography>
-                        Chapters
-                      </Typography>
-                    </Fragment>
-                  }
-                  btnText="Explore"
-                  dpos="center"
-                  onLocate={() => {
-                    router.push(`/courses/${course.id}`);
-                  }}
-                >
-                  <CardContent>
-                    <Box className="CardImage">
-                      <img
-                        src={"api/" + course.imagePath}
-                        alt={course.title}
-                        width={80}
-                        height={80}
-                        style={{
-                          width: "100%",
-                          height: "auto",
-                          maxHeight: "120px",
-                          objectFit: "cover",
-                          borderRadius: "1rem",
-                        }}
-                      />
-                    </Box>
-
-                    <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                      {course.title}
-                    </Typography>
-                    <Typography variant="caption1" sx={{ mt: 1 }}>
-                      {course.description}
-                    </Typography>
-                  </CardContent>
-                </GradientCard>
+                <CourseCard course={course} />
               </Grid>
             ))
           ) : (

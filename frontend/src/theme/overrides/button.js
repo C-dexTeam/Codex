@@ -7,8 +7,6 @@ const button = theme => {
         root: ({ ownerState }) => ({
           color: ownerState.color ? `${theme.palette[ownerState.color || "primary"]?.main}` : `${theme.palette.text.primary}`,
           background: ownerState.bgc ? `${theme.palette.background.default}` : `${theme.palette.background.paper}`,
-          // outline: `0.1em solid ${theme.palette[ownerState.color || "primary"].main}`,
-          // outlineOffset: "-0.1em",
           padding: "0.5em 1em",
           borderRadius: "0.5em",
           textTransform: "none",
@@ -17,6 +15,14 @@ const button = theme => {
           fontHeight: "1.5em",
           zIndex: 1,
           fontWeight: 300,
+
+          "&.Mui-disabled": {
+            color: `${theme.palette.text.disabled}`,
+            background: `${theme.palette.action.disabledBackground}`,
+            cursor: "not-allowed",
+            opacity: 0.7,
+            pointerEvents: "none",
+          },
 
           "&:hover": {
             background: `${hexToRGBA(theme.palette[ownerState.color || "primary"].main, 0.1)} !important`,
@@ -39,6 +45,11 @@ const button = theme => {
                 background: "inherit !important",
                 outline: `0.1em solid ${theme.palette[ownerState.color || "primary"].main}`,
                 outlineOffset: "-0.1em",
+
+                "&.Mui-disabled": {
+                  outline: `0.1em solid ${theme.palette.action.disabled}`,
+                  color: `${theme.palette.text.disabled}`,
+                }
               }
               : ownerState.variant === "gradient"
                 ? { // gradient button
@@ -47,6 +58,11 @@ const button = theme => {
                   outline: "none",
                   webkitTransition: "all 0.45s cubic-bezier(0.86, 0, 0.07, 1)",
                   transition: "all 0.45s cubic-bezier(0.86, 0, 0.07, 1)",
+
+                  "&.Mui-disabled": {
+                    background: `${theme.palette.action.disabledBackground} !important`,
+                    color: `${theme.palette.text.disabled} !important`,
+                  },
 
                   "&:hover": {
                     webkitTextFillColor: `${theme.palette[ownerState.color || "primary"].contrastText}`,
@@ -73,6 +89,11 @@ const button = theme => {
                     webkitTransition: "all 0.45s cubic-bezier(0.86, 0, 0.07, 1)",
                     transition: "all 0.45s cubic-bezier(0.86, 0, 0.07, 1)",
 
+                    "&.Mui-disabled": {
+                      background: `${theme.palette.action.disabledBackground} !important`,
+                      color: `${theme.palette.text.disabled} !important`,
+                    },
+
                     "&:hover": {
                       webkitTextFillColor: `${theme.palette[ownerState.color || "primary"].contrastText}`,
                       textFillColor: `${theme.palette[ownerState.color || "primary"].contrastText}`,
@@ -92,6 +113,12 @@ const button = theme => {
                   : { // default button
                     color: `${theme.palette.text.primary}`,
                     borderRadius: "0em",
+
+                    "&.Mui-disabled": {
+                      "&::before, &::after": {
+                        borderColor: `${theme.palette.action.disabled}`,
+                      }
+                    },
 
                     "&::before": {
                       content: '""',
@@ -117,10 +144,6 @@ const button = theme => {
                     },
                   }
           ),
-
-          // borderRadius: "1.25rem",
-          // background: `${theme.palette[ownerState.color || "primary"].main} !important`,
-          // color: `${theme.palette[ownerState.color || "primary"].contrastText} !important`,
         }),
       },
     },
@@ -129,8 +152,14 @@ const button = theme => {
       styleOverrides: {
         root: ({ ownerState }) => ({
           color: `${theme.palette.text.primary}`,
+          
+          "&.Mui-disabled": {
+            color: `${theme.palette.text.disabled}`,
+            background: "transparent",
+            cursor: "not-allowed",
+            opacity: 0.7,
+          }
         })
-
       }
     }
   }

@@ -149,9 +149,12 @@ const ClassicTable = (props) => {
                         // ".css-149d7vg-MuiDataGrid-virtualScrollerRenderZone .MuiDataGrid-row": {
                         //     maxHeight: "unset !important",
                         // },
+                        ".MuiDataGrid-virtualScroller": {
+                            overflow: "auto !important",
+                        },
                         ".MuiDataGrid-virtualScrollerContent": {
-                            minHeight: "200px !important",
-                            maxHeight: "500px !important",
+                            minHeight: "20rem !important",
+                            maxHeight: "40rem !important",
                             height: 'auto'
                         },
                         '& .odd': {

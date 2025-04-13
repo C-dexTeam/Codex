@@ -3,7 +3,7 @@ import { showDatetime } from "@/utils/timeOptions"
 import {
     Typography
 } from "@mui/material"
-import CourseActions from "../actions/article"
+import CourseActions from "../actions/course"
 import CustomTooltip from "@/components/tooltip"
 
 export const coursesColumns = [
@@ -76,7 +76,7 @@ export const coursesColumns = [
 
             return (
                 <Typography variant='body1' sx={{ cursor: 'default' }}>
-                    {showDatetime({ date: row.createdAt }) ?? '-'}
+                    {showDatetime(row.createdAt) ?? '-'}
                 </Typography>
             )
         }
