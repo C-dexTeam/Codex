@@ -1,11 +1,14 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import coursesReducer from './courses'; // Assuming courses.js is in the same directory
-import rewardsReducer from './rewards'; // Assuming courses.js is in the same directory
+import coursesReducer from './courses';
+import rewardsReducer from './rewards';
+import chaptersReducer from './chapters';
+import languagesReducer from './languages';
 
 const adminReducer = combineReducers({
     courses: coursesReducer,
     rewards: rewardsReducer,
-    // Add other slices here as needed
+    chapters: chaptersReducer,
+    languages: languagesReducer,
 });
 
 export default adminReducer;

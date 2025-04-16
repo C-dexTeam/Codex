@@ -4,7 +4,7 @@ import DefaultTextField from "../components/DefaultTextField"
 import { useEffect, useState } from "react"
 import { validate } from "@/utils/validation"
 import { showToast } from "@/utils/showToast"
-import { courseSchema, courseEditSchema } from "@/@local/table/form-values/event/defaultValues"
+import { courseSchema, courseEditSchema } from "@/@local/table/form-values/courses/defaultValues"
 import { useDispatch, useSelector } from "react-redux"
 import { getAllPlanguages, getProgrammingLanguages } from "@/store/planguages/planguagesSlice"
 import { fetchRewards, getRewards } from "@/store/admin/rewards"
@@ -102,7 +102,6 @@ const CourseForm = ({
         }
 
         let data = new FormData()
-        console.log("sdfasd", values);
 
         data.append('title', values.title);
         data.append('description', values.description);

@@ -1821,7 +1821,7 @@ const docTemplate = `{
                 "frontendTemplate": {
                     "type": "string"
                 },
-                "fundName": {
+                "funcName": {
                     "type": "string"
                 },
                 "grantsExperience": {
@@ -1966,7 +1966,7 @@ const docTemplate = `{
                 "frontendTemplate": {
                     "type": "string"
                 },
-                "fundName": {
+                "funcName": {
                     "type": "string"
                 },
                 "grantsExperience": {

@@ -3,42 +3,39 @@ import { useRouter } from 'next/router'
 import { Delete, Edit, Visibility } from '@mui/icons-material'
 import DeleteDialog from '@/components/dialog/DeleteDialog'
 import { useState } from 'react'
-import { deleteCourse } from '@/store/admin/courses'
 import { useDispatch } from 'react-redux'
-import DvrOutlinedIcon from '@mui/icons-material/DvrOutlined';
+import { deleteChapter } from '@/store/admin/chapters'
 
-const CourseActions = ({ row }) => {
+const ChapterActions = ({ row }) => {
     const router = useRouter()
     const [openDelete, setOpenDelete] = useState(false)
-
     const dispatch = useDispatch()
 
     const handleEdit = () => {
-        router.push(`/admin/courses/${row.id}/edit`)
+        router.push(`/admin/chapters/${row.id}/edit`)
     }
 
-    const handleChapters = () => {
-        router.push(`/admin/courses/${row.id}/chapters`)
+    const handleView = () => {
+        router.push(`/admin/chapters/${row.id}`)
     }
 
     const handleDelete = () => {
-        dispatch(deleteCourse(row.id))
+        dispatch(deleteChapter(row.id))
+        setOpenDelete(false)
     }
 
     return (
         <>
-            <Tooltip title="Chapters">
-                <IconButton onClick={handleChapters}>
-                    <DvrOutlinedIcon />
+            <Tooltip title="View">
+                <IconButton onClick={handleView}>
+                    <Visibility />
                 </IconButton>
             </Tooltip>
-
             <Tooltip title="Edit">
                 <IconButton onClick={handleEdit}>
                     <Edit />
                 </IconButton>
             </Tooltip>
-
             <Tooltip title="Delete">
                 <IconButton onClick={() => setOpenDelete(true)}>
                     <Delete />
@@ -47,11 +44,11 @@ const CourseActions = ({ row }) => {
             <DeleteDialog
                 open={openDelete}
                 setOpen={setOpenDelete}
-                title="Delete Course"
+                title="Delete Chapter"
                 handleDelete={handleDelete}
             />
         </>
     )
 }
 
-export default CourseActions
+export default ChapterActions 

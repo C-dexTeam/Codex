@@ -48,6 +48,7 @@ const TableHeader = (props) => {
                                 placeholder="Ne arıyorsun?"
                                 size='small'
                                 noMargin
+                                noControl
                             />
                             : null
                     }
