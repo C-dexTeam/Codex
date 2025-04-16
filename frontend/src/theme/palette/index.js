@@ -14,7 +14,7 @@ const border = {
 const palette = {
     action: {
         active: hexToRGBA(border.main, 0.12),
-        disabled: hexToRGBA(border.main, 0.25),
+        disabled: hexToRGBA(border.main, 0.5),
         disabledBackground: border.secondary,
         focus: hexToRGBA(border.secondary, 0.5),
         hover: hexToRGBA(border.light, 0.5),

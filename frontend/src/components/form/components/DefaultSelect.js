@@ -20,11 +20,22 @@ const Input = (props) => {
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", cursor: disabled ? "not-allowed" : "default" }}>
-            {label ? <Typography variant='body1' component="label" {...(_props?.error ? { color: "error" } : disabled ? { color: "text.disabled" } : {})}>{label}{required ? "*" : ""}</Typography> : null}
+            {label ? <Typography variant='body1' component="label" {...(_props?.error ? { color: "error" } : disabled ? { color: "text.disabled" } : {})}>
+                {label}
+                {
+                    required
+                        ? <Typography component="span" sx={{ color: "error.main" }}>*</Typography>
+                        : ""
+                }
+            </Typography> : null}
             {description ? <Typography variant='caption2' component="span" {...(_props?.error ? { color: "error" } : {})}>{description}</Typography> : null}
 
-            <Select {..._props}>
-                <MenuItem value='' disabled>{firstSelect}</MenuItem>
+            <Select {..._props} displayEmpty>
+                <MenuItem value='' disabled={true}>
+                    <Typography variant='body1' component="span" sx={{ opacity: 0.7 }}>
+                        {firstSelect}
+                    </Typography>
+                </MenuItem>
 
                 {items}
             </Select>

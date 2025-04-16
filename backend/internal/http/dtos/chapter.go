@@ -77,7 +77,7 @@ type AddChapterDTO struct {
 	Title            string `json:"title"`
 	Description      string `json:"description"`
 	Content          string `json:"content"`
-	FuncName         string `json:"fundName"`
+	FuncName         string `json:"funcName"`
 	FrontendTmp      string `json:"frontendTemplate"`
 	DockerTmp        string `json:"dockerTemplate"`
 	GrantsExperience bool   `json:"grantsExperience"`
@@ -94,7 +94,7 @@ type UpdateChapterDTO struct {
 	Title            string `json:"title"`
 	Description      string `json:"description"`
 	Content          string `json:"content"`
-	FuncName         string `json:"fundName"`
+	FuncName         string `json:"funcName"`
 	FrontendTmp      string `json:"frontendTemplate"`
 	DockerTmp        string `json:"dockerTemplate"`
 	GrantsExperience *bool  `json:"grantsExperience"`

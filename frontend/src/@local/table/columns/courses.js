@@ -16,7 +16,7 @@ export const coursesColumns = [
     // },
     {
         flex: 0.1,
-        minWidth: 40,
+        minWidth: 152,
         headerName: "",
         field: "actions",
         renderCell: params => <CourseActions row={params.row} />

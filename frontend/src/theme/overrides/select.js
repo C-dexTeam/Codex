@@ -48,7 +48,7 @@ const select = theme => {
 
     MuiMenuItem: {
       styleOverrides: {
-        root: {
+        root: ({ ownerState }) => ({
           width: "100%",
 
           "&:hover": {
@@ -59,14 +59,17 @@ const select = theme => {
             background: theme.palette.action.disabledBackground,
             color: theme.palette.text.disabled,
             cursor: "not-allowed",
-            opacity: 0.7,
-            pointerEvents: "none"
+            opacity: 0.5,
+            pointerEvents: "none",
+            "&.MuiMenuItem-root": {
+              color: theme.palette.text.disabled
+            }
           },
 
           "&.Mui-focusVisible": {
             background: hexToRGBA(theme.palette.primary.main, 0.1),
           }
-        }
+        })
       }
     }
   }

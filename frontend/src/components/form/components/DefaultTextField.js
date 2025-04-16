@@ -15,7 +15,14 @@ const Input = (props) => {
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
-            {label ? <Typography variant='body1' component="label" {...(_props?.error ? { color: "error" } : {})}>{label}{required ? "*" : ""}</Typography> : null}
+            {label ? <Typography variant='body1' component="label" {...(_props?.error ? { color: "error" } : {})}>
+                {label}
+                {
+                    required
+                        ? <Typography component="span" sx={{ color: "error.main" }}>*</Typography>
+                        : ""
+                }
+            </Typography> : null}
             {description ? <Typography variant='caption2' component="span" {...(_props?.error ? { color: "error" } : {})}>{description}</Typography> : null}
 
             <TextField {..._props} />

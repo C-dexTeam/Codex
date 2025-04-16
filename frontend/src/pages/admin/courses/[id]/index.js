@@ -1,4 +1,4 @@
-import { courseValues } from "@/@local/table/form-values/event/defaultValues"
+import { courseValues } from "@/@local/table/form-values/courses/defaultValues"
 import CourseForm from "@/components/form/course/form"
 import { fetchCourse, getCourse, getErrors, updateCourse } from "@/store/admin/courses"
 import { Card, CardContent, Grid, Typography, Box, Divider, Chip } from "@mui/material"
