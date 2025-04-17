@@ -1,5 +1,7 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
+import { Box, Button, Divider, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
+import DefaultTextField from '../form/components/DefaultTextField'
+import DefaultSelect from '../form/components/DefaultSelect'
 
 const ChapterFilter = ({ filters, setFilters, onClose }) => {
     const [localFilters, setLocalFilters] = useState(filters)
@@ -32,63 +34,38 @@ const ChapterFilter = ({ filters, setFilters, onClose }) => {
     return (
         <Box sx={{ p: 2, minWidth: 300 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Filter Chapters</Typography>
-            
-            <TextField
+            <Divider sx={{ mb: 2 }} />
+
+            <DefaultTextField
                 fullWidth
                 label="Title"
                 name="title"
                 value={localFilters.title}
                 onChange={handleChange}
-                sx={{ mb: 2 }}
             />
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Language</InputLabel>
-                <Select
-                    name="languageID"
-                    value={localFilters.languageID}
-                    onChange={handleChange}
-                    label="Language"
-                >
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="EN">English</MenuItem>
-                    <MenuItem value="TR">Turkish</MenuItem>
-                </Select>
-            </FormControl>
+            <DefaultSelect
+                label="Grants Experience"
+                id='grantsExperience'
+                firstSelect={"All"}
+                value={localFilters.grantsExperience}
+                onChange={handleChange}
+            />
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Grants Experience</InputLabel>
-                <Select
-                    name="grantsExperience"
-                    value={localFilters.grantsExperience}
-                    onChange={handleChange}
-                    label="Grants Experience"
-                >
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="true">Yes</MenuItem>
-                    <MenuItem value="false">No</MenuItem>
-                </Select>
-            </FormControl>
-
-            <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Active</InputLabel>
-                <Select
-                    name="active"
-                    value={localFilters.active}
-                    onChange={handleChange}
-                    label="Active"
-                >
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="true">Yes</MenuItem>
-                    <MenuItem value="false">No</MenuItem>
-                </Select>
-            </FormControl>
+            <DefaultSelect
+                label="Active"
+                id='active'
+                firstSelect={"All"}
+                value={localFilters.active}
+                onChange={handleChange}
+            />
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                <Button onClick={handleReset}>
+                <Button onClick={handleReset} variant="empty" color='secondary'>
                     Reset
                 </Button>
-                <Button onClick={handleApply} variant="contained">
+
+                <Button onClick={handleApply} variant="outlined" color='primary'>
                     Apply
                 </Button>
             </Box>

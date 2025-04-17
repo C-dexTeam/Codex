@@ -110,9 +110,16 @@ const button = theme => {
                       },
                     }
                   }
-                  : ownerState.variant == "text"
-                    ? {
+                  : ownerState.variant == "empty"
+                    ? { // empty button
                       color: `${theme.palette.text.primary}`,
+                      border: "none",
+                      background: "transparent",
+                      padding: "0",
+                      "&:hover": {
+                        background: "transparent",
+                        color: `${theme.palette[ownerState.color || "primary"].main}`,
+                      },
                     }
                     : { // default button
                       color: `${theme.palette.text.primary}`,

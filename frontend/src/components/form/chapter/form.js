@@ -1,7 +1,7 @@
 import { Button, Grid, TextField, FormControlLabel, Checkbox, MenuItem, Box, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchCourses, getCourses } from '@/store/admin/courses'
+import { fetchCourses, getCourseCount, getCourses } from '@/store/admin/courses'
 import { fetchRewards, getRewards } from '@/store/admin/rewards'
 import { fetchLanguages, getLanguages } from '@/store/admin/languages'
 import { validate } from '@/utils/validation'
@@ -11,17 +11,21 @@ import DefaultTextField from '../components/DefaultTextField'
 import DefaultSelect from '../components/DefaultSelect'
 
 const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = false }) => {
+    // ** States
     const [localErrors, setLocalErrors] = useState(null)
     const [isSubmitted, setIsSubmitted] = useState(false)
+
+    // ** Hooks
     const dispatch = useDispatch()
     const courses = useSelector(getCourses)
     const languages = useSelector(getLanguages)
-    // const { rewards } = useSelector(getRewards)
+    const rewards = useSelector(getRewards)
 
+    // ** Effects
     useEffect(() => {
         dispatch(fetchCourses())
         dispatch(fetchLanguages())
-        // dispatch(fetchRewards())
+        dispatch(fetchRewards())
     }, [])
 
     useEffect(() => {
@@ -30,28 +34,42 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
         }
     }, [values])
 
+    // ** Handlers
     const handleSubmit = (e) => {
         e.preventDefault()
         setIsSubmitted(true)
-        
+
         if (localErrors && Object.keys(localErrors)?.length) {
             showToast("dismiss")
             showToast("error", "Lütfen gerekli alanları kontrol edin.")
             return
         }
 
+        let chapterCount = courses?.find(course => course?.id == values?.courseID)?.chapterCount
+
         _handleSubmit({
-            ...values,
-            languageID: languages?.find(language => language.value == "EN")?.id,
+            content: values.content,
+            courseID: values.courseID,
+            description: values.description,
+            dockerTemplate: values.dockerTemplate,
+            frontendTemplate: values.frontendTemplate,
+            funcName: values.funcName,
+            languageID: isEdit ? values.languageID : languages?.find(language => language.value == "EN")?.id,
+            order: isEdit ? values.order : chapterCount + 1,
+            rewardID: values.rewardID,
+            title: values.title
         })
     }
 
+    // ** Getters
     const getError = (field) => {
         return isSubmitted && localErrors?.[field] ? localErrors[field] : undefined
     }
 
+    // ** Handlers
     const handleChange = (e) => {
         const { name, value, checked } = e.target
+
         setValues({
             ...values,
             [name]: e.target.type === 'checkbox' ? checked : value
@@ -96,37 +114,35 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
                 />
             </Grid>
 
-            {/* <Grid item xs={12}>
-                    <DefaultSelect
-                        required
-                        label="Language"
-                        id='languageID'
-                        firstSelect={"-- Select a language --"}
-                        value={values?.languageID}
-                        onChange={e => setValues({ ...values, languageID: e.target.value })}
-                        items={
-                            languages && languages?.length > 0 &&
-                            languages?.map((item, index) => {
-                                return (
-                                    <MenuItem key={item?.id} value={item?.id}>
-                                        {item?.value}
-                                    </MenuItem>
-                                )
-                            })
-                        }
-                        error={getError('languageID')}
-                    />
-                </Grid> */}
+            <Grid item xs={12}>
+                <DefaultSelect
+                    label="Reward"
+                    id='rewardID'
+                    firstSelect={"-- Select a reward --"}
+                    value={values?.rewardID}
+                    onChange={e => setValues({ ...values, rewardID: e.target.value })}
+                    items={
+                        rewards && rewards?.length > 0 &&
+                        rewards?.map((item, index) => {
+                            return (
+                                <MenuItem key={item?.id} value={item?.id}>
+                                    {item?.title}
+                                </MenuItem>
+                            )
+                        })
+                    }
+                />
+            </Grid>
 
             <Grid item xs={12}>
                 <DefaultTextField
                     fullWidth
-                    type="text"
-                    label="Title"
-                    name="title"
-                    value={values.title}
-                    onChange={handleChange}
                     required
+                    label="Title"
+                    id='title'
+                    name='title'
+                    value={values?.title}
+                    onChange={handleChange}
                     error={getError('title')}
                 />
             </Grid>
@@ -134,12 +150,12 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
             <Grid item xs={12}>
                 <DefaultTextField
                     fullWidth
+                    required
                     label="Description"
-                    name="description"
-                    value={values.description}
+                    id='description'
+                    name='description'
+                    value={values?.description}
                     onChange={handleChange}
-                    multiline
-                    rows={4}
                     error={getError('description')}
                 />
             </Grid>
@@ -147,38 +163,27 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
             <Grid item xs={12}>
                 <DefaultTextField
                     fullWidth
-                    label="Content"
-                    name="content"
-                    value={values.content}
-                    onChange={handleChange}
-                    multiline
-                    rows={6}
                     required
-                    error={getError('content')}
-                />
-            </Grid>
-
-            <Grid item xs={12}>
-                <DefaultSelect
-                    fullWidth
-                    label="Reward"
-                    name="rewardID"
-                    value={values.rewardID}
+                    label="Content"
+                    id='content'
+                    name='content'
+                    value={values?.content}
                     onChange={handleChange}
-                    firstSelect="-- Select a reward --"
-                    // options={rewards}
-                    error={getError('rewardID')}
+                    error={getError('content')}
+                    multiline
+                    rows={4}
                 />
             </Grid>
 
             <Grid item xs={12}>
                 <DefaultTextField
                     fullWidth
-                    label="Function Name"
-                    name="funcName"
-                    value={values.funcName}
-                    onChange={handleChange}
                     required
+                    label="Function Name"
+                    id='funcName'
+                    name='funcName'
+                    value={values?.funcName}
+                    onChange={handleChange}
                     error={getError('funcName')}
                 />
             </Grid>
@@ -186,91 +191,30 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
             <Grid item xs={12}>
                 <DefaultTextField
                     fullWidth
+                    required
                     label="Frontend Template"
-                    name="frontendTemplate"
-                    value={values.frontendTemplate}
+                    id='frontendTemplate'
+                    name='frontendTemplate'
+                    value={values?.frontendTemplate}
                     onChange={handleChange}
-                    multiline
-                    rows={4}
                     error={getError('frontendTemplate')}
+                    multiline
+                    rows={4}
                 />
             </Grid>
 
             <Grid item xs={12}>
                 <DefaultTextField
                     fullWidth
+                    required
                     label="Docker Template"
-                    name="dockerTemplate"
-                    value={values.dockerTemplate}
+                    id='dockerTemplate'
+                    name='dockerTemplate'
+                    value={values?.dockerTemplate}
                     onChange={handleChange}
-                    multiline
-                    rows={4}
                     error={getError('dockerTemplate')}
-                />
-            </Grid>
-
-            <Grid item xs={12}>
-                <DefaultTextField
-                    fullWidth
-                    label="Check Template"
-                    name="checkTemplate"
-                    value={values.checkTemplate}
-                    onChange={handleChange}
                     multiline
                     rows={4}
-                    required
-                    error={getError('checkTemplate')}
-                />
-            </Grid>
-
-            <Grid item xs={12}>
-                <DefaultTextField
-                    fullWidth
-                    type="number"
-                    label="Reward Amount"
-                    name="rewardAmount"
-                    value={values.rewardAmount}
-                    onChange={handleChange}
-                    error={getError('rewardAmount')}
-                />
-            </Grid>
-
-            <Grid item xs={12}>
-                <DefaultTextField
-                    fullWidth
-                    type="number"
-                    label="Order"
-                    name="order"
-                    value={values.order}
-                    onChange={handleChange}
-                    required
-                    error={getError('order')}
-                />
-            </Grid>
-
-            <Grid item xs={12}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            name="grantsExperience"
-                            checked={values.grantsExperience}
-                            onChange={handleChange}
-                        />
-                    }
-                    label="Grants Experience"
-                />
-            </Grid>
-
-            <Grid item xs={12}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            name="active"
-                            checked={values.active}
-                            onChange={handleChange}
-                        />
-                    }
-                    label="Active"
                 />
             </Grid>
 
@@ -282,7 +226,7 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
                     onClick={handleSubmit}
                     fullWidth
                 >
-                    {isEdit ? 'Update Chapter' : 'Create Chapter'}
+                    {isEdit ? 'Update' : 'Create'} Chapter
                 </Button>
             </Grid>
         </Grid>

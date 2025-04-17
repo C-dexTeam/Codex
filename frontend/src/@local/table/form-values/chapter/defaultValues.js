@@ -16,6 +16,12 @@ export const chapterValues = {
     order: 0
 }
 
+export const chapterFilters = {
+    page: 1,
+    limit: 10,
+    title: '',
+}
+
 export const chapterSchema = yup.object().shape({
     title: yup.string().required(),
     description: yup.string().required(),

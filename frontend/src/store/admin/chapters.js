@@ -19,7 +19,7 @@ export const fetchChapters = createAsyncThunk(
     'chapters/fetchChapters',
     async ({ params }, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`/api/v1/private/chapters`, { ...params, page: params?.page || 1, limit: params?.limit || 10 })
+            const response = await axios.get(`/api/v1/private/chapters`, { params: { ...params, page: params?.page || 1, limit: params?.limit || 10 } })
 
             return response.data
         } catch (error) {
@@ -127,9 +127,11 @@ export const updateChapter = createAsyncThunk(
 
 export const deleteChapter = createAsyncThunk(
     'chapters/deleteChapter',
-    async (id, { rejectWithValue }) => {
+    async (id, { rejectWithValue, dispatch }) => {
         try {
             await axios.delete(`/api/v1/admin/chapters/${id}`)
+
+            dispatch(fetchChapters({ params: { page: 1, limit: 10 } }))
             return id
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error deleting chapter')

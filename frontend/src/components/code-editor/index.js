@@ -155,10 +155,10 @@ const CodeEditorComponent = ({
           marginTop: "16px",
         }}
       >
-        <Button variant="text" color="primary" onClick={handleRun}>
+        <Button variant="empty" color="primary" onClick={handleRun}>
           Run
         </Button>
-        <Button variant="text" color="secondary" onClick={onStop}>
+        <Button variant="empty" color="secondary" onClick={onStop}>
           Stop
         </Button>
       </Box>

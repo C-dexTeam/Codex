@@ -178,7 +178,7 @@ const coursesSlice = createSlice({
 
 export const getLoading = (state) => state.admin.courses.loading;
 export const getCourses = (state) => state.admin.courses.data;
-export const getTotalCourses = (state) => state.admin.courses.total;
+export const getCourseCount = (state) => state.admin.courses.total;
 export const getCourse = (state) => state.admin.courses.course;
 export const getErrors = (state) => state.admin.courses.errors;
 
