@@ -113,7 +113,8 @@ const coursesSlice = createSlice({
             })
             .addCase(fetchCourses.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload;
+                state.data = action.payload.courses;
+                state.total = action.payload.courseCount;
             })
             .addCase(fetchCourses.rejected, (state) => {
                 state.loading = false;
@@ -177,6 +178,7 @@ const coursesSlice = createSlice({
 
 export const getLoading = (state) => state.admin.courses.loading;
 export const getCourses = (state) => state.admin.courses.data;
+export const getTotalCourses = (state) => state.admin.courses.total;
 export const getCourse = (state) => state.admin.courses.course;
 export const getErrors = (state) => state.admin.courses.errors;
 

@@ -1,11 +1,10 @@
-import React from 'react'
-import CourseEdit from './index'
+import CourseEdit from '@/views/courses/edit'
 
-const CourseEditPage = () => <CourseEdit />
+const CourseEditPage2 = () => <CourseEdit />
 
-CourseEditPage.acl = {
+CourseEditPage2.acl = {
     action: 'read',
     permission: 'admin'
 }
-CourseEditPage.admin = true
-export default CourseEditPage
+CourseEditPage2.admin = true
+export default CourseEditPage2

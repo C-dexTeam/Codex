@@ -110,39 +110,43 @@ const button = theme => {
                       },
                     }
                   }
-                  : { // default button
-                    color: `${theme.palette.text.primary}`,
-                    borderRadius: "0em",
+                  : ownerState.variant == "text"
+                    ? {
+                      color: `${theme.palette.text.primary}`,
+                    }
+                    : { // default button
+                      color: `${theme.palette.text.primary}`,
+                      borderRadius: "0em",
 
-                    "&.Mui-disabled": {
-                      "&::before, &::after": {
-                        borderColor: `${theme.palette.action.disabled}`,
-                      }
-                    },
+                      "&.Mui-disabled": {
+                        "&::before, &::after": {
+                          borderColor: `${theme.palette.action.disabled}`,
+                        }
+                      },
 
-                    "&::before": {
-                      content: '""',
-                      display: "block",
-                      width: "15%",
-                      height: "calc(100% - 4px)",
-                      position: "absolute",
-                      left: "0px",
-                      borderTop: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`,
-                      borderBottom: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`,
-                      borderLeft: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`
-                    },
-                    "&::after": {
-                      content: '""',
-                      display: "block",
-                      width: "15%",
-                      height: "calc(100% - 4px)",
-                      position: "absolute",
-                      right: "0px",
-                      borderTop: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`,
-                      borderBottom: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`,
-                      borderRight: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`
-                    },
-                  }
+                      "&::before": {
+                        content: '""',
+                        display: "block",
+                        width: "15%",
+                        height: "calc(100% - 4px)",
+                        position: "absolute",
+                        left: "0px",
+                        borderTop: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`,
+                        borderBottom: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`,
+                        borderLeft: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`
+                      },
+                      "&::after": {
+                        content: '""',
+                        display: "block",
+                        width: "15%",
+                        height: "calc(100% - 4px)",
+                        position: "absolute",
+                        right: "0px",
+                        borderTop: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`,
+                        borderBottom: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`,
+                        borderRight: `2px solid ${hexToRGBA(theme.palette[ownerState.color || "primary"]?.main, 1)}`
+                      },
+                    }
           ),
         }),
       },
@@ -152,7 +156,7 @@ const button = theme => {
       styleOverrides: {
         root: ({ ownerState }) => ({
           color: `${theme.palette.text.primary}`,
-          
+
           "&.Mui-disabled": {
             color: `${theme.palette.text.disabled}`,
             background: "transparent",
