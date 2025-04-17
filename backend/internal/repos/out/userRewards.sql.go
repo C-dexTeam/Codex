@@ -70,7 +70,7 @@ func (q *Queries) CheckUserReward(ctx context.Context, arg CheckUserRewardParams
 
 const userRewards = `-- name: UserRewards :many
 SELECT
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri, 
+    r.id, r.symbol, r.name, r.description, r.image_path, r.uri, 
     ur.created_at AS earned_date
 FROM
     t_rewards AS r
@@ -92,7 +92,6 @@ type UserRewardsParams struct {
 
 type UserRewardsRow struct {
 	ID          uuid.UUID
-	RewardType  string
 	Symbol      string
 	Name        string
 	Description string
@@ -112,7 +111,6 @@ func (q *Queries) UserRewards(ctx context.Context, arg UserRewardsParams) ([]Use
 		var i UserRewardsRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.RewardType,
 			&i.Symbol,
 			&i.Name,
 			&i.Description,

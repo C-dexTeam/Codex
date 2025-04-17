@@ -17,8 +17,6 @@ definitions:
     type: object
   dto.AddChapterDTO:
     properties:
-      active:
-        type: boolean
       content:
         type: string
       courseID:
@@ -31,20 +29,14 @@ definitions:
         type: string
       funcName:
         type: string
-      grantsExperience:
-        type: boolean
       languageID:
         type: string
       order:
-        type: integer
-      rewardAmount:
         type: integer
       rewardID:
         type: string
       title:
         type: string
-    required:
-    - active
     type: object
   dto.AddPLanguageDTO:
     properties:
@@ -117,8 +109,6 @@ definitions:
     type: object
   dto.UpdateChapterDTO:
     properties:
-      active:
-        type: boolean
       content:
         type: string
       courseID:
@@ -131,14 +121,10 @@ definitions:
         type: string
       funcName:
         type: string
-      grantsExperience:
-        type: boolean
       id:
         type: string
       languageID:
         type: string
-      rewardAmount:
-        type: integer
       rewardID:
         type: string
       title:
@@ -404,10 +390,6 @@ paths:
         name: programmingLanguageID
         type: string
       - in: formData
-        minimum: 1
-        name: rewardAmount
-        type: integer
-      - in: formData
         name: rewardID
         type: string
       - in: formData
@@ -444,10 +426,6 @@ paths:
         name: programmingLanguageID
         required: true
         type: string
-      - in: formData
-        minimum: 1
-        name: rewardAmount
-        type: integer
       - in: formData
         name: rewardID
         type: string
@@ -569,10 +547,6 @@ paths:
         type: string
       - in: formData
         maxLength: 30
-        name: rewardType
-        type: string
-      - in: formData
-        maxLength: 30
         name: symbol
         type: string
       - description: Course Image File
@@ -605,11 +579,6 @@ paths:
       - in: formData
         maxLength: 30
         name: name
-        required: true
-        type: string
-      - in: formData
-        maxLength: 30
-        name: rewardType
         required: true
         type: string
       - in: formData
@@ -1125,10 +1094,6 @@ paths:
       - description: Reward Symbol
         in: query
         name: symbol
-        type: string
-      - description: Reward Type
-        in: query
-        name: rewardType
         type: string
       - description: Page
         in: query

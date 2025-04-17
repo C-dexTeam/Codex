@@ -107,6 +107,7 @@ const (
 	ErrErrorWhileFilteringUserProfile          = "ERROR_WHILE_FILTERING_USER_PROFILE"
 	ErrErrorWhileFilteringRole                 = "ERROR_WHILE_FILTERING_ROLES"
 	ErrErrorWhileFilteringCourse               = "ERROR_WHILE_FILTERING_COURSES"
+	ErrErrorWhileFilteringCourseCount          = "ERROR_WHILE_FILTERING_COURSES_COUNT"
 	ErrErrorWhileFilteringUserCourse           = "ERROR_WHILE_FILTERING_USER_COURSES"
 	ErrErrorWhileFilteringChapter              = "ERROR_WHILE_FILTERING_CHAPTERS"
 	ErrErrorWhileAddingExperience              = "ERROR_WHILE_ADDING_EXPERIENCE"

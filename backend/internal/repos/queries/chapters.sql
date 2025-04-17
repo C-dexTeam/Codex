@@ -1,7 +1,7 @@
 -- name: GetChapters :many
 SELECT 
-    c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
-    c.func_name, c.frontend_template, c.docker_template, c.grants_experience, c.active,
+    c.id, c.course_id, c.language_id, c.reward_id, c.title, c.description, c.content,
+    c.func_name, c.frontend_template, c.docker_template,
     c.chapter_order, c.created_at, c.deleted_at
 FROM 
     t_chapters as c
@@ -19,8 +19,8 @@ LIMIT
 
 -- name: GetChapter :one
 SELECT
-    c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
-    c.func_name, c.frontend_template, c.docker_template, c.grants_experience, c.active,
+    c.id, c.course_id, c.language_id, c.reward_id, c.title, c.description, c.content,
+    c.func_name, c.frontend_template, c.docker_template,
     c.chapter_order, c.created_at, c.deleted_at
 FROM
     t_chapters as c
@@ -30,11 +30,11 @@ WHERE
 
 -- name: CreateChapter :one
 INSERT INTO
-    t_chapters (course_id, language_id, reward_id, reward_amount, title, description, content,
-    func_name, frontend_template, docker_template, grants_experience, active, chapter_order)
+    t_chapters (course_id, language_id, reward_id, title, description, content,
+    func_name, frontend_template, docker_template, chapter_order)
 VALUES
-   (@course_id, @language_id, @reward_id, @reward_amount, @title, @description, @content,
-    @func_name, @frontend_template, @docker_template, @grants_experience, @active, @chapter_order)
+   (@course_id, @language_id, @reward_id, @title, @description, @content,
+    @func_name, @frontend_template, @docker_template, @chapter_order)
 RETURNING id;
 
 
@@ -45,15 +45,12 @@ SET
     course_id = COALESCE(sqlc.narg(course_id), course_id),
     language_id = COALESCE(sqlc.narg(language_id), language_id),
     reward_id = COALESCE(sqlc.narg(reward_id), reward_id),
-    reward_amount =  COALESCE(sqlc.narg(reward_amount), reward_amount),
     title =  COALESCE(sqlc.narg(title), title),
     description =  COALESCE(sqlc.narg(description), description),
     content =  COALESCE(sqlc.narg(content), content),
     func_name =  COALESCE(sqlc.narg(func_name), func_name),
     frontend_template =  COALESCE(sqlc.narg(frontend_template), frontend_template),
-    docker_template =  COALESCE(sqlc.narg(docker_template), docker_template),
-    grants_experience =  COALESCE(sqlc.narg(grants_experience)::BOOLEAN, grants_experience),
-    active =  COALESCE(sqlc.narg(active)::BOOLEAN, active)
+    docker_template =  COALESCE(sqlc.narg(docker_template), docker_template)
 WHERE
     id = @chapter_id;
 

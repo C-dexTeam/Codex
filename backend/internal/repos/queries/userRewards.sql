@@ -18,7 +18,7 @@ END AS exists;
 
 -- name: UserRewards :many
 SELECT
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.image_path, r.uri, 
+    r.id, r.symbol, r.name, r.description, r.image_path, r.uri, 
     ur.created_at AS earned_date
 FROM
     t_rewards AS r

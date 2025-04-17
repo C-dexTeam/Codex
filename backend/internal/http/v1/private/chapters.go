@@ -42,7 +42,7 @@ func (h *PrivateHandler) GetChapters(c *fiber.Ctx) error {
 	limit := c.Query("limit")
 
 	// if you put "" in bool area. Its means all. Like not only true or false.
-	chapters, err := h.services.ChapterService().GetChapters(c.Context(), id, languageID, courseID, rewardID, title, "", "", page, limit)
+	chapters, err := h.services.ChapterService().GetChapters(c.Context(), id, languageID, courseID, rewardID, title, page, limit)
 	if err != nil {
 		return err
 	}

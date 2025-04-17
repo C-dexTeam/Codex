@@ -33,7 +33,7 @@ func newCourseService(
 func (s *courseService) GetCourses(
 	ctx context.Context,
 	id, langugeID, pLanguageID, title, page, limit string,
-) ([]domains.Course, error) {
+) (*domains.Courses, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -71,9 +71,15 @@ func (s *courseService) GetCourses(
 			err,
 		)
 	}
+
+	count, err := s.GetCourseCount(ctx)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourseCount)
+	}
+
 	domainCourses := domains.NewCourses(courses)
 
-	return domainCourses, nil
+	return domains.NewCoursesS(domainCourses, count), nil
 }
 
 func (s *courseService) GetPopularCourses(
@@ -185,7 +191,6 @@ func (s *courseService) UserCourse(ctx context.Context, userAuthID, courseID str
 func (s *courseService) AddCourse(
 	ctx context.Context,
 	languageID, pLanguageID, rewardID, title, description, imagePath string,
-	rewardAmount int,
 ) (uuid.UUID, error) {
 	languageUUID, err := s.utilService.NParseUUID(languageID)
 	if err != nil {
@@ -202,7 +207,6 @@ func (s *courseService) AddCourse(
 		LanguageID:            languageUUID,
 		ProgrammingLanguageID: s.utilService.ParseNullUUID(pLanguageID),
 		RewardID:              s.utilService.ParseNullUUID(rewardID),
-		RewardAmount:          int32(rewardAmount),
 		Title:                 title,
 		Description:           description,
 		ImagePath:             s.utilService.ParseString(imagePath),
@@ -217,7 +221,6 @@ func (s *courseService) AddCourse(
 func (s *courseService) UpdateCourse(
 	ctx context.Context,
 	id, languageID, pLanguageID, rewardID, title, description, imagePath string,
-	rewardAmount int,
 ) error {
 	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
@@ -230,20 +233,11 @@ func (s *courseService) UpdateCourse(
 		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrCourseNotFound)
 	}
 
-	var r sql.NullInt32
-	if rewardAmount == 0 {
-		r.Valid = false
-	} else {
-		r.Valid = true
-		r.Int32 = int32(rewardAmount)
-	}
-
 	if err := s.queries.UpdateCourse(ctx, repo.UpdateCourseParams{
 		CourseID:              idUUID,
 		LanguageID:            s.utilService.ParseNullUUID(languageID),
 		ProgrammingLanguageID: s.utilService.ParseNullUUID(pLanguageID),
 		RewardID:              s.utilService.ParseNullUUID(rewardID),
-		RewardAmount:          r,
 		Title:                 s.utilService.ParseString(title),
 		Description:           s.utilService.ParseString(description),
 		ImagePath:             s.utilService.ParseString(imagePath),
@@ -334,4 +328,13 @@ func (s *courseService) UpdateUserCourseProgress(
 	}
 
 	return 0, nil
+}
+
+func (s *courseService) GetCourseCount(ctx context.Context) (int64, error) {
+	count, err := s.queries.CourseCount(ctx)
+	if err != nil {
+		return 0, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringCourseCount)
+	}
+
+	return count, nil
 }

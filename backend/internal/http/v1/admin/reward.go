@@ -43,7 +43,6 @@ func (h *AdminHandler) AddReward(c *fiber.Ctx) error {
 
 	id, err := h.services.RewardService().AddReward(
 		c.Context(),
-		newReward.RewardType,
 		newReward.Symbol,
 		newReward.Name,
 		newReward.Description,
@@ -62,7 +61,7 @@ func (h *AdminHandler) AddReward(c *fiber.Ctx) error {
 	uri := paths.CreateURI(h.config.Application.Https, id.String(), h.config.Application.Site)
 	fmt.Println(uri, "psaokdapğsok")
 
-	if err := h.services.RewardService().UpdateReward(c.Context(), id.String(), "", "", "", "", imagePath, uri); err != nil {
+	if err := h.services.RewardService().UpdateReward(c.Context(), id.String(), "", "", "", imagePath, uri); err != nil {
 		return err
 	}
 
@@ -105,7 +104,6 @@ func (h *AdminHandler) UpdateReward(c *fiber.Ctx) error {
 	err = h.services.RewardService().UpdateReward(
 		c.Context(),
 		updateReward.ID,
-		updateReward.RewardType,
 		updateReward.Symbol,
 		updateReward.Name,
 		updateReward.Description,

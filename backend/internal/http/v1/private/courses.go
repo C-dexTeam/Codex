@@ -41,7 +41,7 @@ func (h *PrivateHandler) GetCourses(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	courseDTOs := h.dtoManager.CourseManager().ToCourseDTOs(courses)
+	courseDTOs := h.dtoManager.CourseManager().ToCourseDTOCount(courses)
 
 	return response.Response(200, "Status OK", courseDTOs)
 }

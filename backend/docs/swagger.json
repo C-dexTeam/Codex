@@ -240,12 +240,6 @@
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "name": "rewardAmount",
-                        "in": "formData"
-                    },
-                    {
                         "type": "string",
                         "name": "rewardID",
                         "in": "formData"
@@ -305,12 +299,6 @@
                     {
                         "type": "string",
                         "name": "programmingLanguageID",
-                        "in": "formData"
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "name": "rewardAmount",
                         "in": "formData"
                     },
                     {
@@ -498,13 +486,6 @@
                         "required": true
                     },
                     {
-                        "maxLength": 30,
-                        "type": "string",
-                        "name": "rewardType",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
                         "type": "integer",
                         "name": "sellerFee",
                         "in": "formData"
@@ -554,12 +535,6 @@
                         "maxLength": 30,
                         "type": "string",
                         "name": "name",
-                        "in": "formData"
-                    },
-                    {
-                        "maxLength": 30,
-                        "type": "string",
-                        "name": "rewardType",
                         "in": "formData"
                     },
                     {
@@ -1348,12 +1323,6 @@
                     },
                     {
                         "type": "string",
-                        "description": "Reward Type",
-                        "name": "rewardType",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "description": "Page",
                         "name": "page",
                         "in": "query"
@@ -1792,13 +1761,7 @@
         },
         "dto.AddChapterDTO": {
             "type": "object",
-            "required": [
-                "active"
-            ],
             "properties": {
-                "active": {
-                    "type": "boolean"
-                },
                 "content": {
                     "type": "string"
                 },
@@ -1817,16 +1780,10 @@
                 "funcName": {
                     "type": "string"
                 },
-                "grantsExperience": {
-                    "type": "boolean"
-                },
                 "languageID": {
                     "type": "string"
                 },
                 "order": {
-                    "type": "integer"
-                },
-                "rewardAmount": {
                     "type": "integer"
                 },
                 "rewardID": {
@@ -1941,9 +1898,6 @@
         "dto.UpdateChapterDTO": {
             "type": "object",
             "properties": {
-                "active": {
-                    "type": "boolean"
-                },
                 "content": {
                     "type": "string"
                 },
@@ -1962,17 +1916,11 @@
                 "funcName": {
                     "type": "string"
                 },
-                "grantsExperience": {
-                    "type": "boolean"
-                },
                 "id": {
                     "type": "string"
                 },
                 "languageID": {
                     "type": "string"
-                },
-                "rewardAmount": {
-                    "type": "integer"
                 },
                 "rewardID": {
                     "type": "string"

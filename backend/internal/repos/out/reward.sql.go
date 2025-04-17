@@ -33,14 +33,13 @@ func (q *Queries) CheckRewardByID(ctx context.Context, rewardID uuid.UUID) (bool
 
 const createReward = `-- name: CreateReward :one
 INSERT INTO
-    t_rewards (reward_type, symbol, name, description, image_path, uri, seller_fee)
+    t_rewards (symbol, name, description, image_path, uri, seller_fee)
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7)
+    ($1, $2, $3, $4, $5, $6)
 RETURNING id
 `
 
 type CreateRewardParams struct {
-	RewardType  string
 	Symbol      string
 	Name        string
 	Description string
@@ -51,7 +50,6 @@ type CreateRewardParams struct {
 
 func (q *Queries) CreateReward(ctx context.Context, arg CreateRewardParams) (uuid.UUID, error) {
 	row := q.db.QueryRowContext(ctx, createReward,
-		arg.RewardType,
 		arg.Symbol,
 		arg.Name,
 		arg.Description,
@@ -78,7 +76,7 @@ func (q *Queries) DeleteReward(ctx context.Context, rewardID uuid.UUID) error {
 
 const getReward = `-- name: GetReward :one
 SELECT 
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.seller_fee, r.image_path, r.uri
+    r.id, r.symbol, r.name, r.description, r.seller_fee, r.image_path, r.uri
 FROM 
     t_rewards as r
 WHERE
@@ -90,7 +88,6 @@ func (q *Queries) GetReward(ctx context.Context, rewardID uuid.UUID) (TReward, e
 	var i TReward
 	err := row.Scan(
 		&i.ID,
-		&i.RewardType,
 		&i.Symbol,
 		&i.Name,
 		&i.Description,
@@ -103,21 +100,19 @@ func (q *Queries) GetReward(ctx context.Context, rewardID uuid.UUID) (TReward, e
 
 const getRewards = `-- name: GetRewards :many
 SELECT 
-    r.id, r.reward_type, r.symbol, r.name, r.description, r.seller_fee, r.image_path, r.uri 
+    r.id, r.symbol, r.name, r.description, r.seller_fee, r.image_path, r.uri 
 FROM 
     t_rewards as r
 WHERE
     ($1::UUID IS NULL OR r.id = $1::UUID) AND
-    ($2::text IS NULL OR r.reward_type = $2) AND
-    ($3::text IS NULL OR r.symbol ILIKE '%' || $3::text || '%') AND
-    ($4::text IS NULL OR r.name ILIKE '%' || $4::text || '%') AND
-    ($5::text IS NULL OR r.description ILIKE '%' || $5::text || '%')
-LIMIT $7 OFFSET $6
+    ($2::text IS NULL OR r.symbol ILIKE '%' || $2::text || '%') AND
+    ($3::text IS NULL OR r.name ILIKE '%' || $3::text || '%') AND
+    ($4::text IS NULL OR r.description ILIKE '%' || $4::text || '%')
+LIMIT $6 OFFSET $5
 `
 
 type GetRewardsParams struct {
 	ID          uuid.NullUUID
-	RewardType  sql.NullString
 	Symbol      sql.NullString
 	Name        sql.NullString
 	Description sql.NullString
@@ -128,7 +123,6 @@ type GetRewardsParams struct {
 func (q *Queries) GetRewards(ctx context.Context, arg GetRewardsParams) ([]TReward, error) {
 	rows, err := q.db.QueryContext(ctx, getRewards,
 		arg.ID,
-		arg.RewardType,
 		arg.Symbol,
 		arg.Name,
 		arg.Description,
@@ -144,7 +138,6 @@ func (q *Queries) GetRewards(ctx context.Context, arg GetRewardsParams) ([]TRewa
 		var i TReward
 		if err := rows.Scan(
 			&i.ID,
-			&i.RewardType,
 			&i.Symbol,
 			&i.Name,
 			&i.Description,
@@ -169,19 +162,17 @@ const updateReward = `-- name: UpdateReward :exec
 UPDATE
     t_rewards
 SET
-    reward_type =  COALESCE($1::TEXT, reward_type),
-    symbol =  COALESCE($2::TEXT, symbol),
-    name =  COALESCE($3::TEXT, name),
-    description =  COALESCE($4::TEXT, description),
-    image_path =  COALESCE($5::TEXT, image_path),
-    uri =  COALESCE($6::TEXT, uri),
-    seller_fee =  COALESCE($7::INTEGER, seller_fee)
+    symbol =  COALESCE($1::TEXT, symbol),
+    name =  COALESCE($2::TEXT, name),
+    description =  COALESCE($3::TEXT, description),
+    image_path =  COALESCE($4::TEXT, image_path),
+    uri =  COALESCE($5::TEXT, uri),
+    seller_fee =  COALESCE($6::INTEGER, seller_fee)
 WHERE
-    id = $8
+    id = $7
 `
 
 type UpdateRewardParams struct {
-	RewardType  sql.NullString
 	Symbol      sql.NullString
 	Name        sql.NullString
 	Description sql.NullString
@@ -193,7 +184,6 @@ type UpdateRewardParams struct {
 
 func (q *Queries) UpdateReward(ctx context.Context, arg UpdateRewardParams) error {
 	_, err := q.db.ExecContext(ctx, updateReward,
-		arg.RewardType,
 		arg.Symbol,
 		arg.Name,
 		arg.Description,

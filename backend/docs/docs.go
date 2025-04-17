@@ -247,12 +247,6 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "name": "rewardAmount",
-                        "in": "formData"
-                    },
-                    {
                         "type": "string",
                         "name": "rewardID",
                         "in": "formData"
@@ -312,12 +306,6 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "programmingLanguageID",
-                        "in": "formData"
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "name": "rewardAmount",
                         "in": "formData"
                     },
                     {
@@ -505,13 +493,6 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "maxLength": 30,
-                        "type": "string",
-                        "name": "rewardType",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
                         "type": "integer",
                         "name": "sellerFee",
                         "in": "formData"
@@ -561,12 +542,6 @@ const docTemplate = `{
                         "maxLength": 30,
                         "type": "string",
                         "name": "name",
-                        "in": "formData"
-                    },
-                    {
-                        "maxLength": 30,
-                        "type": "string",
-                        "name": "rewardType",
                         "in": "formData"
                     },
                     {
@@ -1355,12 +1330,6 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Reward Type",
-                        "name": "rewardType",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "description": "Page",
                         "name": "page",
                         "in": "query"
@@ -1799,13 +1768,7 @@ const docTemplate = `{
         },
         "dto.AddChapterDTO": {
             "type": "object",
-            "required": [
-                "active"
-            ],
             "properties": {
-                "active": {
-                    "type": "boolean"
-                },
                 "content": {
                     "type": "string"
                 },
@@ -1824,16 +1787,10 @@ const docTemplate = `{
                 "funcName": {
                     "type": "string"
                 },
-                "grantsExperience": {
-                    "type": "boolean"
-                },
                 "languageID": {
                     "type": "string"
                 },
                 "order": {
-                    "type": "integer"
-                },
-                "rewardAmount": {
                     "type": "integer"
                 },
                 "rewardID": {
@@ -1948,9 +1905,6 @@ const docTemplate = `{
         "dto.UpdateChapterDTO": {
             "type": "object",
             "properties": {
-                "active": {
-                    "type": "boolean"
-                },
                 "content": {
                     "type": "string"
                 },
@@ -1969,17 +1923,11 @@ const docTemplate = `{
                 "funcName": {
                     "type": "string"
                 },
-                "grantsExperience": {
-                    "type": "boolean"
-                },
                 "id": {
                     "type": "string"
                 },
                 "languageID": {
                     "type": "string"
-                },
-                "rewardAmount": {
-                    "type": "integer"
                 },
                 "rewardID": {
                     "type": "string"
