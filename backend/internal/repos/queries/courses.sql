@@ -1,7 +1,6 @@
 -- name: GetCourses :many
 SELECT 
-    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
-    c.description, c.image_path, 
+    id, language_id, programming_language_id, reward_id, title, c.description, c.image_path, 
     (SELECT COUNT(*) FROM t_chapters as ch WHERE ch.course_id = c.id) as chapter_count,
     c.created_at, c.deleted_at
 FROM 
@@ -18,8 +17,7 @@ LIMIT
 
 -- name: GetCourse :one
 SELECT 
-    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
-    c.description, c.image_path, 
+    id, language_id, programming_language_id, reward_id, title, c.description, c.image_path, 
     (SELECT COUNT(*) FROM t_chapters as ch WHERE ch.course_id = c.id) as chapter_count,
     c.created_at, c.deleted_at
 FROM 
@@ -33,7 +31,6 @@ SELECT
     c.language_id,
     c.programming_language_id,
     c.reward_id,
-    c.reward_amount,
     c.title,
     c.description,
     c.image_path,
@@ -47,7 +44,7 @@ JOIN
 ON 
     uc.course_id = c.id
 GROUP BY 
-    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title, 
+    c.id, c.language_id, c.programming_language_id, c.reward_id, c.title, 
     c.description, c.image_path, c.created_at, c.deleted_at
 ORDER BY 
     COUNT(uc.user_auth_id) DESC
@@ -56,9 +53,9 @@ LIMIT @lim OFFSET @off;
 
 -- name: CreateCourse :one
 INSERT INTO
-    t_courses (language_id, programming_language_id, reward_id, reward_amount, title, description, image_path)
+    t_courses (language_id, programming_language_id, reward_id, title, description, image_path)
 VALUES
-    (@language_id, @programming_language_id, @reward_id, @reward_amount, @title, @description, @image_path)
+    (@language_id, @programming_language_id, @reward_id, @title, @description, @image_path)
 RETURNING id;
 
 -- name: UpdateCourse :exec
@@ -68,7 +65,6 @@ SET
     language_id =  COALESCE(sqlc.narg(language_id)::UUID, language_id),
     programming_language_id =  COALESCE(sqlc.narg(programming_language_id)::UUID, programming_language_id),
     reward_id =  COALESCE(sqlc.narg(reward_id)::UUID, reward_id),
-    reward_amount =  COALESCE(sqlc.narg(reward_amount)::INTEGER, reward_amount),
     title =  COALESCE(sqlc.narg(title)::TEXT, title),
     description =  COALESCE(sqlc.narg(description)::TEXT, description),
     image_path =  COALESCE(sqlc.narg(image_path)::TEXT, image_path)
@@ -99,3 +95,6 @@ CASE
     ) THEN true
     ELSE false
 END AS exists;
+
+-- name: CourseCount :one
+SELECT COUNT(*) FROM t_courses WHERE deleted_at IS NULL;

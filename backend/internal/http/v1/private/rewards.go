@@ -19,7 +19,6 @@ func (h *PrivateHandler) initRewardsRoutes(root fiber.Router) {
 // @Param rewardID query string false "Reward ID"
 // @Param name query string false "Reward Name"
 // @Param symbol query string false "Reward Symbol"
-// @Param rewardType query string false "Reward Type"
 // @Param page query string false "Page"
 // @Param limit query string false "Limit"
 // @Success 200 {object} response.BaseResponse{}
@@ -28,11 +27,10 @@ func (h *PrivateHandler) GetRewards(c *fiber.Ctx) error {
 	rewardID := c.Query("rewardID")
 	name := c.Query("name")
 	symbol := c.Query("symbol")
-	rewardType := c.Query("rewardType")
 	page := c.Query("page")
 	limit := c.Query("limit")
 
-	rewards, err := h.services.RewardService().GetRewards(c.Context(), rewardID, name, symbol, rewardType, page, limit)
+	rewards, err := h.services.RewardService().GetRewards(c.Context(), rewardID, name, symbol, page, limit)
 	if err != nil {
 		return err
 	}

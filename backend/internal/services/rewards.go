@@ -32,7 +32,7 @@ func newRewardService(
 
 func (s *rewardService) GetRewards(
 	ctx context.Context,
-	id, name, symbol, rewardType, page, limit string,
+	id, name, symbol, page, limit string,
 ) ([]domains.Reward, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
@@ -49,12 +49,11 @@ func (s *rewardService) GetRewards(
 	}
 
 	rewards, err := s.queries.GetRewards(ctx, repo.GetRewardsParams{
-		ID:         s.utilService.ParseNullUUID(id),
-		Name:       s.utilService.ParseString(name),
-		Symbol:     s.utilService.ParseString(symbol),
-		RewardType: s.utilService.ParseString(rewardType),
-		Lim:        int32(limitNum),
-		Off:        (int32(pageNum) - 1) * int32(limitNum),
+		ID:     s.utilService.ParseNullUUID(id),
+		Name:   s.utilService.ParseString(name),
+		Symbol: s.utilService.ParseString(symbol),
+		Lim:    int32(limitNum),
+		Off:    (int32(pageNum) - 1) * int32(limitNum),
 	})
 	if err != nil {
 		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
@@ -115,11 +114,10 @@ func (s *rewardService) GetReward(
 
 func (s *rewardService) AddReward(
 	ctx context.Context,
-	rewardType, symbol, name, description string,
+	symbol, name, description string,
 	sellerFee int,
 ) (uuid.UUID, error) {
 	id, err := s.queries.CreateReward(ctx, repo.CreateRewardParams{
-		RewardType:  rewardType,
 		Symbol:      symbol,
 		Name:        name,
 		Description: description,
@@ -134,7 +132,7 @@ func (s *rewardService) AddReward(
 
 func (s *rewardService) UpdateReward(
 	ctx context.Context,
-	id, rewardType, symbol, name, description, imagePath, URI string,
+	id, symbol, name, description, imagePath, URI string,
 ) error {
 	idUUID, err := s.utilService.ParseUUID(id)
 	if err != nil {
@@ -158,7 +156,6 @@ func (s *rewardService) UpdateReward(
 
 	if err := s.queries.UpdateReward(ctx, repo.UpdateRewardParams{
 		RewardID:    idUUID,
-		RewardType:  s.utilService.ParseString(rewardType),
 		Symbol:      s.utilService.ParseString(symbol),
 		Name:        s.utilService.ParseString(name),
 		Description: s.utilService.ParseString(description),

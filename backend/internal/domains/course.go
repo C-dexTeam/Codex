@@ -12,7 +12,6 @@ type Course struct {
 	LanguageID   uuid.UUID
 	PLanguageID  uuid.UUID
 	RewardID     *uuid.UUID
-	RewardAmount int32
 	Title        string
 	Description  string
 	ImagePath    string
@@ -21,6 +20,21 @@ type Course struct {
 	PLanguage    *PLanguage
 	CreatedAt    time.Time
 	DeletedAt    *time.Time
+}
+
+type Courses struct {
+	Courses     []Course
+	TotalCourse int64
+}
+
+func NewCoursesS(
+	courses []Course,
+	count int64,
+) *Courses {
+	return &Courses{
+		Courses:     courses,
+		TotalCourse: count,
+	}
 }
 
 func NewCourse(
@@ -47,7 +61,6 @@ func NewCourse(
 		LanguageID:   course.LanguageID,
 		PLanguageID:  course.ProgrammingLanguageID.UUID,
 		RewardID:     rewardID,
-		RewardAmount: course.RewardAmount,
 		Title:        course.Title,
 		Description:  course.Description,
 		ImagePath:    course.ImagePath.String,
@@ -65,7 +78,6 @@ func NewGetCoursesRow(course repo.GetTopCoursesRow) *repo.GetCoursesRow {
 		LanguageID:            course.LanguageID,
 		ProgrammingLanguageID: course.ProgrammingLanguageID,
 		RewardID:              course.RewardID,
-		RewardAmount:          course.RewardAmount,
 		Title:                 course.Title,
 		Description:           course.Description,
 		ImagePath:             course.ImagePath,
@@ -107,7 +119,6 @@ func NewCourses(
 			LanguageID:   course.LanguageID,
 			PLanguageID:  course.ProgrammingLanguageID.UUID,
 			RewardID:     rewardID,
-			RewardAmount: course.RewardAmount,
 			Title:        course.Title,
 			Description:  course.Description,
 			ImagePath:    course.ImagePath.String,

@@ -33,11 +33,11 @@ func (q *Queries) CheckChapterByID(ctx context.Context, chapterID uuid.UUID) (bo
 
 const createChapter = `-- name: CreateChapter :one
 INSERT INTO
-    t_chapters (course_id, language_id, reward_id, reward_amount, title, description, content,
-    func_name, frontend_template, docker_template, grants_experience, active, chapter_order)
+    t_chapters (course_id, language_id, reward_id, title, description, content,
+    func_name, frontend_template, docker_template, chapter_order)
 VALUES
-   ($1, $2, $3, $4, $5, $6, $7,
-    $8, $9, $10, $11, $12, $13)
+   ($1, $2, $3, $4, $5, $6,
+    $7, $8, $9, $10)
 RETURNING id
 `
 
@@ -45,15 +45,12 @@ type CreateChapterParams struct {
 	CourseID         uuid.UUID
 	LanguageID       uuid.UUID
 	RewardID         uuid.NullUUID
-	RewardAmount     int32
 	Title            string
 	Description      string
 	Content          string
 	FuncName         string
 	FrontendTemplate string
 	DockerTemplate   string
-	GrantsExperience bool
-	Active           bool
 	ChapterOrder     int32
 }
 
@@ -62,15 +59,12 @@ func (q *Queries) CreateChapter(ctx context.Context, arg CreateChapterParams) (u
 		arg.CourseID,
 		arg.LanguageID,
 		arg.RewardID,
-		arg.RewardAmount,
 		arg.Title,
 		arg.Description,
 		arg.Content,
 		arg.FuncName,
 		arg.FrontendTemplate,
 		arg.DockerTemplate,
-		arg.GrantsExperience,
-		arg.Active,
 		arg.ChapterOrder,
 	)
 	var id uuid.UUID
@@ -80,8 +74,8 @@ func (q *Queries) CreateChapter(ctx context.Context, arg CreateChapterParams) (u
 
 const getChapter = `-- name: GetChapter :one
 SELECT
-    c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
-    c.func_name, c.frontend_template, c.docker_template, c.grants_experience, c.active,
+    c.id, c.course_id, c.language_id, c.reward_id, c.title, c.description, c.content,
+    c.func_name, c.frontend_template, c.docker_template,
     c.chapter_order, c.created_at, c.deleted_at
 FROM
     t_chapters as c
@@ -97,15 +91,12 @@ func (q *Queries) GetChapter(ctx context.Context, chapterID uuid.UUID) (TChapter
 		&i.CourseID,
 		&i.LanguageID,
 		&i.RewardID,
-		&i.RewardAmount,
 		&i.Title,
 		&i.Description,
 		&i.Content,
 		&i.FuncName,
 		&i.FrontendTemplate,
 		&i.DockerTemplate,
-		&i.GrantsExperience,
-		&i.Active,
 		&i.ChapterOrder,
 		&i.CreatedAt,
 		&i.DeletedAt,
@@ -115,8 +106,8 @@ func (q *Queries) GetChapter(ctx context.Context, chapterID uuid.UUID) (TChapter
 
 const getChapters = `-- name: GetChapters :many
 SELECT 
-    c.id, c.course_id, c.language_id, c.reward_id, c.reward_amount, c.title, c.description, c.content,
-    c.func_name, c.frontend_template, c.docker_template, c.grants_experience, c.active,
+    c.id, c.course_id, c.language_id, c.reward_id, c.title, c.description, c.content,
+    c.func_name, c.frontend_template, c.docker_template,
     c.chapter_order, c.created_at, c.deleted_at
 FROM 
     t_chapters as c
@@ -165,15 +156,12 @@ func (q *Queries) GetChapters(ctx context.Context, arg GetChaptersParams) ([]TCh
 			&i.CourseID,
 			&i.LanguageID,
 			&i.RewardID,
-			&i.RewardAmount,
 			&i.Title,
 			&i.Description,
 			&i.Content,
 			&i.FuncName,
 			&i.FrontendTemplate,
 			&i.DockerTemplate,
-			&i.GrantsExperience,
-			&i.Active,
 			&i.ChapterOrder,
 			&i.CreatedAt,
 			&i.DeletedAt,
@@ -212,32 +200,26 @@ SET
     course_id = COALESCE($1, course_id),
     language_id = COALESCE($2, language_id),
     reward_id = COALESCE($3, reward_id),
-    reward_amount =  COALESCE($4, reward_amount),
-    title =  COALESCE($5, title),
-    description =  COALESCE($6, description),
-    content =  COALESCE($7, content),
-    func_name =  COALESCE($8, func_name),
-    frontend_template =  COALESCE($9, frontend_template),
-    docker_template =  COALESCE($10, docker_template),
-    grants_experience =  COALESCE($11::BOOLEAN, grants_experience),
-    active =  COALESCE($12::BOOLEAN, active)
+    title =  COALESCE($4, title),
+    description =  COALESCE($5, description),
+    content =  COALESCE($6, content),
+    func_name =  COALESCE($7, func_name),
+    frontend_template =  COALESCE($8, frontend_template),
+    docker_template =  COALESCE($9, docker_template)
 WHERE
-    id = $13
+    id = $10
 `
 
 type UpdateChapterParams struct {
 	CourseID         uuid.NullUUID
 	LanguageID       uuid.NullUUID
 	RewardID         uuid.NullUUID
-	RewardAmount     sql.NullInt32
 	Title            sql.NullString
 	Description      sql.NullString
 	Content          sql.NullString
 	FuncName         sql.NullString
 	FrontendTemplate sql.NullString
 	DockerTemplate   sql.NullString
-	GrantsExperience sql.NullBool
-	Active           sql.NullBool
 	ChapterID        uuid.UUID
 }
 
@@ -246,15 +228,12 @@ func (q *Queries) UpdateChapter(ctx context.Context, arg UpdateChapterParams) er
 		arg.CourseID,
 		arg.LanguageID,
 		arg.RewardID,
-		arg.RewardAmount,
 		arg.Title,
 		arg.Description,
 		arg.Content,
 		arg.FuncName,
 		arg.FrontendTemplate,
 		arg.DockerTemplate,
-		arg.GrantsExperience,
-		arg.Active,
 		arg.ChapterID,
 	)
 	return err

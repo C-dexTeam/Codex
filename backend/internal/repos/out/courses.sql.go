@@ -31,11 +31,22 @@ func (q *Queries) CheckCourseByID(ctx context.Context, courseID uuid.UUID) (bool
 	return exists, err
 }
 
+const courseCount = `-- name: CourseCount :one
+SELECT COUNT(*) FROM t_courses WHERE deleted_at IS NULL
+`
+
+func (q *Queries) CourseCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, courseCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createCourse = `-- name: CreateCourse :one
 INSERT INTO
-    t_courses (language_id, programming_language_id, reward_id, reward_amount, title, description, image_path)
+    t_courses (language_id, programming_language_id, reward_id, title, description, image_path)
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7)
+    ($1, $2, $3, $4, $5, $6)
 RETURNING id
 `
 
@@ -43,7 +54,6 @@ type CreateCourseParams struct {
 	LanguageID            uuid.UUID
 	ProgrammingLanguageID uuid.NullUUID
 	RewardID              uuid.NullUUID
-	RewardAmount          int32
 	Title                 string
 	Description           string
 	ImagePath             sql.NullString
@@ -54,7 +64,6 @@ func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (uui
 		arg.LanguageID,
 		arg.ProgrammingLanguageID,
 		arg.RewardID,
-		arg.RewardAmount,
 		arg.Title,
 		arg.Description,
 		arg.ImagePath,
@@ -78,8 +87,7 @@ func (q *Queries) DeleteCourse(ctx context.Context, courseID uuid.UUID) error {
 
 const getCourse = `-- name: GetCourse :one
 SELECT 
-    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
-    c.description, c.image_path, 
+    id, language_id, programming_language_id, reward_id, title, c.description, c.image_path, 
     (SELECT COUNT(*) FROM t_chapters as ch WHERE ch.course_id = c.id) as chapter_count,
     c.created_at, c.deleted_at
 FROM 
@@ -93,7 +101,6 @@ type GetCourseRow struct {
 	LanguageID            uuid.UUID
 	ProgrammingLanguageID uuid.NullUUID
 	RewardID              uuid.NullUUID
-	RewardAmount          int32
 	Title                 string
 	Description           string
 	ImagePath             sql.NullString
@@ -110,7 +117,6 @@ func (q *Queries) GetCourse(ctx context.Context, courseID uuid.UUID) (GetCourseR
 		&i.LanguageID,
 		&i.ProgrammingLanguageID,
 		&i.RewardID,
-		&i.RewardAmount,
 		&i.Title,
 		&i.Description,
 		&i.ImagePath,
@@ -123,8 +129,7 @@ func (q *Queries) GetCourse(ctx context.Context, courseID uuid.UUID) (GetCourseR
 
 const getCourses = `-- name: GetCourses :many
 SELECT 
-    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title,
-    c.description, c.image_path, 
+    id, language_id, programming_language_id, reward_id, title, c.description, c.image_path, 
     (SELECT COUNT(*) FROM t_chapters as ch WHERE ch.course_id = c.id) as chapter_count,
     c.created_at, c.deleted_at
 FROM 
@@ -155,7 +160,6 @@ type GetCoursesRow struct {
 	LanguageID            uuid.UUID
 	ProgrammingLanguageID uuid.NullUUID
 	RewardID              uuid.NullUUID
-	RewardAmount          int32
 	Title                 string
 	Description           string
 	ImagePath             sql.NullString
@@ -186,7 +190,6 @@ func (q *Queries) GetCourses(ctx context.Context, arg GetCoursesParams) ([]GetCo
 			&i.LanguageID,
 			&i.ProgrammingLanguageID,
 			&i.RewardID,
-			&i.RewardAmount,
 			&i.Title,
 			&i.Description,
 			&i.ImagePath,
@@ -213,7 +216,6 @@ SELECT
     c.language_id,
     c.programming_language_id,
     c.reward_id,
-    c.reward_amount,
     c.title,
     c.description,
     c.image_path,
@@ -227,7 +229,7 @@ JOIN
 ON 
     uc.course_id = c.id
 GROUP BY 
-    c.id, c.language_id, c.programming_language_id, c.reward_id, c.reward_amount, c.title, 
+    c.id, c.language_id, c.programming_language_id, c.reward_id, c.title, 
     c.description, c.image_path, c.created_at, c.deleted_at
 ORDER BY 
     COUNT(uc.user_auth_id) DESC
@@ -244,7 +246,6 @@ type GetTopCoursesRow struct {
 	LanguageID            uuid.UUID
 	ProgrammingLanguageID uuid.NullUUID
 	RewardID              uuid.NullUUID
-	RewardAmount          int32
 	Title                 string
 	Description           string
 	ImagePath             sql.NullString
@@ -267,7 +268,6 @@ func (q *Queries) GetTopCourses(ctx context.Context, arg GetTopCoursesParams) ([
 			&i.LanguageID,
 			&i.ProgrammingLanguageID,
 			&i.RewardID,
-			&i.RewardAmount,
 			&i.Title,
 			&i.Description,
 			&i.ImagePath,
@@ -309,19 +309,17 @@ SET
     language_id =  COALESCE($1::UUID, language_id),
     programming_language_id =  COALESCE($2::UUID, programming_language_id),
     reward_id =  COALESCE($3::UUID, reward_id),
-    reward_amount =  COALESCE($4::INTEGER, reward_amount),
-    title =  COALESCE($5::TEXT, title),
-    description =  COALESCE($6::TEXT, description),
-    image_path =  COALESCE($7::TEXT, image_path)
+    title =  COALESCE($4::TEXT, title),
+    description =  COALESCE($5::TEXT, description),
+    image_path =  COALESCE($6::TEXT, image_path)
 WHERE
-    id = $8
+    id = $7
 `
 
 type UpdateCourseParams struct {
 	LanguageID            uuid.NullUUID
 	ProgrammingLanguageID uuid.NullUUID
 	RewardID              uuid.NullUUID
-	RewardAmount          sql.NullInt32
 	Title                 sql.NullString
 	Description           sql.NullString
 	ImagePath             sql.NullString
@@ -333,7 +331,6 @@ func (q *Queries) UpdateCourse(ctx context.Context, arg UpdateCourseParams) erro
 		arg.LanguageID,
 		arg.ProgrammingLanguageID,
 		arg.RewardID,
-		arg.RewardAmount,
 		arg.Title,
 		arg.Description,
 		arg.ImagePath,

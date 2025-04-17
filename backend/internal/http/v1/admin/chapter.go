@@ -64,9 +64,6 @@ func (h *AdminHandler) AddChapter(c *fiber.Ctx) error {
 		newChapter.FuncName,
 		newChapter.FrontendTmp,
 		newChapter.DockerTmp,
-		newChapter.GrantsExperience,
-		newChapter.Active,
-		newChapter.RewardAmount,
 		newChapter.Order,
 	)
 	if err != nil {
@@ -105,9 +102,6 @@ func (h *AdminHandler) UpdateChapter(c *fiber.Ctx) error {
 		updateChapter.FuncName,
 		updateChapter.FrontendTmp,
 		updateChapter.DockerTmp,
-		updateChapter.GrantsExperience,
-		updateChapter.Active,
-		updateChapter.RewardAmount,
 	)
 	if err != nil {
 		return err

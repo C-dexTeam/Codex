@@ -8,23 +8,20 @@ import (
 )
 
 type Chapter struct {
-	ID           uuid.UUID
-	CourseID     uuid.UUID
-	LanguageID   uuid.UUID
-	RewardID     *uuid.UUID
-	RewardAmount int32
-	Title        string
-	Description  string
-	Content      string
-	FuncName     string
-	FrontTmp     string
-	DockerTmp    string
-	GrantsExp    bool
-	Active       bool
-	Tests        []Test
-	Reward       *Reward
-	CreatedAt    time.Time
-	DeletedAt    *time.Time
+	ID          uuid.UUID
+	CourseID    uuid.UUID
+	LanguageID  uuid.UUID
+	RewardID    *uuid.UUID
+	Title       string
+	Description string
+	Content     string
+	FuncName    string
+	FrontTmp    string
+	DockerTmp   string
+	Tests       []Test
+	Reward      *Reward
+	CreatedAt   time.Time
+	DeletedAt   *time.Time
 }
 
 func NewChapter(
@@ -47,23 +44,20 @@ func NewChapter(
 	}
 
 	return Chapter{
-		ID:           chapter.ID,
-		CourseID:     chapter.CourseID,
-		LanguageID:   chapter.LanguageID,
-		RewardID:     rewardID,
-		RewardAmount: chapter.RewardAmount,
-		Title:        chapter.Title,
-		Description:  chapter.Description,
-		Content:      chapter.Content,
-		FuncName:     chapter.FuncName,
-		FrontTmp:     chapter.FrontendTemplate,
-		DockerTmp:    chapter.DockerTemplate,
-		GrantsExp:    chapter.GrantsExperience,
-		Active:       chapter.Active,
-		Tests:        NewTests(tests),
-		Reward:       NewReward(reward, nil),
-		CreatedAt:    chapter.CreatedAt.Time,
-		DeletedAt:    deletedAt,
+		ID:          chapter.ID,
+		CourseID:    chapter.CourseID,
+		LanguageID:  chapter.LanguageID,
+		RewardID:    rewardID,
+		Title:       chapter.Title,
+		Description: chapter.Description,
+		Content:     chapter.Content,
+		FuncName:    chapter.FuncName,
+		FrontTmp:    chapter.FrontendTemplate,
+		DockerTmp:   chapter.DockerTemplate,
+		Tests:       NewTests(tests),
+		Reward:      NewReward(reward, nil),
+		CreatedAt:   chapter.CreatedAt.Time,
+		DeletedAt:   deletedAt,
 	}
 }
 

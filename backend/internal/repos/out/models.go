@@ -23,15 +23,12 @@ type TChapter struct {
 	CourseID         uuid.UUID
 	LanguageID       uuid.UUID
 	RewardID         uuid.NullUUID
-	RewardAmount     int32
 	Title            string
 	Description      string
 	Content          string
 	FuncName         string
 	FrontendTemplate string
 	DockerTemplate   string
-	GrantsExperience bool
-	Active           bool
 	ChapterOrder     int32
 	CreatedAt        sql.NullTime
 	DeletedAt        sql.NullTime
@@ -42,7 +39,6 @@ type TCourse struct {
 	LanguageID            uuid.UUID
 	ProgrammingLanguageID uuid.NullUUID
 	RewardID              uuid.NullUUID
-	RewardAmount          int32
 	Title                 string
 	Description           string
 	ImagePath             sql.NullString
@@ -69,7 +65,6 @@ type TProgrammingLanguage struct {
 
 type TReward struct {
 	ID          uuid.UUID
-	RewardType  string
 	Symbol      string
 	Name        string
 	Description string

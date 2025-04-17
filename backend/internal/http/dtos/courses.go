@@ -25,6 +25,11 @@ type UserCourseView struct {
 	CreatedAt    time.Time          `json:"createdAt"`
 }
 
+type UserCourseViews struct {
+	Courses     []UserCourseView `json:"courses"`
+	CourseCount int64            `json:"courseCount"`
+}
+
 func (d *CourseDTOManager) ToCourseDTO(courseModel *domains.Course) UserCourseView {
 	chapterDTOManager := new(ChapterDTOManager)
 	pLangDTOManager := new(ProgrammingLanguageDTOManager)
@@ -51,23 +56,34 @@ func (d *CourseDTOManager) ToCourseDTOs(courseModels []domains.Course) []UserCou
 	return courseDTOs
 }
 
+func (d *CourseDTOManager) ToCourseDTOCount(courseModels *domains.Courses) UserCourseViews {
+	var viewsCourse UserCourseViews
+	var courseDTOs []UserCourseView
+	for _, model := range courseModels.Courses {
+		courseDTOs = append(courseDTOs, d.ToCourseDTO(&model))
+	}
+
+	viewsCourse.Courses = courseDTOs
+	viewsCourse.CourseCount = courseModels.TotalCourse
+
+	return viewsCourse
+}
+
 type AddCourseDTO struct {
 	LanguageID            string
 	ProgrammingLanguageID string `validate:"required,uuid4"`
 	RewardID              string
-	RewardAmount          int    `validate:"gte=1"`
 	Title                 string `validate:"required,max=60"`
 	Description           string `validte:"required"`
 }
 
 type UpdateCourseDTO struct {
-	ID           string `json:"id"`
-	LanguageID   string `json:"languageID"`
-	PLanguageID  string `json:"programmingLanguageID"`
-	RewardID     string `json:"rewardID"`
-	RewardAmount int    `json:"rewardAmount" validate:"gte=1"`
-	Title        string `json:"title" validate:"max=60"`
-	Description  string `json:"description"`
+	ID          string `json:"id"`
+	LanguageID  string `json:"languageID"`
+	PLanguageID string `json:"programmingLanguageID"`
+	RewardID    string `json:"rewardID"`
+	Title       string `json:"title" validate:"max=60"`
+	Description string `json:"description"`
 }
 
 type StartCourseDTO struct {

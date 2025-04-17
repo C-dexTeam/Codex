@@ -67,7 +67,6 @@ func (h *AdminHandler) AddCourse(c *fiber.Ctx) error {
 		courseInfo.Title,
 		courseInfo.Description,
 		"imagePath",
-		courseInfo.RewardAmount,
 	)
 	if err != nil {
 		return err
@@ -80,7 +79,7 @@ func (h *AdminHandler) AddCourse(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := h.services.CourseService().UpdateCourse(c.Context(), id.String(), "", "", "", "", "", imagePath, 0); err != nil {
+	if err := h.services.CourseService().UpdateCourse(c.Context(), id.String(), "", "", "", "", "", imagePath); err != nil {
 		return err
 	}
 
@@ -151,7 +150,6 @@ func (h *AdminHandler) UpdateCourse(c *fiber.Ctx) error {
 		updateCourse.Title,
 		updateCourse.Description,
 		newImagePath,
-		updateCourse.RewardAmount,
 	)
 	if err != nil {
 		return err

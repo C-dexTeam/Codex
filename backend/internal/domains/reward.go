@@ -7,7 +7,6 @@ import (
 
 type Reward struct {
 	ID          uuid.UUID
-	RewardType  string
 	Name        string
 	Symbol      string
 	Description string
@@ -31,7 +30,6 @@ func NewReward(reward *repo.TReward, attributes []repo.TAttribute) *Reward {
 
 	return &Reward{
 		ID:          reward.ID,
-		RewardType:  reward.RewardType,
 		Name:        reward.Name,
 		Symbol:      reward.Symbol,
 		Description: reward.Description,

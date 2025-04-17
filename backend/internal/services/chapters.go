@@ -39,7 +39,7 @@ func NewChapterService(
 
 func (s *chapterService) GetChapters(
 	ctx context.Context,
-	id, langugeID, courseID, rewardID, title, grantsExperience, active, page, limit string,
+	id, langugeID, courseID, rewardID, title, page, limit string,
 ) ([]domains.Chapter, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
@@ -146,8 +146,7 @@ func (s *chapterService) AddChapter(
 	ctx context.Context,
 	courseID, languageID, rewardID, title, description, content, funcName string,
 	frontendTmp, dockerTmp string,
-	grantsExperience, active bool,
-	rewardAmount, order int,
+	order int,
 ) (uuid.UUID, error) {
 	languageUUID, err := s.utilService.NParseUUID(languageID)
 	if err != nil {
@@ -171,9 +170,6 @@ func (s *chapterService) AddChapter(
 		FuncName:         funcName,
 		FrontendTemplate: frontendTmp,
 		DockerTemplate:   dockerTmp,
-		RewardAmount:     int32(rewardAmount),
-		GrantsExperience: grantsExperience,
-		Active:           active,
 		ChapterOrder:     int32(order),
 	})
 	if err != nil {
@@ -187,8 +183,6 @@ func (s *chapterService) UpdateChapter(
 	ctx context.Context,
 	id, courseID, languageID, rewardID, title, description, content, funcName string,
 	frontendTmp, dockerTmp string,
-	grantsExperience, active *bool,
-	rewardAmount int,
 ) error {
 	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
@@ -199,29 +193,6 @@ func (s *chapterService) UpdateChapter(
 		return serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringUsers, err)
 	} else if !ok {
 		return serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrUserNotFound)
-	}
-
-	var rewAmountNullInt sql.NullInt32
-	if rewardAmount == 0 {
-		rewAmountNullInt.Valid = false
-	} else {
-		rewAmountNullInt.Valid = true
-		rewAmountNullInt.Int32 = int32(rewardAmount)
-	}
-
-	var grantsExpNullBool sql.NullBool
-	if grantsExperience == nil {
-		grantsExpNullBool.Valid = false
-	} else {
-		grantsExpNullBool.Valid = true
-		grantsExpNullBool.Bool = *grantsExperience
-	}
-
-	var validNullBool sql.NullBool
-	if active == nil {
-		validNullBool.Valid = false
-	} else {
-		validNullBool.Bool = *active
 	}
 
 	if err := s.queries.UpdateChapter(ctx, repo.UpdateChapterParams{
@@ -235,9 +206,6 @@ func (s *chapterService) UpdateChapter(
 		FuncName:         s.utilService.ParseString(funcName),
 		FrontendTemplate: s.utilService.ParseString(frontendTmp),
 		DockerTemplate:   s.utilService.ParseString(dockerTmp),
-		RewardAmount:     rewAmountNullInt,
-		GrantsExperience: grantsExpNullBool,
-		Active:           validNullBool,
 	}); err != nil {
 		return err
 	}

@@ -14,7 +14,6 @@ func NewRewardDTOManager() RewardDTOManager {
 
 type UserRewardView struct {
 	ID          uuid.UUID `json:"id"`
-	RewardType  string    `json:"rewardType" validate:"required"`
 	Name        string    `json:"name" validate:"required,min=3,max=30"`
 	Symbol      string    `json:"symbol" validate:"required,min=2,max=8"`
 	Description string    `json:"description" validate:"required"`
@@ -25,7 +24,6 @@ type UserRewardView struct {
 func (m *RewardDTOManager) ToUserRewardDTO(appModel *repo.UserRewardsRow) UserRewardView {
 	return UserRewardView{
 		ID:          appModel.ID,
-		RewardType:  appModel.RewardType,
 		Name:        appModel.Name,
 		Symbol:      appModel.Symbol,
 		Description: appModel.Description,
@@ -44,7 +42,6 @@ func (m *RewardDTOManager) ToUserRewardDTOs(appModels []repo.UserRewardsRow) []U
 
 type RewardView struct {
 	ID          uuid.UUID      `json:"id"`
-	RewardType  string         `json:"rewardType" validate:"required"`
 	Name        string         `json:"name" validate:"required,min=3,max=30"`
 	Symbol      string         `json:"symbol" validate:"required,min=2,max=8"`
 	Description string         `json:"description" validate:"required"`
@@ -56,7 +53,6 @@ type RewardView struct {
 func (m *RewardDTOManager) ToRewardDTO(appModel *domains.Reward) RewardView {
 	return RewardView{
 		ID:          appModel.ID,
-		RewardType:  appModel.RewardType,
 		Name:        appModel.Name,
 		Symbol:      appModel.Symbol,
 		Description: appModel.Description,
@@ -116,7 +112,6 @@ func (m *RewardDTOManager) ToMetadataAttributeDTOs(appModels []domains.Attribute
 }
 
 type AddRewardDTO struct {
-	RewardType  string `json:"rewardType" validate:"required,max=30"`
 	Name        string `json:"name" validate:"required,max=30"`
 	Symbol      string `json:"symbol" validate:"required,max=30"`
 	Description string `json:"Description"`
@@ -125,7 +120,6 @@ type AddRewardDTO struct {
 
 type UpdateRewardDTO struct {
 	ID          string `json:"id" validate:"required"`
-	RewardType  string `json:"rewardType" validate:"max=30"`
 	Name        string `json:"name" validate:"max=30"`
 	Symbol      string `json:"symbol" validate:"max=30"`
 	Description string `json:"Description"`
