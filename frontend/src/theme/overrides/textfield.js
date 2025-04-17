@@ -45,7 +45,7 @@ const textfield = theme => {
           },
 
           "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: theme.palette.error.main,
+            // borderColor: theme.palette.error.main,
           }
 
           // ...(ownerState.variant === "filled" && {

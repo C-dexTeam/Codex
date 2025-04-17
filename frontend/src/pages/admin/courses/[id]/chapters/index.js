@@ -7,11 +7,15 @@ import { fetchChapters, getChapters, updateChapter } from '@/store/admin/chapter
 import ChapterFilter from '@/components/filter/ChapterFilter'
 import { arrayMove } from '@dnd-kit/sortable'
 import { SortableList } from './SortableList'
+import { fetchCourse, getCourse } from '@/store/admin/courses'
+import DefaultTextField from '@/components/form/components/DefaultTextField'
 
 const CourseChapters = () => {
+    // ** Hooks
     const router = useRouter()
     const dispatch = useDispatch()
 
+    // ** States
     const [filterAnchor, setFilterAnchor] = useState(null)
     const [filters, setFilters] = useState({
         page: 1,
@@ -24,8 +28,11 @@ const CourseChapters = () => {
         active: ''
     })
 
+    // ** Selectors
     const chapters = useSelector(getChapters)
+    const course = useSelector(getCourse)
 
+    // ** Handlers
     const handleFilterClick = (event) => {
         setFilterAnchor(event.currentTarget)
     }
@@ -49,20 +56,38 @@ const CourseChapters = () => {
         }
     }
 
+    // ** Effects
     useEffect(() => {
         if (router.query.id) {
             dispatch(fetchChapters({ params: filters }))
+            dispatch(fetchCourse(router.query.id))
         }
     }, [router.query.id, filters])
 
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4">Course Chapters</Typography>
-                <Box>
-                    <IconButton onClick={handleFilterClick} sx={{ mr: 2 }}>
-                        <FilterList />
-                    </IconButton>
+                <Typography variant="h4">
+                    {course?.title} -
+                    <Typography variant="h6">
+                        {chapters?.totalCount} chapters
+                    </Typography>
+                </Typography>
+
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <DefaultTextField
+                        value={filters.title}
+                        onChange={(e) => setFilters({ ...filters, title: e.target.value })}
+                        noMargin
+                        noControl
+                        sx={{
+                            height: "100%",
+                            "& .MuiInputBase-root": {
+                                height: "100%",
+                            },
+                        }}
+                        placeholder="Search chapter"
+                    />
 
                     <Button
                         variant="outlined"
@@ -79,15 +104,8 @@ const CourseChapters = () => {
                 chapters={chapters}
                 onSortEnd={handleSortEnd}
             />
-            {/* <Grid container spacing={3}>
-                {chapters?.data?.map((chapter, index) => (
-                    <Grid item xs={12} key={chapter.id}>
-                        <ChapterCard chapter={chapter} index={index} />
-                    </Grid>
-                ))}
-            </Grid> */}
 
-            <Popover
+            {/* <Popover
                 open={Boolean(filterAnchor)}
                 anchorEl={filterAnchor}
                 onClose={handleFilterClose}
@@ -105,7 +123,7 @@ const CourseChapters = () => {
                     setFilters={setFilters}
                     onClose={handleFilterClose}
                 />
-            </Popover>
+            </Popover> */}
         </Box>
     )
 }
