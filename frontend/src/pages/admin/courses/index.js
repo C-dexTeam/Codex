@@ -20,6 +20,8 @@ const CoursesAdminPage = () => {
 
     // ** Data
     const courses = useSelector(getCourses)
+    console.log(courses);
+    
 
     useEffect(() => {
         dispatch(fetchCourses(filters))

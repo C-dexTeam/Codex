@@ -1,61 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
-import { Box, Button, Card, CardContent, Typography, Grid, IconButton, Popover } from '@mui/material'
-import { DragIndicator, FilterList, Add } from '@mui/icons-material'
-import { fetchChapters, getChapters } from '@/store/admin/chapters'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import { useDrag, useDrop } from 'react-dnd'
+import { Box, Button, Typography, IconButton, Popover } from '@mui/material'
+import { FilterList, Add } from '@mui/icons-material'
+import { fetchChapters, getChapters, updateChapter } from '@/store/admin/chapters'
 import ChapterFilter from '@/components/filter/ChapterFilter'
-import { showToast } from '@/utils/showToast'
-
-const ChapterCard = ({ chapter, index, moveChapter }) => {
-    const [{ isDragging }, drag] = useDrag({
-        type: 'CHAPTER',
-        item: { id: chapter.id, index },
-        collect: (monitor) => ({
-            isDragging: monitor.isDragging(),
-        }),
-    })
-
-    const [, drop] = useDrop({
-        accept: 'CHAPTER',
-        hover: (draggedItem) => {
-            if (draggedItem.index !== index) {
-                moveChapter(draggedItem.index, index)
-                draggedItem.index = index
-            }
-        },
-    })
-
-    return (
-        <Card
-            ref={(node) => drag(drop(node))}
-            sx={{
-                mb: 2,
-                opacity: isDragging ? 0.5 : 1,
-                cursor: 'move',
-                display: 'flex',
-                alignItems: 'center',
-                p: 2
-            }}
-        >
-            <DragIndicator sx={{ mr: 2, color: 'text.secondary' }} />
-            <CardContent sx={{ flex: 1 }}>
-                <Typography variant="h6">{chapter.title}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                    {chapter.description}
-                </Typography>
-            </CardContent>
-        </Card>
-    )
-}
+import { arrayMove } from '@dnd-kit/sortable'
+import { SortableList } from './SortableList'
 
 const CourseChapters = () => {
     const router = useRouter()
     const dispatch = useDispatch()
-    const chapters = useSelector(getChapters)
+
     const [filterAnchor, setFilterAnchor] = useState(null)
     const [filters, setFilters] = useState({
         page: 1,
@@ -68,11 +24,7 @@ const CourseChapters = () => {
         active: ''
     })
 
-    useEffect(() => {
-        if (router.query.id) {
-            dispatch(fetchChapters({ params: filters }))
-        }
-    }, [router.query.id, filters])
+    const chapters = useSelector(getChapters)
 
     const handleFilterClick = (event) => {
         setFilterAnchor(event.currentTarget)
@@ -82,13 +34,29 @@ const CourseChapters = () => {
         setFilterAnchor(null)
     }
 
-    const moveChapter = (fromIndex, toIndex) => {
-        // TODO: Implement chapter reordering API call
-        showToast('info', 'Chapter order updated')
+    const handleSortEnd = (event) => {
+        const { active, over } = event;
+        console.log("qweqwe", active, over);
+
+        if (active?.data?.current?.sortable?.index !== over?.data?.current?.sortable?.index) {
+            const oldIndex = chapters.findIndex((item, index) => index === active?.data?.current?.sortable?.index);
+            const newIndex = chapters.findIndex((item, index) => index === over?.data?.current?.sortable?.index);
+            const newItems = arrayMove(chapters, oldIndex, newIndex);
+
+            newItems?.forEach((item, index) => {
+                dispatch(updateChapter({ ...item, order: index }))
+            });
+        }
     }
 
+    useEffect(() => {
+        if (router.query.id) {
+            dispatch(fetchChapters({ params: filters }))
+        }
+    }, [router.query.id, filters])
+
     return (
-        <Box sx={{ p: 3 }}>
+        <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4">Course Chapters</Typography>
                 <Box>
@@ -97,7 +65,8 @@ const CourseChapters = () => {
                     </IconButton>
 
                     <Button
-                        variant="contained"
+                        variant="outlined"
+                        color="secondary"
                         startIcon={<Add />}
                         onClick={() => router.push(`/admin/courses/${router.query.id}/chapters/create`)}
                     >
@@ -106,20 +75,17 @@ const CourseChapters = () => {
                 </Box>
             </Box>
 
-            <DndProvider backend={HTML5Backend}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        {chapters?.data?.map((chapter, index) => (
-                            <ChapterCard
-                                key={chapter.id}
-                                chapter={chapter}
-                                index={index}
-                                moveChapter={moveChapter}
-                            />
-                        ))}
+            <SortableList
+                chapters={chapters}
+                onSortEnd={handleSortEnd}
+            />
+            {/* <Grid container spacing={3}>
+                {chapters?.data?.map((chapter, index) => (
+                    <Grid item xs={12} key={chapter.id}>
+                        <ChapterCard chapter={chapter} index={index} />
                     </Grid>
-                </Grid>
-            </DndProvider>
+                ))}
+            </Grid> */}
 
             <Popover
                 open={Boolean(filterAnchor)}
