@@ -204,10 +204,11 @@ SET
     description =  COALESCE($5, description),
     content =  COALESCE($6, content),
     func_name =  COALESCE($7, func_name),
-    frontend_template =  COALESCE($8, frontend_template),
-    docker_template =  COALESCE($9, docker_template)
+    chapter_order = COALESCE($8, chapter_order),
+    frontend_template =  COALESCE($9, frontend_template),
+    docker_template =  COALESCE($10, docker_template)
 WHERE
-    id = $10
+    id = $11
 `
 
 type UpdateChapterParams struct {
@@ -218,6 +219,7 @@ type UpdateChapterParams struct {
 	Description      sql.NullString
 	Content          sql.NullString
 	FuncName         sql.NullString
+	ChapterOrder     sql.NullInt32
 	FrontendTemplate sql.NullString
 	DockerTemplate   sql.NullString
 	ChapterID        uuid.UUID
@@ -232,6 +234,7 @@ func (q *Queries) UpdateChapter(ctx context.Context, arg UpdateChapterParams) er
 		arg.Description,
 		arg.Content,
 		arg.FuncName,
+		arg.ChapterOrder,
 		arg.FrontendTemplate,
 		arg.DockerTemplate,
 		arg.ChapterID,

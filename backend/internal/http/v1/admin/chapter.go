@@ -102,6 +102,7 @@ func (h *AdminHandler) UpdateChapter(c *fiber.Ctx) error {
 		updateChapter.FuncName,
 		updateChapter.FrontendTmp,
 		updateChapter.DockerTmp,
+		updateChapter.Order,
 	)
 	if err != nil {
 		return err

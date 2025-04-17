@@ -183,6 +183,7 @@ func (s *chapterService) UpdateChapter(
 	ctx context.Context,
 	id, courseID, languageID, rewardID, title, description, content, funcName string,
 	frontendTmp, dockerTmp string,
+	order int32,
 ) error {
 	idUUID, err := s.utilService.NParseUUID(id)
 	if err != nil {
@@ -202,6 +203,7 @@ func (s *chapterService) UpdateChapter(
 		RewardID:         s.utilService.ParseNullUUID(rewardID),
 		Title:            s.utilService.ParseString(title),
 		Description:      s.utilService.ParseString(description),
+		ChapterOrder:     sql.NullInt32{Int32: order, Valid: order != 0},
 		Content:          s.utilService.ParseString(content),
 		FuncName:         s.utilService.ParseString(funcName),
 		FrontendTemplate: s.utilService.ParseString(frontendTmp),

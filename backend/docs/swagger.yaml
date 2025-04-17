@@ -125,6 +125,8 @@ definitions:
         type: string
       languageID:
         type: string
+      order:
+        type: integer
       rewardID:
         type: string
       title:

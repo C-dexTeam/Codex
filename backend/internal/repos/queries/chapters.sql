@@ -49,6 +49,7 @@ SET
     description =  COALESCE(sqlc.narg(description), description),
     content =  COALESCE(sqlc.narg(content), content),
     func_name =  COALESCE(sqlc.narg(func_name), func_name),
+    chapter_order = COALESCE(sqlc.narg(chapter_order), chapter_order),
     frontend_template =  COALESCE(sqlc.narg(frontend_template), frontend_template),
     docker_template =  COALESCE(sqlc.narg(docker_template), docker_template)
 WHERE

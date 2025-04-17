@@ -83,6 +83,7 @@ type UpdateChapterDTO struct {
 	RewardID    string `json:"rewardID"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	Order       int32  `json:"order"`
 	Content     string `json:"content"`
 	FuncName    string `json:"funcName"`
 	FrontendTmp string `json:"frontendTemplate"`
