@@ -19,7 +19,7 @@ export const fetchChapters = createAsyncThunk(
     'chapters/fetchChapters',
     async ({ params }, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`/api/private/chapters`, { ...params, page: params?.page || 1, limit: params?.limit || 10 })
+            const response = await axios.get(`/api/v1/private/chapters`, { ...params, page: params?.page || 1, limit: params?.limit || 10 })
 
             return response.data
         } catch (error) {
@@ -41,7 +41,7 @@ export const fetchChapter = createAsyncThunk(
     'chapters/fetchChapter',
     async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`/api/private/chapters/${id}?page=${page}&limit=${limit}`)
+            const response = await axios.get(`/api/v1/private/chapters/${id}?page=${page}&limit=${limit}`)
             return response.data
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error fetching chapter')
@@ -175,7 +175,7 @@ const chaptersSlice = createSlice({
             })
             .addCase(fetchChapters.fulfilled, (state, action) => {
                 state.loading = false
-                state.chapters = action.payload
+                state.chapters = action.payload.data;
             })
             .addCase(fetchChapters.rejected, (state, action) => {
                 state.loading = false

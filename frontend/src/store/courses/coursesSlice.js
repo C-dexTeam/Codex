@@ -72,7 +72,7 @@ export const getPopularCourses = createAsyncThunk(
 
 export const startCourse = createAsyncThunk(
   "courses/startCourse",
-  async (id, { rejectWithValue }) => {  
+  async (id, { rejectWithValue }) => {
     try {
       const response = await axios({
         method: "POST",
@@ -83,7 +83,7 @@ export const startCourse = createAsyncThunk(
         data: id,
       });
       if (response.status === 200) {
-        return response.data; 
+        return response.data;
       }
     } catch (error) {
       return rejectWithValue(response.message || error.message);
@@ -102,7 +102,8 @@ const coursesSlice = createSlice({
       })
       .addCase(getAllCourses.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        state.data = action.payload.courses;
+        state.total = action.payload.courseCount;
       })
       .addCase(getAllCourses.rejected, (state) => {
         state.loading = false;
