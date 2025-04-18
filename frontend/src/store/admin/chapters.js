@@ -108,10 +108,13 @@ export const createChapter = createAsyncThunk(
 
 export const updateChapter = createAsyncThunk(
     'chapters/updateChapter',
-    async (data, { rejectWithValue, dispatch }) => {
+    async ({ data, callback }, { rejectWithValue, dispatch, getState }) => {
         try {
-            const response = await axios.patch(`/api/v1/admin/chapters`, data)
+            const response = await axios.patch(`/api/v1/admin/chapters`, data || getState().chapters.currentChapter)
+
             dispatch(fetchChapters({ params: { page: 1, limit: 10 } }))
+            callback?.()
+
             return response.data
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error updating chapter')
@@ -190,7 +193,7 @@ const chaptersSlice = createSlice({
             })
             .addCase(fetchChapter.fulfilled, (state, action) => {
                 state.loading = false
-                state.currentChapter = action.payload
+                state.currentChapter = action.payload.data
             })
             .addCase(fetchChapter.rejected, (state, action) => {
                 state.loading = false

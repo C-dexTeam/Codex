@@ -191,7 +191,7 @@ const CourseForm = ({
                     label="Programming Language"
                     id='programmingLanguageID'
                     firstSelect={"-- Select a programming language --"}
-                    value={values?.programmingLanguageID}
+                    value={values?.programmingLanguageID || ''}
                     onChange={e => setValues({ ...values, programmingLanguageID: e.target.value })}
                     items={
                         programmingLanguages && programmingLanguages?.length > 0 &&
@@ -213,7 +213,7 @@ const CourseForm = ({
                     label="Reward"
                     id='rewardID'
                     firstSelect={"-- Select a reward --"}
-                    value={values?.rewardID}
+                    value={values?.rewardID || ''}
                     onChange={e => setValues({ ...values, rewardID: e.target.value })}
                     items={
                         rewards && rewards?.length > 0 &&

@@ -10,9 +10,6 @@ export const chapterValues = {
     funcName: '',
     frontendTemplate: '',
     dockerTemplate: '',
-    rewardAmount: 0,
-    grantsExperience: false,
-    active: true,
     order: 0
 }
 
