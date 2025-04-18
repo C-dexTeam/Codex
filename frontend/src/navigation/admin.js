@@ -15,7 +15,14 @@ const navigation = [
     { // single item
         type: "item",
         path: "/admin/courses",
-        title: "courses",
+        title: "Courses",
+        permission: "admin",
+        // icon: <HelpCenter />
+    },
+    { // single item
+        type: "item",
+        path: "/admin/rewards",
+        title: "Rewards",
         permission: "admin",
         // icon: <HelpCenter />
     },

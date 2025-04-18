@@ -15,10 +15,10 @@ const SortableList = ({ chapters = [], onSortEnd }) => {
             onDragEnd={onSortEnd}
         >
             <SortableContext
-                items={chapters.map(chapter => chapter.id)}
+                items={chapters?.map(chapter => chapter.id)}
                 strategy={verticalListSortingStrategy}
             >
-                {chapters.map(chapter => (
+                {chapters?.map(chapter => (
                     <DraggableChapter
                         key={chapter.id}
                         id={chapter.id}

@@ -101,20 +101,7 @@ const CourseForm = ({
             return;
         }
 
-        let data = new FormData()
-
-        data.append('title', values.title);
-        data.append('description', values.description);
-        data.append('languageID', values.languageID);
-        data.append('programmingLanguageID', values.programmingLanguageID);
-        data.append('rewardAmount', values.rewardAmount);
-        data.append('rewardID', values.rewardID);
-        if (files.length > 0) {
-            data.append('imageFile', files[0]);
-        } else {
-            data.append('imageFile', null);
-        }
-        _handleSubmit(data);
+        _handleSubmit({ ...values, files: files });
     };
 
     useEffect(() => {

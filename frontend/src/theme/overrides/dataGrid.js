@@ -1,3 +1,5 @@
+import { hexToRGBA } from "@/utils/hex-to-rgba"
+
 const DataGrid = theme => {
   return {
     MuiDataGrid: {
@@ -68,7 +70,7 @@ const DataGrid = theme => {
             maxHeight: 'unset !important',
             // minHeight: '50px !important',
             "&:hover": {
-              backgroundColor: theme.palette.action.hover,
+              backgroundColor: hexToRGBA(theme.palette.border.secondary, 1),
             }
           }
         },
