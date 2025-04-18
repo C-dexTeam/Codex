@@ -93,9 +93,10 @@ export const updateCourse = createAsyncThunk('adminCourses/updateCourse', async 
  * 
  * @param {string} id - Course ID (required).
  */
-export const deleteCourse = createAsyncThunk('adminCourses/deleteCourse', async (id, { rejectWithValue }) => {
+export const deleteCourse = createAsyncThunk('adminCourses/deleteCourse', async (id, { rejectWithValue, dispatch }) => {
     try {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses/${id}`);
+        dispatch(fetchCourses());
         return { id: id };
     } catch (error) {
         return rejectWithValue(error.response);
@@ -154,7 +155,6 @@ const adminCoursesSlice = createSlice({
             })
             .addCase(deleteCourse.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = state.data.filter(course => course.id !== action.payload.id);
                 showToast("dismiss")
                 showToast("success", "Course deleted successfully");
             })

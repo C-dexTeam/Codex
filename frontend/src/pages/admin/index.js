@@ -7,9 +7,6 @@ const AdminDashboard = props => {
     const courses = useSelector(getCourses); // Use useSelector to get courses from the state
     const loading = useSelector(getLoading); // Use useSelector to get loading state
 
-    console.log("stateasd:", courses);
-
-
     useEffect(() => {
         dispatch(fetchCourses());
     }, [dispatch]);

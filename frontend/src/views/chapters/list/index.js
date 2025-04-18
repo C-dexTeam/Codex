@@ -8,14 +8,13 @@ import { arrayMove } from '@dnd-kit/sortable'
 import { fetchCourse, getCourse } from '@/store/admin/courses'
 import DefaultTextField from '@/components/form/components/DefaultTextField'
 import SortableList from '@/components/dnd/SortableList'
-
+import CustomBreadcrumbs from '@/components/breadcrumbs'
 const CourseChaptersList = () => {
     // ** Hooks
     const router = useRouter()
     const dispatch = useDispatch()
 
     // ** States
-    const [filterAnchor, setFilterAnchor] = useState(null)
     const [filters, setFilters] = useState({
         page: 1,
         limit: 10,
@@ -33,14 +32,11 @@ const CourseChaptersList = () => {
 
     const handleSortEnd = (event) => {
         const { active, over } = event;
-        console.log("qweqwe", active, over);
 
         if (active?.data?.current?.sortable?.index !== over?.data?.current?.sortable?.index) {
             const oldIndex = chapters.findIndex((item, index) => index === active?.data?.current?.sortable?.index);
             const newIndex = chapters.findIndex((item, index) => index === over?.data?.current?.sortable?.index);
             const newItems = arrayMove(chapters, oldIndex, newIndex);
-
-            console.log("newItems", newItems);
 
             newItems?.forEach((item, index) => {
                 dispatch(updateChapter({ ...item, order: index }))
@@ -58,6 +54,14 @@ const CourseChaptersList = () => {
 
     return (
         <Box>
+            <CustomBreadcrumbs
+                titles={[
+                    { title: 'Admin', path: '/admin' },
+                    { title: 'Courses', path: '/admin/courses' },
+                    { title: 'Create Course' }
+                ]}
+            />
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4">
                     {course?.title} -

@@ -8,14 +8,32 @@ import { useDispatch } from "react-redux"
 import CustomBreadcrumbs from "@/components/breadcrumbs"
 import CourseCardPreview from "@/components/card/CourseCardPreview"
 
-const CourseAdd = () => {
-    const [values, setValues] = useState(courseValues)
-
+const CourseCreate = () => {
+    // ** Hooks
     const dispatch = useDispatch()
     const router = useRouter()
 
-    const handleSubmit = (formData) => {
-        dispatch(createCourse({ formData, callback: () => router.replace("/admin/courses") }))
+    // ** State
+    const [values, setValues] = useState(courseValues)
+
+    // ** Handlers
+    const handleSubmit = (data) => {
+        let formData = new FormData()
+
+        formData.append('title', data.title)
+        formData.append('description', data.description)
+        formData.append('languageID', data.languageID)
+        formData.append('programmingLanguageID', data.programmingLanguageID)
+        formData.append('rewardID', data.rewardID)
+        formData.append('active', data.active)
+        if (data?.files?.length > 0) {
+            formData.append('imageFile', data.files[0])
+        }
+
+        dispatch(createCourse({
+            formData,
+            callback: () => router.replace('/admin/courses')
+        }))
     }
 
     return (
@@ -37,7 +55,8 @@ const CourseAdd = () => {
                         <CourseForm
                             values={values}
                             setValues={setValues}
-                            handleSubmit={handleSubmit}
+                            handleSubmit={data => handleSubmit(data)}
+                            isEdit={false}
                         />
                     </CardContent>
                 </Card>
@@ -50,9 +69,4 @@ const CourseAdd = () => {
     )
 }
 
-CourseAdd.acl = {
-    action: 'read',
-    permission: 'admin'
-}
-CourseAdd.admin = true
-export default CourseAdd
+export default CourseCreate 

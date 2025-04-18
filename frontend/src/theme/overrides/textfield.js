@@ -74,6 +74,17 @@ const textfield = theme => {
           color: theme.palette.border.main,
         })
       }
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          color: theme.palette.border.secondary,
+
+          "&:hover": {
+            color: theme.palette.border.light,
+          }
+        })
+      }
     }
   }
 }

@@ -32,7 +32,22 @@ const CourseEdit = () => {
         }
     }, [course])
 
-    const handleSubmit = (formData) => {
+    const handleSubmit = (data) => {
+
+        const formData = new FormData()
+
+        formData.append('id', data.id)
+        formData.append('title', data.title)
+        formData.append('description', data.description)
+        formData.append('languageID', data.languageID)
+        formData.append('programmingLanguageID', data.programmingLanguageID)
+        formData.append('rewardID', data.rewardID)
+        if (data?.files?.length > 0) {
+            formData.append('imageFile', data.files[0]);
+        } else {
+            formData.append('imageFile', null);
+        }
+
         dispatch(updateCourse({
             id,
             formData,

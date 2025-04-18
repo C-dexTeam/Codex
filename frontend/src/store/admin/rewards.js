@@ -1,9 +1,11 @@
+import { showToast } from '@/utils/showToast';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const initialState = {
     loading: false,
     data: null,
+    reward: null,
 };
 
 /**
@@ -26,6 +28,20 @@ export const fetchRewards = createAsyncThunk('rewards/fetchRewards', async (para
     }
 });
 
+/** 
+ * Fetch a reward by ID.
+ * 
+ * @param {string} id - Reward ID (required).
+ */
+export const fetchReward = createAsyncThunk('rewards/fetchReward', async (id, { rejectWithValue }) => {
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/rewards/${id}`);
+        return response.data?.data;
+    } catch (error) {
+        return rejectWithValue(error.response);
+    }
+});
+
 /**
  * Create a new reward.
  * 
@@ -37,10 +53,11 @@ export const fetchRewards = createAsyncThunk('rewards/fetchRewards', async (para
  * @param {string} formData.sellerFee - Seller Fee (optional).
  * @param {string} formData.symbol - Reward Symbol (required).
  */
-export const createReward = createAsyncThunk('rewards/createReward', async (formData, { dispatch, rejectWithValue }) => {
+export const createReward = createAsyncThunk('rewards/createReward', async ({ formData, callback }, { dispatch, rejectWithValue }) => {
     try {
         const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/rewards`, formData);
         dispatch(fetchRewards());
+        if (callback) callback();
         return response.data?.data;
     } catch (error) {
         return rejectWithValue(error.response);
@@ -59,9 +76,14 @@ export const createReward = createAsyncThunk('rewards/createReward', async (form
  * @param {string} formData.sellerFee - Seller Fee (optional).
  * @param {string} formData.symbol - Reward Symbol (optional).
  */
-export const updateReward = createAsyncThunk('rewards/updateReward', async (formData, { rejectWithValue }) => {
+export const updateReward = createAsyncThunk('rewards/updateReward', async ({ formData, callback }, { dispatch, rejectWithValue }) => {
     try {
         const response = await axios.patch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/rewards`, formData);
+
+        dispatch(fetchRewards());
+
+        if (callback) callback();
+
         return response.data?.data;
     } catch (error) {
         return rejectWithValue(error.response);
@@ -73,9 +95,10 @@ export const updateReward = createAsyncThunk('rewards/updateReward', async (form
  * 
  * @param {string} id - Reward ID (required).
  */
-export const deleteReward = createAsyncThunk('rewards/deleteReward', async (id, { rejectWithValue }) => {
+export const deleteReward = createAsyncThunk('rewards/deleteReward', async (id, { rejectWithValue, dispatch }) => {
     try {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/rewards/${id}`);
+        dispatch(fetchRewards());
         return response.data?.data;
     } catch (error) {
         return rejectWithValue(error.response);
@@ -85,7 +108,11 @@ export const deleteReward = createAsyncThunk('rewards/deleteReward', async (id, 
 const rewardsSlice = createSlice({
     name: 'rewards',
     initialState,
-    reducers: {},
+    reducers: {
+        setCurrentReward: (state, action) => {
+            state.reward = action.payload;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchRewards.pending, (state) => {
@@ -96,6 +123,16 @@ const rewardsSlice = createSlice({
                 state.data = action.payload;
             })
             .addCase(fetchRewards.rejected, (state) => {
+                state.loading = false;
+            })
+            .addCase(fetchReward.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchReward.fulfilled, (state, action) => {
+                state.loading = false;
+                state.reward = action.payload;
+            })
+            .addCase(fetchReward.rejected, (state) => {
                 state.loading = false;
             })
             .addCase(createReward.pending, (state) => {
@@ -113,28 +150,32 @@ const rewardsSlice = createSlice({
             })
             .addCase(updateReward.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.data.findIndex(course => course.id === action.payload.id);
-                if (index !== -1) {
-                    state.data[index] = action.payload;
-                }
             })
             .addCase(updateReward.rejected, (state) => {
                 state.loading = false;
             })
             .addCase(deleteReward.pending, (state) => {
                 state.loading = true;
+                showToast("dismiss");
+                showToast("error", "Reward deleted successfully");
             })
             .addCase(deleteReward.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = state.data.filter(course => course.id !== action.payload.id);
+                showToast("dismiss");
+                showToast("success", "Reward deleted successfully");
             })
             .addCase(deleteReward.rejected, (state) => {
                 state.loading = false;
+                showToast("dismiss");
+                showToast("error", "Reward deleted failed");
             });
     },
 });
 
 export const getLoading = (state) => state.admin.rewards.loading;
 export const getRewards = (state) => state.admin.rewards.data;
+export const getCurrentReward = (state) => state.admin.rewards.reward;
+
+export const { setCurrentReward } = rewardsSlice.actions;
 
 export default rewardsSlice.reducer;
