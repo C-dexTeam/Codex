@@ -29,10 +29,11 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
     }, [])
 
     useEffect(() => {
-        if (values) {
-            validate(chapterSchema, values, setIsSubmitted, setLocalErrors)
-        }
+        if (values) validate(chapterSchema, values, setIsSubmitted, setLocalErrors)
     }, [values])
+
+    console.log(values);
+
 
     // ** Handlers
     const handleSubmit = (e) => {
@@ -84,7 +85,7 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
                     label="Course"
                     id='courseID'
                     firstSelect={"-- Select a course --"}
-                    value={values?.courseID}
+                    value={values?.courseID || ''}
                     onChange={e => setValues({ ...values, courseID: e.target.value })}
                     items={
                         courses && courses?.length > 0 &&
@@ -119,7 +120,7 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
                     label="Reward"
                     id='rewardID'
                     firstSelect={"-- Select a reward --"}
-                    value={values?.rewardID}
+                    value={values?.rewardID || ''}
                     onChange={e => setValues({ ...values, rewardID: e.target.value })}
                     items={
                         rewards && rewards?.length > 0 &&
@@ -175,18 +176,22 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
                 />
             </Grid>
 
-            <Grid item xs={12}>
-                <DefaultTextField
-                    fullWidth
-                    required
-                    label="Function Name"
-                    id='funcName'
-                    name='funcName'
-                    value={values?.funcName}
-                    onChange={handleChange}
-                    error={getError('funcName')}
-                />
-            </Grid>
+            {
+                !isEdit
+                &&
+                <Grid item xs={12}>
+                    <DefaultTextField
+                        fullWidth
+                        required
+                        label="Function Name"
+                        id='funcName'
+                        name='funcName'
+                        value={values?.funcName}
+                        onChange={handleChange}
+                        error={getError('funcName')}
+                    />
+                </Grid>
+            }
 
             <Grid item xs={12}>
                 <DefaultTextField
@@ -203,20 +208,24 @@ const ChapterForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = 
                 />
             </Grid>
 
-            <Grid item xs={12}>
-                <DefaultTextField
-                    fullWidth
-                    required
-                    label="Docker Template"
-                    id='dockerTemplate'
-                    name='dockerTemplate'
-                    value={values?.dockerTemplate}
-                    onChange={handleChange}
-                    error={getError('dockerTemplate')}
-                    multiline
-                    rows={4}
-                />
-            </Grid>
+            {
+                !isEdit
+                &&
+                <Grid item xs={12}>
+                    <DefaultTextField
+                        fullWidth
+                        required
+                        label="Docker Template"
+                        id='dockerTemplate'
+                        name='dockerTemplate'
+                        value={values?.dockerTemplate}
+                        onChange={handleChange}
+                        error={getError('dockerTemplate')}
+                        multiline
+                        rows={4}
+                    />
+                </Grid>
+            }
 
             <Grid item xs={12}>
                 <Button

@@ -12,7 +12,7 @@ const initialState = {
 export const getAllCourses = createAsyncThunk(
   "courses/getAllCourses",
   async (data, { rejectWithValue }) => {
-    console.log(data);
+    console.log("sfasdf", data);
     try {
       const response = await axios({
         method: "GET",
@@ -21,9 +21,8 @@ export const getAllCourses = createAsyncThunk(
           "Content-Type": "application/json",
         },
       });
-      if (response.status === 200) {
-        return response.data;
-      }
+
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(response.message || error.message);
     }
@@ -99,15 +98,20 @@ const coursesSlice = createSlice({
     builder
       .addCase(getAllCourses.pending, (state) => {
         state.loading = true;
+        console.log("qwewqeqwe");
+        
       })
       .addCase(getAllCourses.fulfilled, (state, action) => {
         state.loading = false;
+        console.log("qwewqeqwe1");
+        
         state.data = action.payload.courses;
         state.total = action.payload.courseCount;
       })
       .addCase(getAllCourses.rejected, (state) => {
         state.loading = false;
         state.error = true;
+        console.log("qwewqeqwe2");
       })
       .addCase(getPopularCourses.pending, (state) => {
         state.loading = true;
@@ -147,5 +151,7 @@ const coursesSlice = createSlice({
       });
   },
 });
+
+export const getCourses = (state) => state.courses.data;
 
 export default coursesSlice.reducer;

@@ -48,7 +48,7 @@ const ChapterFilter = ({ filters, setFilters, onClose }) => {
                 label="Grants Experience"
                 id='grantsExperience'
                 firstSelect={"All"}
-                value={localFilters.grantsExperience}
+                value={localFilters.grantsExperience || ''}
                 onChange={handleChange}
             />
 
@@ -56,7 +56,7 @@ const ChapterFilter = ({ filters, setFilters, onClose }) => {
                 label="Active"
                 id='active'
                 firstSelect={"All"}
-                value={localFilters.active}
+                value={localFilters.active || ''}
                 onChange={handleChange}
             />
 

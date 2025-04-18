@@ -1,12 +1,12 @@
 import React from 'react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { DraggableChapter } from './DraggableChapter';
 import {
     restrictToVerticalAxis,
 } from '@dnd-kit/modifiers';
+import DraggableChapter from '@/components/dnd/DraggableChapter';
 
-export function SortableList({ chapters = [], onSortEnd }) {
+const SortableList = ({ chapters = [], onSortEnd }) => {
 
     return (
         <DndContext
@@ -29,3 +29,5 @@ export function SortableList({ chapters = [], onSortEnd }) {
         </DndContext>
     );
 }
+
+export default SortableList

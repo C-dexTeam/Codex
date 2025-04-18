@@ -20,7 +20,7 @@ const initialState = {
  * @param {string} params.page - Page number.
  * @param {string} params.limit - Number of items per page.
  */
-export const fetchCourses = createAsyncThunk('courses/fetchCourses', async (params = {}) => {
+export const fetchCourses = createAsyncThunk('adminCourses/fetchCourses', async (params = {}) => {
     try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/courses`, { params });
         return response.data?.data;
@@ -29,7 +29,7 @@ export const fetchCourses = createAsyncThunk('courses/fetchCourses', async (para
     }
 });
 
-export const fetchCourse = createAsyncThunk('courses/fetchCourse', async (id, { rejectWithValue }) => {
+export const fetchCourse = createAsyncThunk('adminCourses/fetchCourse', async (id, { rejectWithValue }) => {
     try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/courses/${id}`);
         return response.data?.data;
@@ -51,7 +51,7 @@ export const fetchCourse = createAsyncThunk('courses/fetchCourse', async (id, { 
  * @param {string} [formData.rewardID] - Reward ID (optional).
  * @param {string} formData.title - Course Title (required).
  */
-export const createCourse = createAsyncThunk('courses/createCourse', async ({ formData, callback }, { dispatch, rejectWithValue }) => {
+export const createCourse = createAsyncThunk('adminCourses/createCourse', async ({ formData, callback }, { dispatch, rejectWithValue }) => {
     try {
         const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses`, formData);
 
@@ -77,7 +77,7 @@ export const createCourse = createAsyncThunk('courses/createCourse', async ({ fo
  * @param {string} [formData.rewardID] - Reward ID (optional).
  * @param {string} formData.title - Course Title (required).
  */
-export const updateCourse = createAsyncThunk('courses/updateCourse', async (formData, { rejectWithValue }) => {
+export const updateCourse = createAsyncThunk('adminCourses/updateCourse', async (formData, { rejectWithValue }) => {
     try {
         const response = await axios.patch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses`, formData);
         return response.data?.data;
@@ -93,7 +93,7 @@ export const updateCourse = createAsyncThunk('courses/updateCourse', async (form
  * 
  * @param {string} id - Course ID (required).
  */
-export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id, { rejectWithValue }) => {
+export const deleteCourse = createAsyncThunk('adminCourses/deleteCourse', async (id, { rejectWithValue }) => {
     try {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses/${id}`);
         return { id: id };
@@ -102,8 +102,8 @@ export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id, 
     }
 });
 
-const coursesSlice = createSlice({
-    name: 'courses',
+const adminCoursesSlice = createSlice({
+    name: 'adminCourses',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
@@ -176,10 +176,10 @@ const coursesSlice = createSlice({
     },
 });
 
-export const getLoading = (state) => state.admin.courses.loading;
-export const getCourses = (state) => state.admin.courses.data;
-export const getCourseCount = (state) => state.admin.courses.total;
-export const getCourse = (state) => state.admin.courses.course;
-export const getErrors = (state) => state.admin.courses.errors;
+export const getLoading = (state) => state.admin.adminCourses.loading;
+export const getCourses = (state) => state.admin.adminCourses.data;
+export const getCourseCount = (state) => state.admin.adminCourses.total;
+export const getCourse = (state) => state.admin.adminCourses.course;
+export const getErrors = (state) => state.admin.adminCourses.errors;
 
-export default coursesSlice.reducer;
+export default adminCoursesSlice.reducer;

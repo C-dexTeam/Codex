@@ -2,7 +2,7 @@ import LevelBar from "@/components/bar/LevelBar";
 import GradientCard from "@/components/card/GradientCard";
 import DefaultTextField from "@/components/form/components/DefaultTextField";
 import { AuthContext } from "@/context/AuthContext";
-import { getAllCourses, getPopularCourses } from "@/store/courses/coursesSlice";
+import { getAllCourses, getCourses, getPopularCourses } from "@/store/courses/coursesSlice";
 import { getAllPlanguages } from "@/store/planguages/planguagesSlice";
 import { Search, Shield, Web } from "@mui/icons-material";
 import {
@@ -36,9 +36,11 @@ const Courses = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("");
 
   const dispatch = useDispatch();
-  const { courses: coursesSlice, planguages: planguagesSlice } = useSelector(
+  const { planguages: planguagesSlice } = useSelector(
     (state) => state
   );
+
+  const courses = useSelector(getCourses);
 
   const { user, loading } = useContext(AuthContext);
 
@@ -52,6 +54,8 @@ const Courses = () => {
   };
 
   useEffect(() => {
+    console.log("asdadasd");
+
     dispatch(
       getAllCourses({
         page: 1,
@@ -60,6 +64,7 @@ const Courses = () => {
         pLanguageID: selectedLanguage,
       })
     );
+    console.log("asdadasd1");
     dispatch(getAllPlanguages());
     dispatch(getPopularCourses());
   }, [dispatch, search, selectedLanguage]);
@@ -193,8 +198,8 @@ const Courses = () => {
         </Grid>
 
         <Grid item container sx={12} spacing={4}>
-          {coursesSlice?.popoularData?.data?.length > 0 ? (
-            coursesSlice?.popoularData?.data?.map((course) => (
+          {courses?.popoularData?.data?.length > 0 ? (
+            courses?.popoularData?.data?.map((course) => (
               <Grid item xs={12} md={4} key={course.id}>
                 <CourseCard course={course} />
               </Grid>
@@ -272,9 +277,9 @@ const Courses = () => {
         </Grid>
 
         <Grid item container sx={12} spacing={10}>
-          {Array.isArray(coursesSlice?.data?.data) &&
-            coursesSlice?.data?.data.length > 0 ? (
-            coursesSlice.data.data.map((course) => (
+          {Array.isArray(courses?.data?.data) &&
+            courses?.data?.data.length > 0 ? (
+            courses?.data?.data.map((course) => (
               <Grid item xs={12} md={6} key={course.id}>
                 <CourseCard course={course} />
               </Grid>

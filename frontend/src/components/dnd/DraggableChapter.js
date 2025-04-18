@@ -26,7 +26,7 @@ const DragHandle = () => (
     </Box>
 );
 
-export function DraggableChapter({ id, chapter }) {
+const DraggableChapter = ({ id, chapter }) => {
 
     // ** States
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -52,7 +52,7 @@ export function DraggableChapter({ id, chapter }) {
     };
 
     const handleDetailsClick = () => {
-        router.push(`/admin/courses/${chapter.course_id}/chapters/${chapter.id}`);
+        router.push(`/admin/chapter/${chapter.id}`);
     };
 
     const handleDeleteClick = () => {
@@ -127,3 +127,5 @@ export function DraggableChapter({ id, chapter }) {
         </>
     );
 }
+
+export default DraggableChapter
