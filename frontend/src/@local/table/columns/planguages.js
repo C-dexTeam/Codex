@@ -15,7 +15,7 @@ export const planguageColumns = [
         renderCell: params => <PlanguagesActions row={params.row} />
     },
     {
-        flex: 0.1,
+        flex: 0.3,
         minWidth: 60,
         headerName: 'Name',
         field: 'name',

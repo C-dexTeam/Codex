@@ -91,6 +91,7 @@ const PlanguageForm = ({
     const defLanguages = useSelector(getLanguages)
     const compiler = useSelector(getCompiler)
 
+
     const handleSubmit = () => {
         setIsSubmitted(true);
 
@@ -100,6 +101,13 @@ const PlanguageForm = ({
             showToast("error", "Lütfen gerekli alanları kontrol edin.");
             return;
         }
+
+        if (propErrors?.length) {
+            showToast("dismiss");
+            showToast("error", "Lütfen gerekli alanları kontrol edin.");
+            return;
+        }
+        _handleSubmit(values)
 
        
     };
@@ -124,7 +132,6 @@ const PlanguageForm = ({
         return isSubmitted && localErrors?.[field] ? localErrors[field] : undefined;
     };
 
-    console.log(compiler, "values")
 
 
     return (
@@ -189,6 +196,7 @@ const PlanguageForm = ({
                     required
                     label="Language"
                     id='languageID'
+                    disabled ={isEdit}
                     firstSelect={"-- Select a language --"}
                     value={values?.languageID}
                     onChange={e => setValues({ ...values, languageID: e.target.value })}
@@ -215,11 +223,12 @@ const PlanguageForm = ({
                     value={values?.name}
                     onChange={e => setValues({ ...values, name: e.target.value })}
                     items={
-                        compiler && compiler?.length > 0 &&
+                        compiler && compiler?.length > 0 && 
+                       
                         compiler?.map((item, index) => {
                             return (
-                                <MenuItem key={item?.id} value={item?.id}>
-                                    {item?.value}
+                                <MenuItem key={item} value={item}>
+                                    {item}
                                 </MenuItem>
                             )
                         })

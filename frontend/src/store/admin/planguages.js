@@ -71,6 +71,22 @@ export const createPlanguages = createAsyncThunk(
   }
 );
 
+export const updatePlanguages = createAsyncThunk(
+  "planguages/updatePlanguages",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/planguages`,
+      );
+      return response.data?.data;
+    } catch (error) {
+      console.log("error", error);
+
+      return rejectWithValue(error.response);
+    }
+  }
+);
+
 const planguageSlice = createSlice({
   name: "planguages",
   initialState,
@@ -124,6 +140,24 @@ const planguageSlice = createSlice({
       })
       .addCase(createPlanguages.rejected, (state) => {
         state.loading = false;
+      })
+      .addCase(updatePlanguages.pending, (state) => {
+        state.loading = true;
+        state.errors = null;
+      })
+      .addCase(updatePlanguages.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.data.findIndex(
+          (planguage) => planguage.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.data[index] = action.payload;
+        }
+      })
+      .addCase(updatePlanguages.rejected, (state, action) => {
+        state.loading = false;
+        state.errors = action.payload?.data?.errors;
+        showToast("error", "Failed to update planguage");
       });
   },
 });

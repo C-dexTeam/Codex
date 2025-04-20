@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux"
 import CustomBreadcrumbs from "@/components/breadcrumbs"
 import CourseCardPreview from "@/components/card/CourseCardPreview"
 import { planguageValues } from "@/@local/table/form-values/planguages/defaultValues"
-import { fetchPlanguage, getPlanguage } from "@/store/admin/planguages"
+import { fetchPlanguage, getPlanguage, updatePlanguages } from "@/store/admin/planguages"
 import PlanguageForm from "@/components/form/planguages/form"
 
 const PlanguageEdit = () => {
@@ -17,6 +17,8 @@ const PlanguageEdit = () => {
     const dispatch = useDispatch()
     const router = useRouter()
     const { id } = router.query
+
+    const courseId = router.query
 
     const plangauge = useSelector(getPlanguage)
     const errors = useSelector(getErrors)
@@ -34,10 +36,13 @@ const PlanguageEdit = () => {
         }
     }, [plangauge])
 
-    const handleSubmit = (formData) => {
-        dispatch(updateCourse({
-            id,
-            formData,
+    const handleSubmit = (dataMain) => {
+        const data = {
+            ...dataMain,
+             courseId
+        }
+        dispatch(updatePlanguages({
+            data,
             callback: () => router.replace("/admin/plangauge")
         }))
     }
