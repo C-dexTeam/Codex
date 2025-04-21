@@ -1,5 +1,5 @@
 
-import CourseEdit from "@/views/courses/edit"
+import CourseEdit from "@/views/admin/courses/edit"
 
 const CourseEditPage = () => <CourseEdit />
 

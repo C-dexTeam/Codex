@@ -7,6 +7,12 @@ const initialState = {
     errors: null,
     data: null,
     course: null,
+    totalCount: 0,
+    filters: {
+        page: 1,
+        limit: 10,
+        title: "",
+    }
 };
 
 /**
@@ -20,12 +26,13 @@ const initialState = {
  * @param {string} params.page - Page number.
  * @param {string} params.limit - Number of items per page.
  */
-export const fetchCourses = createAsyncThunk('adminCourses/fetchCourses', async (params = {}) => {
+export const fetchCourses = createAsyncThunk('adminCourses/fetchCourses', async (_, { rejectWithValue, getState }) => {
+
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/courses`, { params });
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/courses`, { params: { ...getState().admin.adminCourses.filters } });
         return response.data?.data;
     } catch (error) {
-        return error.response.data;
+        return rejectWithValue(error.response);
     }
 });
 
@@ -80,6 +87,7 @@ export const createCourse = createAsyncThunk('adminCourses/createCourse', async 
 export const updateCourse = createAsyncThunk('adminCourses/updateCourse', async (formData, { rejectWithValue }) => {
     try {
         const response = await axios.patch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses`, formData);
+        dispatch(fetchCourses());
         return response.data?.data;
     } catch (error) {
         console.log("error", error);
@@ -97,7 +105,6 @@ export const deleteCourse = createAsyncThunk('adminCourses/deleteCourse', async 
     try {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/courses/${id}`);
         dispatch(fetchCourses());
-        return { id: id };
     } catch (error) {
         return rejectWithValue(error.response);
     }
@@ -106,7 +113,11 @@ export const deleteCourse = createAsyncThunk('adminCourses/deleteCourse', async 
 const adminCoursesSlice = createSlice({
     name: 'adminCourses',
     initialState,
-    reducers: {},
+    reducers: {
+        setFilters: (state, action) => {
+            state.filters = action.payload;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchCourses.pending, (state) => {
@@ -114,8 +125,9 @@ const adminCoursesSlice = createSlice({
             })
             .addCase(fetchCourses.fulfilled, (state, action) => {
                 state.loading = false;
+
                 state.data = action.payload.courses;
-                state.total = action.payload.courseCount;
+                state.totalCount = action.payload.totalCount;
             })
             .addCase(fetchCourses.rejected, (state) => {
                 state.loading = false;
@@ -125,7 +137,6 @@ const adminCoursesSlice = createSlice({
             })
             .addCase(createCourse.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = [...state.data || [], action.payload];
             })
             .addCase(createCourse.rejected, (state) => {
                 state.loading = false;
@@ -136,16 +147,11 @@ const adminCoursesSlice = createSlice({
             })
             .addCase(updateCourse.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.data.findIndex(course => course.id === action.payload.id);
-                if (index !== -1) {
-                    state.data[index] = action.payload;
-                }
             })
             .addCase(updateCourse.rejected, (state, action) => {
                 state.loading = false;
-                state.errors = action.payload?.data?.errors;
-                console.log("sdasda", action.payload?.data?.errors);
 
+                showToast("dismiss")
                 showToast("error", "Failed to update course");
             })
             .addCase(deleteCourse.pending, (state) => {
@@ -181,5 +187,7 @@ export const getCourses = (state) => state.admin.adminCourses.data;
 export const getCourseCount = (state) => state.admin.adminCourses.total;
 export const getCourse = (state) => state.admin.adminCourses.course;
 export const getErrors = (state) => state.admin.adminCourses.errors;
+export const getFilters = (state) => state.admin.adminCourses.filters;
+export const getTotalCount = (state) => state.admin.adminCourses.totalCount;
 
 export default adminCoursesSlice.reducer;

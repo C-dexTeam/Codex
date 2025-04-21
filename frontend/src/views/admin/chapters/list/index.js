@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
-import { Box, Button, Typography, IconButton, Popover } from '@mui/material'
+import { Box, Button, Typography, Pagination } from '@mui/material'
 import { Add } from '@mui/icons-material'
-import { fetchChapters, getChapters, updateChapter } from '@/store/admin/chapters'
+import { fetchChapters, getChapters, updateChapter, getFilters, setFilters } from '@/store/admin/chapters'
 import { arrayMove } from '@dnd-kit/sortable'
 import { fetchCourse, getCourse } from '@/store/admin/courses'
 import DefaultTextField from '@/components/form/components/DefaultTextField'
@@ -15,16 +15,8 @@ const CourseChaptersList = () => {
     const dispatch = useDispatch()
 
     // ** States
-    const [filters, setFilters] = useState({
-        page: 1,
-        limit: 10,
-        courseID: router.query.id,
-        title: '',
-        languageID: '',
-        rewardID: '',
-        grantsExperience: '',
-        active: ''
-    })
+    const filters = useSelector(getFilters)
+    const _setFilters = v => dispatch(setFilters(v))
 
     // ** Selectors
     const chapters = useSelector(getChapters)
@@ -47,7 +39,7 @@ const CourseChaptersList = () => {
     // ** Effects
     useEffect(() => {
         if (router.query.id) {
-            dispatch(fetchChapters({ params: filters }))
+            dispatch(fetchChapters())
             dispatch(fetchCourse(router.query.id))
         }
     }, [router.query.id, filters])
@@ -66,14 +58,14 @@ const CourseChaptersList = () => {
                 <Typography variant="h4">
                     {course?.title} -
                     <Typography variant="h6">
-                        {chapters?.totalCount} chapters
+                        {course?.chapterCount} chapters
                     </Typography>
                 </Typography>
 
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <DefaultTextField
                         value={filters.title}
-                        onChange={(e) => setFilters({ ...filters, title: e.target.value })}
+                        onChange={(e) => _setFilters({ ...filters, title: e.target.value })}
                         noMargin
                         noControl
                         sx={{
@@ -100,6 +92,17 @@ const CourseChaptersList = () => {
                 chapters={chapters}
                 onSortEnd={handleSortEnd}
             />
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                <Pagination
+                    count={Math.ceil(course?.chapterCount / filters.limit)}
+                    page={filters.page}
+                    onChange={(e, val) => _setFilters({ ...filters, page: val })}
+                    variant='outlined'
+                    shape='circular'
+                    color='primary'
+                />
+            </Box>
 
             {/* <Popover
                 open={Boolean(filterAnchor)}

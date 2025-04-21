@@ -28,23 +28,15 @@ const navigation = [
     },
     { // single item
         type: "item",
+        title: 'Attributes',
+        path: '/admin/attributes',
+        permission: 'admin',
+    },
+    { // single item
+        type: "item",
         path: "/roadmap",
         title: "roadmap",
         permission: "admin",
-        // icon: <HelpCenter />
-    },
-    { // single item
-        type: "item",
-        path: "/build",
-        title: "build",
-        permission: "build",
-        // icon: <HelpCenter />
-    },
-    { // single item
-        type: "item",
-        path: "/community",
-        title: "community",
-        permission: "community",
         // icon: <HelpCenter />
     },
     // { // item with children

@@ -6,6 +6,12 @@ const initialState = {
     loading: false,
     data: null,
     reward: null,
+    totalCount: 0,
+    filters: {
+        page: 1,
+        limit: 10,
+        name: "",
+    }
 };
 
 /**
@@ -19,12 +25,12 @@ const initialState = {
  * @param {string} params.page - Page number.
  * @param {string} params.limit - Number of items per page.
  */
-export const fetchRewards = createAsyncThunk('rewards/fetchRewards', async (params = {}) => {
+export const fetchRewards = createAsyncThunk('rewards/fetchRewards', async (_, { rejectWithValue, getState }) => {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/rewards`, { params });
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/rewards`, { params: { ...getState().admin.rewards.filters } });
         return response.data?.data;
     } catch (error) {
-        return error.response.data;
+        return rejectWithValue(error.response);
     }
 });
 
@@ -112,6 +118,9 @@ const rewardsSlice = createSlice({
         setCurrentReward: (state, action) => {
             state.reward = action.payload;
         },
+        setFilters: (state, action) => {
+            state.filters = action.payload;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -120,7 +129,8 @@ const rewardsSlice = createSlice({
             })
             .addCase(fetchRewards.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload;
+                state.data = action.payload?.rewards || []
+                state.totalCount = action.payload?.totalCount || 0
             })
             .addCase(fetchRewards.rejected, (state) => {
                 state.loading = false;
@@ -137,22 +147,31 @@ const rewardsSlice = createSlice({
             })
             .addCase(createReward.pending, (state) => {
                 state.loading = true;
+                showToast("dismiss");
+                showToast("loading", "Creating reward...");
             })
             .addCase(createReward.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = [...state.data || [], action.payload];
+                showToast("dismiss");
+                showToast("success", "Reward created successfully");
             })
             .addCase(createReward.rejected, (state) => {
                 state.loading = false;
+                showToast("dismiss");
+                showToast("error", "Reward created failed");
             })
             .addCase(updateReward.pending, (state) => {
                 state.loading = true;
             })
             .addCase(updateReward.fulfilled, (state, action) => {
                 state.loading = false;
+                showToast("dismiss");
+                showToast("success", "Reward updated successfully");
             })
             .addCase(updateReward.rejected, (state) => {
                 state.loading = false;
+                showToast("dismiss");
+                showToast("error", "Reward updated failed");
             })
             .addCase(deleteReward.pending, (state) => {
                 state.loading = true;
@@ -173,9 +192,12 @@ const rewardsSlice = createSlice({
 });
 
 export const getLoading = (state) => state.admin.rewards.loading;
+export const getReward = (state) => state.admin.rewards.reward;
 export const getRewards = (state) => state.admin.rewards.data;
 export const getCurrentReward = (state) => state.admin.rewards.reward;
+export const getTotalCount = (state) => state.admin.rewards.totalCount;
+export const getFilters = (state) => state.admin.rewards.filters;
 
-export const { setCurrentReward } = rewardsSlice.actions;
+export const { setCurrentReward, setFilters } = rewardsSlice.actions;
 
 export default rewardsSlice.reducer;

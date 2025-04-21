@@ -30,5 +30,5 @@ export const courseEditSchema = yup.object().shape({
     programmingLanguageID: yup.string(),
     rewardAmount: yup.number(),
     rewardID: yup.string(),
-    imageFile: yup.mixed().required(),
+    imageFile: yup.mixed(),
 })
