@@ -46,7 +46,6 @@ function Code() {
       "}\n" +
       "```";
 
-      console.log("markdownContent", chaptersSlice.data.data);
 
       const handleRun = (outputData) => {
         setOutput(outputData?.data);
