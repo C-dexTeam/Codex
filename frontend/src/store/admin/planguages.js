@@ -10,7 +10,7 @@ const initialState = {
 };
 
 export const fetchPlanguages = createAsyncThunk(
-  "planguages/fetchPlanguages",
+  "admin/adminPlanguages/fetchPlanguages",
   async (params = {}) => {
     try {
       const response = await axios.get(
@@ -25,7 +25,7 @@ export const fetchPlanguages = createAsyncThunk(
 );
 
 export const fetchPlanguage = createAsyncThunk(
-  "planguages/fetchPlanguage",
+  "admin/adminPlanguages/fetchPlanguage",
   async (id, { rejectWithValue }) => {
     try {
       const response = await axios.get(
@@ -39,12 +39,14 @@ export const fetchPlanguage = createAsyncThunk(
 );
 
 export const deletePlanguages = createAsyncThunk(
-  "planguages/deletePlanguages",
-  async (id, { rejectWithValue }) => {
+  "admin/adminPlanguages/deletePlanguages",
+  async (id, { rejectWithValue, dispatch }) => {
     try {
       const response = await axios.delete(
         `${process.env.NEXT_PUBLIC_BASE_URL}/admin/planguages/${id}`
       );
+
+      dispatch(fetchPlanguages());
       return { id: id };
     } catch (error) {
       return rejectWithValue(error.response);
@@ -53,7 +55,7 @@ export const deletePlanguages = createAsyncThunk(
 );
 
 export const createPlanguages = createAsyncThunk(
-  "planguages/createPlanguages",
+  "admin/adminPlanguages/createPlanguages",
   async ({ formData, callback }, { dispatch, rejectWithValue }) => {
     try {
       const response = await axios.post(
@@ -72,12 +74,16 @@ export const createPlanguages = createAsyncThunk(
 );
 
 export const updatePlanguages = createAsyncThunk(
-  "planguages/updatePlanguages",
-  async (data, { rejectWithValue }) => {
+  "admin/adminPlanguages/updatePlanguages",
+  async (data, { rejectWithValue, dispatch }) => {
     try {
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/admin/planguages`,
+        data
       );
+
+      dispatch(fetchPlanguages());
+
       return response.data?.data;
     } catch (error) {
       console.log("error", error);
@@ -87,8 +93,8 @@ export const updatePlanguages = createAsyncThunk(
   }
 );
 
-const planguageSlice = createSlice({
-  name: "planguages",
+const adminPlanguagesSlice = createSlice({
+  name: "admin/adminPlanguages",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -120,9 +126,6 @@ const planguageSlice = createSlice({
       })
       .addCase(deletePlanguages.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = state.data.filter(
-          (planguages) => planguages.id !== action.payload.id
-        );
         showToast("dismiss");
         showToast("success", "Languages deleted successfully");
       })
@@ -147,12 +150,7 @@ const planguageSlice = createSlice({
       })
       .addCase(updatePlanguages.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.data.findIndex(
-          (planguage) => planguage.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.data[index] = action.payload;
-        }
+
       })
       .addCase(updatePlanguages.rejected, (state, action) => {
         state.loading = false;
@@ -162,8 +160,8 @@ const planguageSlice = createSlice({
   },
 });
 
-export const getLoading = (state) => state.admin.courses.loading;
-export const getPlanguages = (state) => state.admin.planguages.data;
-export const getPlanguage = (state) => state.admin.planguages.planguage;
+export const getLoading = (state) => state.admin.adminPlanguages.loading;
+export const getPlanguages = (state) => state.admin.adminPlanguages.data;
+export const getPlanguage = (state) => state.admin.adminPlanguages.planguage;
 
-export default planguageSlice.reducer;
+export default adminPlanguagesSlice.reducer;

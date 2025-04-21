@@ -16,10 +16,10 @@ import axios from 'axios'
  * @param {string} params.limit - Number of items per page
  */
 export const fetchChapters = createAsyncThunk(
-    'chapters/fetchChapters',
+    'admin/adminChapters/fetchChapters',
     async (_, { rejectWithValue, getState }) => {
         try {
-            const response = await axios.get(`/api/v1/private/chapters`, { params: { ...getState().chapters.filters } })
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/chapters`, { params: { ...getState().admin.adminChapters.filters } })
 
             return response.data.data
         } catch (error) {
@@ -38,10 +38,10 @@ export const fetchChapters = createAsyncThunk(
  */
 
 export const fetchChapter = createAsyncThunk(
-    'chapters/fetchChapter',
+    'admin/adminChapters/fetchChapter',
     async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`/api/v1/private/chapters/${id}?page=${page}&limit=${limit}`)
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/chapters/${id}?page=${page}&limit=${limit}`)
             return response.data
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error fetching chapter')
@@ -69,10 +69,10 @@ export const fetchChapter = createAsyncThunk(
  */
 
 export const createChapter = createAsyncThunk(
-    'chapters/createChapter',
+    'admin/adminChapters/createChapter',
     async ({ data, callback }, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.post(`/api/v1/admin/chapters`, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/chapters`, {
                 ...data,
                 rewardAmount: parseInt(data?.rewardAmount) ? parseInt(data?.rewardAmount) : 0,
                 order: parseInt(data?.order) ? parseInt(data?.order) : 0,
@@ -107,10 +107,10 @@ export const createChapter = createAsyncThunk(
  */
 
 export const updateChapter = createAsyncThunk(
-    'chapters/updateChapter',
+    'admin/adminChapters/updateChapter',
     async ({ data, callback }, { rejectWithValue, dispatch, getState }) => {
         try {
-            const response = await axios.patch(`/api/v1/admin/chapters`, data || getState().chapters.currentChapter)
+            const response = await axios.patch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/chapters`, data || getState().admin.adminChapters.currentChapter)
 
             dispatch(fetchChapters({ params: { page: 1, limit: 10 } }))
             callback?.()
@@ -129,10 +129,10 @@ export const updateChapter = createAsyncThunk(
  */
 
 export const deleteChapter = createAsyncThunk(
-    'chapters/deleteChapter',
+    'admin/adminChapters/deleteChapter',
     async (id, { rejectWithValue, dispatch }) => {
         try {
-            await axios.delete(`/api/v1/admin/chapters/${id}`)
+            await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/chapters/${id}`)
 
             dispatch(fetchChapters({ params: { page: 1, limit: 10 } }))
             return id
@@ -158,8 +158,8 @@ const initialState = {
 }
 
 // Slice
-const chaptersSlice = createSlice({
-    name: 'chapters',
+const adminChaptersSlice = createSlice({
+    name: 'admin/adminChapters',
     initialState,
     reducers: {
         clearError: (state) => {
@@ -254,11 +254,11 @@ const chaptersSlice = createSlice({
 })
 
 // Export actions
-export const { clearError, clearSuccess, setCurrentChapter } = chaptersSlice.actions
+export const { clearError, setCurrentChapter } = adminChaptersSlice.actions
 
-export const getChapters = (state) => state.chapters.chapters
-export const getCurrentChapter = (state) => state.chapters.currentChapter
-export const getLoading = (state) => state.chapters.loading
-export const getFilters = (state) => state.chapters.filters
+export const getChapters = (state) => state.admin.adminChapters.chapters
+export const getCurrentChapter = (state) => state.admin.adminChapters.currentChapter
+export const getLoading = (state) => state.admin.adminChapters.loading
+export const getFilters = (state) => state.admin.adminChapters.filters
 // Export reducer
-export default chaptersSlice.reducer 
+export default adminChaptersSlice.reducer 

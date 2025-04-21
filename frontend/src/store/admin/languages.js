@@ -3,10 +3,10 @@ import axios from 'axios'
 
 // Async thunk
 export const fetchLanguages = createAsyncThunk(
-    'languages/fetchLanguages',
+    'admin/adminLanguages/fetchLanguages',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get('/api/v1/private/language/')
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/language/`)
             return response.data.data
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error fetching languages')
@@ -22,8 +22,8 @@ const initialState = {
 }
 
 // Slice
-const languagesSlice = createSlice({
-    name: 'languages',
+const adminLanguagesSlice = createSlice({
+    name: 'admin/adminLanguages',
     initialState,
     reducers: {
         clearError: (state) => {
@@ -49,12 +49,12 @@ const languagesSlice = createSlice({
 })
 
 // Selectors
-export const getLanguages = (state) => state.admin.languages.languages
-export const getLanguagesLoading = (state) => state.admin.languages.loading
-export const getLanguagesError = (state) => state.admin.languages.error
+export const getLanguages = (state) => state.admin.adminLanguages.languages
+export const getLanguagesLoading = (state) => state.admin.adminLanguages.loading
+export const getLanguagesError = (state) => state.admin.adminLanguages.error
 
 // Export actions
-export const { clearError } = languagesSlice.actions
+export const { clearError } = adminLanguagesSlice.actions
 
 // Export reducer
-export default languagesSlice.reducer 
+export default adminLanguagesSlice.reducer 
