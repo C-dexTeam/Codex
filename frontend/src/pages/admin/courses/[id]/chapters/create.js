@@ -1,7 +1,7 @@
 
 import CreateChapter from '@/views/admin/chapters/create'
 
-const AddChapter = <CreateChapter />
+const AddChapter = () => <CreateChapter />
 
 AddChapter.acl = {
     action: 'read',
