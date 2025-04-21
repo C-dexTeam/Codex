@@ -10,10 +10,10 @@ import axios from 'axios'
  * @param {string} params.limit - Number of items per page
  */
 export const fetchAttributes = createAsyncThunk(
-    'admin/attributes/fetchAttributes',
+    'admin/adminAttributes/fetchAttributes',
     async (_, { rejectWithValue, getState }) => {
         try {
-            const response = await axios.get(`/api/v1/private/attributes`, { params: { ...getState().admin.attributes.filters } })
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/private/attributes`, { params: { ...getState().admin.adminAttributes.filters } })
             return response.data?.data
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error fetching attributes')
@@ -28,10 +28,10 @@ export const fetchAttributes = createAsyncThunk(
  * @returns {Promise} - Promise with the response data
  */
 export const fetchAttribute = createAsyncThunk(
-    'admin/attributes/fetchAttribute',
+    'admin/adminAttributes/fetchAttribute',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`/api/v1/admin/attributes/${id}`)
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/attributes/${id}`)
             return response.data
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error fetching attribute')
@@ -47,10 +47,10 @@ export const fetchAttribute = createAsyncThunk(
  * @returns {Promise} - Promise with the response data
  */
 export const createAttribute = createAsyncThunk(
-    'admin/attributes/createAttribute',
+    'admin/adminAttributes/createAttribute',
     async ({ data, callback }, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.post('/api/v1/admin/attributes', data)
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/attributes`, data)
 
             dispatch(fetchAttributes({ params: { page: 1, limit: 10 } }))
             callback && callback()
@@ -68,10 +68,10 @@ export const createAttribute = createAsyncThunk(
  * @returns {Promise} - Promise with the response data
  */
 export const updateAttribute = createAsyncThunk(
-    'admin/attributes/updateAttribute',
+    'admin/adminAttributes/updateAttribute',
     async ({ id, data }, { rejectWithValue }) => {
         try {
-            const response = await axios.patch(`/api/v1/admin/attributes/${id}`, data)
+            const response = await axios.patch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/attributes/${id}`, data)
             return response.data
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error updating attribute')
@@ -86,10 +86,10 @@ export const updateAttribute = createAsyncThunk(
  * @returns {Promise} - Promise with the response data
  */
 export const deleteAttribute = createAsyncThunk(
-    'admin/attributes/deleteAttribute',
+    'admin/adminAttributes/deleteAttribute',
     async (id, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.delete(`/api/v1/admin/attributes/${id}`)
+            const response = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/attributes/${id}`)
             dispatch(fetchAttributes({ page: 1, limit: 10 }))
             return response.data
         } catch (error) {
@@ -110,14 +110,14 @@ const initialState = {
     }
 };
 
-export const getAttributes = (state) => state.admin.attributes.data
-export const getLoading = (state) => state.admin.attributes.loading
-export const getFilters = (state) => state.admin.attributes.filters
-export const getCurrentAttribute = (state) => state.admin.attributes.attribute
-export const getTotalCount = (state) => state.admin.attributes.totalCount
+export const getAttributes = (state) => state.admin.adminAttributes.data
+export const getLoading = (state) => state.admin.adminAttributes.loading
+export const getFilters = (state) => state.admin.adminAttributes.filters
+export const getCurrentAttribute = (state) => state.admin.adminAttributes.attribute
+export const getTotalCount = (state) => state.admin.adminAttributes.totalCount
 
-export const attributesSlice = createSlice({
-    name: 'admin/attributes',
+export const adminAttributesSlice = createSlice({
+    name: 'admin/adminAttributes',
     initialState,
     reducers: {
         setCurrentAttribute: (state, action) => {
@@ -199,6 +199,6 @@ export const attributesSlice = createSlice({
     }
 })
 
-export const { setCurrentAttribute, setFilters } = attributesSlice.actions
+export const { setCurrentAttribute, setFilters } = adminAttributesSlice.actions
 
-export default attributesSlice.reducer 
+export default adminAttributesSlice.reducer 
