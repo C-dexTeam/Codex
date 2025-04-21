@@ -1,4 +1,4 @@
-import ChapterEdit from '@/views/chapters/edit'
+import ChapterEdit from '@/views/admin/chapters/edit'
 
 const ChapterEditPage = () => <ChapterEdit />
 

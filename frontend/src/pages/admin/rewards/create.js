@@ -1,4 +1,4 @@
-import RewardCreate from '@/views/rewards/create'
+import RewardCreate from '@/views/admin/rewards/create'
 
 const RewardCreatePage = () => <RewardCreate />
 

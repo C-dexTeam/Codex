@@ -1,4 +1,4 @@
-import RewardEdit from '@/views/rewards/edit'
+import RewardEdit from '@/views/admin/rewards/edit'
 
 const RewardEditPage = () => <RewardEdit />
 

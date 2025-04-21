@@ -1,4 +1,4 @@
-import CourseChaptersList from "@/views/chapters/list"
+import CourseChaptersList from "@/views/admin/chapters/list"
 
 const CourseChaptersPage = () => <CourseChaptersList />
 

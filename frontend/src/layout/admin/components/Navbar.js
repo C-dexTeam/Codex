@@ -1,6 +1,7 @@
 import NavigationList from "@/layout/components/navigation";
 import { Home, OpenInNew } from "@mui/icons-material";
 import { Box, Button, Container } from "@mui/material";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 const AdminNavbar = () => {
@@ -23,9 +24,11 @@ const AdminNavbar = () => {
           }}
         >
           <Box component="div" sx={{ borderRadius: '1.25rem 0rem 1.25rem 0rem', textAlign: 'center' }}>
-            <Box sx={{ height: "2.5rem" }}>
-              <img src="/images/logo/logo-admin-dashboard.png" alt="Codex Logo" />
-            </Box>
+            <Link href="/admin">
+              <Box sx={{ height: "2.5rem" }}>
+                <img src="/images/logo/logo-admin-dashboard.png" alt="Codex Logo" />
+              </Box>
+            </Link>
 
           </Box>
 
@@ -33,9 +36,9 @@ const AdminNavbar = () => {
 
           <Box sx={{ display: "flex", gap: "1rem" }}>
             {/* <Button color="info" variant="outlined">En</Button> */}
-            <Button 
-              color="primary" 
-              variant="outlined" 
+            <Button
+              color="primary"
+              variant="outlined"
               onClick={() => window.open('/', '_blank')}
               startIcon={<Home />}
               endIcon={<OpenInNew />}

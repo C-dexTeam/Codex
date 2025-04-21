@@ -1,5 +1,5 @@
 
-import CreateChapter from '@/views/chapters/create'
+import CreateChapter from '@/views/admin/chapters/create'
 
 const AddChapter = <CreateChapter />
 

@@ -24,7 +24,7 @@ const RewardForm = ({ values, setValues, handleSubmit: _handleSubmit, isEdit = f
 
         if (localErrors && Object.keys(localErrors)?.length) {
             showToast("dismiss")
-            showToast("error", "Lütfen gerekli alanları kontrol edin.")
+            showToast("error", "Please check the required fields.")
             return
         }
 

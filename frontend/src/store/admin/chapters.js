@@ -17,11 +17,11 @@ import axios from 'axios'
  */
 export const fetchChapters = createAsyncThunk(
     'chapters/fetchChapters',
-    async ({ params }, { rejectWithValue }) => {
+    async (_, { rejectWithValue, getState }) => {
         try {
-            const response = await axios.get(`/api/v1/private/chapters`, { params: { ...params, page: params?.page || 1, limit: params?.limit || 10 } })
+            const response = await axios.get(`/api/v1/private/chapters`, { params: { ...getState().chapters.filters } })
 
-            return response.data
+            return response.data.data
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Error fetching chapters')
         }
@@ -180,7 +180,7 @@ const chaptersSlice = createSlice({
             })
             .addCase(fetchChapters.fulfilled, (state, action) => {
                 state.loading = false
-                state.chapters = action.payload.data;
+                state.chapters = action.payload;
             })
             .addCase(fetchChapters.rejected, (state, action) => {
                 state.loading = false

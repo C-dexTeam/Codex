@@ -3,6 +3,7 @@ import adminCoursesReducer from './courses';
 import rewardsReducer from './rewards';
 import chaptersReducer from './chapters';
 import languagesReducer from './languages';
+import attributesReducer from './attributes';
 import planguagesReducer from './planguages';
 import compilerReducer from './compiler';
 
@@ -11,6 +12,7 @@ const adminReducer = combineReducers({
     rewards: rewardsReducer,
     chapters: chaptersReducer,
     languages: languagesReducer,
+    attributes: attributesReducer,
     planguages : planguagesReducer,
     compiler : compilerReducer
 });

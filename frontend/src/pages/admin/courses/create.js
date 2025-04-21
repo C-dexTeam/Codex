@@ -1,4 +1,4 @@
-import CourseCreate from '@/views/courses/create'
+import CourseCreate from '@/views/admin/courses/create'
 
 const CourseCreatePage = () => <CourseCreate />
 
