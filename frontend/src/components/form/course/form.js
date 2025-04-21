@@ -97,7 +97,7 @@ const CourseForm = ({
 
         if (localErrors && Object.keys(localErrors)?.length) {
             showToast("dismiss");
-            showToast("error", "Lütfen gerekli alanları kontrol edin.");
+            showToast("error", "Please check the required fields.");
             return;
         }
 
