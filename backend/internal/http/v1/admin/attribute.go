@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"fmt"
+
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
 	"github.com/gofiber/fiber/v2"
@@ -10,8 +12,8 @@ func (h *AdminHandler) initAttributesRoutes(root fiber.Router) {
 	attributeRoutes := root.Group("/attributes")
 
 	attributeRoutes.Post("/", h.AddAttribute)
-	attributeRoutes.Delete("/", h.DeleteAttribute)
 	attributeRoutes.Patch("/", h.UpdateAttribute)
+	attributeRoutes.Delete("/:id", h.DeleteAttribute)
 }
 
 // @Tags Attributes
@@ -77,17 +79,22 @@ func (h *AdminHandler) UpdateAttribute(c *fiber.Ctx) error {
 
 // @Tags Attributes
 // @Summary Delete Attribute
-// @Description Delete Attributes from DB.
+// @Description Delete an Attribute by ID.
 // @Accept json
 // @Produce json
-// @Param id path string false "Attribute ID"
-// @Success 200 {object} response.BaseResponse{}
-// @Router /admin/attributes/:id [delete]
+// @Param id path string true "Attribute ID"
+// @Success 200 {object} response.BaseResponse
+// @Failure 400 {object} response.BaseResponse
+// @Failure 500 {object} response.BaseResponse
+// @Router /admin/attributes/{id} [delete]
 func (h *AdminHandler) DeleteAttribute(c *fiber.Ctx) error {
 	id := c.Params("id")
+
+	fmt.Println(id, "desalods")
 
 	if err := h.services.AttributeService().DeleteAttribute(c.Context(), id); err != nil {
 		return err
 	}
-	return response.Response(200, "Status OK", nil)
+
+	return response.Response(200, "Attribute deleted successfully", nil)
 }

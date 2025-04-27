@@ -33,7 +33,7 @@ func NewAttributeService(
 func (s *attributeService) GetAttributes(
 	ctx context.Context,
 	id, rewardID, traitType, page, limit string,
-) ([]domains.Attribute, error) {
+) (*domains.Attributes, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -47,7 +47,7 @@ func (s *attributeService) GetAttributes(
 	if _, err := s.utilService.ParseUUID(id); err != nil {
 		return nil, err
 	}
-	if _, err := s.utilService.ParseUUID(id); err != nil {
+	if _, err := s.utilService.ParseUUID(rewardID); err != nil {
 		return nil, err
 	}
 
@@ -65,9 +65,42 @@ func (s *attributeService) GetAttributes(
 			err,
 		)
 	}
-	domainsAttr := domains.NewAttributes(attributes)
+
+	count, err := s.queries.AttributeCount(ctx)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrFetchingCount,
+			err,
+		)
+	}
+
+	domainsAttr := domains.NewAttributes(attributes, count)
 
 	return domainsAttr, nil
+}
+
+func (s *attributeService) GetAttributeByID(
+	ctx context.Context,
+	id string,
+) (*domains.Attribute, error) {
+
+	idUUID, err := s.utilService.NParseUUID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	attribute, err := s.queries.GetAttributeByID(ctx, idUUID)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrAttributeNotFound)
+		}
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringRewardsAttributes, err)
+	}
+
+	appAttribute := domains.NewAttribute(&attribute)
+
+	return appAttribute, nil
 }
 
 func (s *attributeService) AddAttribute(

@@ -8,6 +8,7 @@ import (
 func (h *PrivateHandler) initTestsRoutes(root fiber.Router) {
 	testRoutes := root.Group("/tests")
 	testRoutes.Get("/", h.GetTests)
+	testRoutes.Get("/:id", h.GetTestByID) // Buraya yeni route ekledim
 }
 
 // @Tags Test
@@ -34,4 +35,24 @@ func (h *PrivateHandler) GetTests(c *fiber.Ctx) error {
 	testDTOs := h.dtoManager.TestManager().ToTestDTOs(tests)
 
 	return response.Response(200, "Status OK", testDTOs)
+}
+
+// @Tags Test
+// @Summary Get One test
+// @Description Retrieves a specific test based on the provided test ID.
+// @Accept json
+// @Produce json
+// @Param id path string true "Test ID"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/tests/{id} [get]
+func (h *PrivateHandler) GetTestByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	test, err := h.services.TestService().GetTestByID(c.Context(), id)
+	if err != nil {
+		return err
+	}
+	testDTO := h.dtoManager.TestManager().ToTestDTO(test)
+
+	return response.Response(200, "Status OK", testDTO)
 }

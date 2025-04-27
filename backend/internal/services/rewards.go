@@ -33,7 +33,7 @@ func newRewardService(
 func (s *rewardService) GetRewards(
 	ctx context.Context,
 	id, name, symbol, page, limit string,
-) ([]domains.Reward, error) {
+) (*domains.Rewards, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -63,7 +63,15 @@ func (s *rewardService) GetRewards(
 		)
 	}
 
-	rewardDomains := domains.NewRewards(rewards, nil)
+	count, err := s.queries.RewardCount(ctx)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrFetchingCount,
+			err,
+		)
+	}
+	rewardDomains := domains.NewRewards(rewards, nil, count)
 
 	return rewardDomains, nil
 }

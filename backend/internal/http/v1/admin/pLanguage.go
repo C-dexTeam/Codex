@@ -48,7 +48,7 @@ func (h *AdminHandler) AddProgrammingLanguage(c *fiber.Ctx) error {
 		languageID,
 		newPLanguage.Name,
 		newPLanguage.Description,
-		newPLanguage.ImagePath,
+		"",
 		newPLanguage.FileExtention,
 		newPLanguage.MonacoEditor,
 	)
@@ -82,7 +82,7 @@ func (h *AdminHandler) UpdateProgrammingLanguage(c *fiber.Ctx) error {
 		updatePLanguage.LanguageID,
 		updatePLanguage.Name,
 		updatePLanguage.Description,
-		updatePLanguage.ImagePath,
+		"",
 		updatePLanguage.FileExtention,
 		updatePLanguage.MonacoEditor,
 	)

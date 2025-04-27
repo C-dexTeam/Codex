@@ -81,9 +81,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/attributes/:id": {
+        "/admin/attributes/{id}": {
             "delete": {
-                "description": "Delete Attributes from DB.",
+                "description": "Delete an Attribute by ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -99,12 +99,25 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Attribute ID",
                         "name": "id",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/response.BaseResponse"
                         }
@@ -285,8 +298,7 @@ const docTemplate = `{
                         "type": "file",
                         "description": "Course Image File",
                         "name": "imageFile",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "string",
@@ -793,6 +805,37 @@ const docTemplate = `{
                         "description": "Limit",
                         "name": "limit",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/attributes/{id}": {
+            "get": {
+                "description": "Retrieves spesific Attribute based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attributes"
+                ],
+                "summary": "Get One Attribute",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attribute ID",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -1443,6 +1486,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/tests/{id}": {
+            "get": {
+                "description": "Retrieves a specific test based on the provided test ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Get One test",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Test ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/private/user/connect": {
             "post": {
                 "description": "Connects Wallet.",
@@ -1805,7 +1880,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "fileExtention",
-                "imagePath",
                 "monacoEditor",
                 "name"
             ],
@@ -1816,10 +1890,6 @@ const docTemplate = `{
                 "fileExtention": {
                     "type": "string",
                     "maxLength": 30
-                },
-                "imagePath": {
-                    "type": "string",
-                    "maxLength": 60
                 },
                 "languageID": {
                     "type": "string"
@@ -1882,9 +1952,6 @@ const docTemplate = `{
         },
         "dto.UpdateAttributeDTO": {
             "type": "object",
-            "required": [
-                "rewardID"
-            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -1893,12 +1960,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "traitType": {
-                    "type": "string",
-                    "maxLength": 30
+                    "type": "string"
                 },
                 "value": {
-                    "type": "string",
-                    "maxLength": 30
+                    "type": "string"
                 }
             }
         },
@@ -1950,9 +2015,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "imagePath": {
                     "type": "string"
                 },
                 "languageID": {

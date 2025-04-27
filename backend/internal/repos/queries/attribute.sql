@@ -40,3 +40,6 @@ DELETE FROM
     t_attributes
 WHERE
     id = @attribute_id;
+
+-- name: AttributeCount :one
+SELECT COUNT(*) FROM t_attributes;

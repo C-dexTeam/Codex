@@ -8,6 +8,7 @@ import (
 func (h *PrivateHandler) initAttributesRoutes(root fiber.Router) {
 	attributeRoutes := root.Group("/attributes")
 	attributeRoutes.Get("/", h.GetAttributes)
+	attributeRoutes.Get("/:id", h.GetAttribute)
 }
 
 // @Tags Attributes
@@ -36,4 +37,24 @@ func (h *PrivateHandler) GetAttributes(c *fiber.Ctx) error {
 	attributeDTOs := h.dtoManager.RewardManager().ToAttributeDTOs(attributes)
 
 	return response.Response(200, "Status OK", attributeDTOs)
+}
+
+// @Tags Attributes
+// @Summary Get One Attribute
+// @Description Retrieves spesific Attribute based on the provided query parameters.
+// @Accept json
+// @Produce json
+// @Param id path string false "Attribute ID"
+// @Success 200 {object} response.BaseResponse{}
+// @Router /private/attributes/{id} [get]
+func (h *PrivateHandler) GetAttribute(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	attribute, err := h.services.AttributeService().GetAttributeByID(c.Context(), id)
+	if err != nil {
+		return err
+	}
+	chapterDTO := h.dtoManager.RewardManager().ToAttributeDTO(attribute)
+
+	return response.Response(200, "Status OK", chapterDTO)
 }

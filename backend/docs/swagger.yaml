@@ -45,9 +45,6 @@ definitions:
       fileExtention:
         maxLength: 30
         type: string
-      imagePath:
-        maxLength: 60
-        type: string
       languageID:
         type: string
       monacoEditor:
@@ -58,7 +55,6 @@ definitions:
         type: string
     required:
     - fileExtention
-    - imagePath
     - monacoEditor
     - name
     type: object
@@ -99,13 +95,9 @@ definitions:
       rewardID:
         type: string
       traitType:
-        maxLength: 30
         type: string
       value:
-        maxLength: 30
         type: string
-    required:
-    - rewardID
     type: object
   dto.UpdateChapterDTO:
     properties:
@@ -139,8 +131,6 @@ definitions:
       fileExtention:
         type: string
       id:
-        type: string
-      imagePath:
         type: string
       languageID:
         type: string
@@ -285,21 +275,30 @@ paths:
       summary: Add Attribute
       tags:
       - Attributes
-  /admin/attributes/:id:
+  /admin/attributes/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete Attributes from DB.
+      description: Delete an Attribute by ID.
       parameters:
       - description: Attribute ID
         in: path
         name: id
+        required: true
         type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Delete Attribute
@@ -377,7 +376,6 @@ paths:
       - description: Course Image File
         in: formData
         name: imageFile
-        required: true
         type: file
       - in: formData
         name: description
@@ -754,6 +752,26 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All Attributes
+      tags:
+      - Attributes
+  /private/attributes/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves spesific Attribute based on the provided query parameters.
+      parameters:
+      - description: Attribute ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get One Attribute
       tags:
       - Attributes
   /private/chapters/:
@@ -1173,6 +1191,27 @@ paths:
           schema:
             $ref: '#/definitions/response.BaseResponse'
       summary: Get All tests
+      tags:
+      - Test
+  /private/tests/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific test based on the provided test ID.
+      parameters:
+      - description: Test ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get One test
       tags:
       - Test
   /private/user/connect:

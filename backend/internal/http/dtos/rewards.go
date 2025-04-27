@@ -50,7 +50,14 @@ type RewardView struct {
 	Attributes  []AttributeDTO `json:"attributes,omitempty"`
 }
 
+type RewardViews struct {
+	Rewards     []RewardView `json:"rewards"`
+	TotalReward int64        `json:"totalReward"`
+}
+
 func (m *RewardDTOManager) ToRewardDTO(appModel *domains.Reward) RewardView {
+	x := m.ToAttributeDTOs(appModel.Attributes)
+
 	return RewardView{
 		ID:          appModel.ID,
 		Name:        appModel.Name,
@@ -58,16 +65,16 @@ func (m *RewardDTOManager) ToRewardDTO(appModel *domains.Reward) RewardView {
 		Description: appModel.Description,
 		ImagePath:   appModel.ImagePath,
 		URI:         appModel.URI,
-		Attributes:  m.ToAttributeDTOs(appModel.Attributes),
+		Attributes:  x.Attributes,
 	}
 }
 
-func (m *RewardDTOManager) ToRewardDTOs(appModels []domains.Reward) []RewardView {
+func (m *RewardDTOManager) ToRewardDTOs(appModels *domains.Rewards) RewardViews {
 	var rewardDTOs []RewardView
-	for _, model := range appModels {
+	for _, model := range appModels.Rewards {
 		rewardDTOs = append(rewardDTOs, m.ToRewardDTO(&model))
 	}
-	return rewardDTOs
+	return RewardViews{Rewards: rewardDTOs, TotalReward: appModels.TotalReward}
 }
 
 type MetadataView struct {
@@ -87,7 +94,7 @@ func (m *RewardDTOManager) ToMetadataView(appModel *domains.Reward, URL string) 
 		Description: appModel.Description,
 		Image:       URL + appModel.ImagePath,
 		URI:         appModel.URI,
-		Attributes:  m.ToMetadataAttributeDTOs(appModel.Attributes),
+		Attributes:  m.ToMetadataAttributeDTOs(appModel.Attributes.Attributes),
 	}
 }
 
@@ -133,6 +140,11 @@ type AttributeDTO struct {
 	Value     string    `json:"value" validate:"required,max=30"`
 }
 
+type AttributesDTO struct {
+	Attributes     []AttributeDTO
+	TotalAttribute int64
+}
+
 func (m *RewardDTOManager) ToAttributeDTO(appModel *domains.Attribute) AttributeDTO {
 	return AttributeDTO{
 		ID:        appModel.ID,
@@ -142,12 +154,13 @@ func (m *RewardDTOManager) ToAttributeDTO(appModel *domains.Attribute) Attribute
 	}
 }
 
-func (m *RewardDTOManager) ToAttributeDTOs(appModels []domains.Attribute) []AttributeDTO {
+func (m *RewardDTOManager) ToAttributeDTOs(appModels *domains.Attributes) AttributesDTO {
 	var attributeDTOs []AttributeDTO
-	for _, model := range appModels {
+	for _, model := range appModels.Attributes {
 		attributeDTOs = append(attributeDTOs, m.ToAttributeDTO(&model))
 	}
-	return attributeDTOs
+
+	return AttributesDTO{Attributes: attributeDTOs, TotalAttribute: appModels.TotalAttribute}
 }
 
 type AddAttributeDTO struct {
@@ -158,7 +171,7 @@ type AddAttributeDTO struct {
 
 type UpdateAttributeDTO struct {
 	ID        string `json:"id"`
-	RewardID  string `json:"rewardID" validate:"required"`
-	TraitType string `json:"traitType" validate:"max=30"`
-	Value     string `json:"value" validate:"max=30"`
+	RewardID  string `json:"rewardID"`
+	TraitType string `json:"traitType"`
+	Value     string `json:"value"`
 }

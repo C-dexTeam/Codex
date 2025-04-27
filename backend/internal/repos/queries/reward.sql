@@ -54,3 +54,6 @@ CASE
     ) THEN true
     ELSE false
 END AS exists;
+
+-- name: RewardCount :one
+SELECT COUNT(*) FROM t_rewards;
