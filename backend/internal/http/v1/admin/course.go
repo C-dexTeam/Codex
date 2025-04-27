@@ -2,6 +2,7 @@ package admin
 
 import (
 	"path/filepath"
+	"strings"
 
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
@@ -91,7 +92,7 @@ func (h *AdminHandler) AddCourse(c *fiber.Ctx) error {
 // @Description Updates Course Into DB.
 // @Accept multipart/form-data
 // @Produce json
-// @Param imageFile formData file true "Course Image File"
+// @Param imageFile formData file false "Course Image File"
 // @Param courseInfo formData dto.UpdateCourseDTO true "Update Course"
 // @Success 200 {object} response.BaseResponse{}
 // @Router /admin/courses/ [patch]
@@ -106,7 +107,7 @@ func (h *AdminHandler) UpdateCourse(c *fiber.Ctx) error {
 
 	// Dosya alanını alıyoruz (sadece imageFile)
 	imageFile, err := c.FormFile("imageFile")
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "there is no uploaded file associated with the given key") {
 		return err
 	}
 

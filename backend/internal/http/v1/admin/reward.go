@@ -3,6 +3,7 @@ package admin
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	dto "github.com/C-dexTeam/codex/internal/http/dtos"
 	"github.com/C-dexTeam/codex/internal/http/response"
@@ -88,7 +89,7 @@ func (h *AdminHandler) UpdateReward(c *fiber.Ctx) error {
 
 	// Dosya alanını alıyoruz (sadece imageFile)
 	imageFile, err := c.FormFile("imageFile")
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "there is no uploaded file associated with the given key") {
 		return err
 	}
 

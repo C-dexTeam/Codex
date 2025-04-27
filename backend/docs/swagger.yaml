@@ -376,7 +376,6 @@ paths:
       - description: Course Image File
         in: formData
         name: imageFile
-        required: true
         type: file
       - in: formData
         name: description

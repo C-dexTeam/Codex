@@ -298,8 +298,7 @@ const docTemplate = `{
                         "type": "file",
                         "description": "Course Image File",
                         "name": "imageFile",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "string",
