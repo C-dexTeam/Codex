@@ -50,6 +50,11 @@ type RewardView struct {
 	Attributes  []AttributeDTO `json:"attributes,omitempty"`
 }
 
+type RewardViews struct {
+	Rewards     []RewardView `json:"rewards"`
+	TotalReward int64        `json:"totalReward"`
+}
+
 func (m *RewardDTOManager) ToRewardDTO(appModel *domains.Reward) RewardView {
 	x := m.ToAttributeDTOs(appModel.Attributes)
 
@@ -64,12 +69,12 @@ func (m *RewardDTOManager) ToRewardDTO(appModel *domains.Reward) RewardView {
 	}
 }
 
-func (m *RewardDTOManager) ToRewardDTOs(appModels []domains.Reward) []RewardView {
+func (m *RewardDTOManager) ToRewardDTOs(appModels *domains.Rewards) RewardViews {
 	var rewardDTOs []RewardView
-	for _, model := range appModels {
+	for _, model := range appModels.Rewards {
 		rewardDTOs = append(rewardDTOs, m.ToRewardDTO(&model))
 	}
-	return rewardDTOs
+	return RewardViews{Rewards: rewardDTOs, TotalReward: appModels.TotalReward}
 }
 
 type MetadataView struct {

@@ -16,6 +16,11 @@ type Reward struct {
 	SellerFee   int
 }
 
+type Rewards struct {
+	Rewards     []Reward
+	TotalReward int64
+}
+
 type Attribute struct {
 	ID        uuid.UUID
 	RewardID  uuid.UUID
@@ -45,14 +50,14 @@ func NewReward(reward *repo.TReward, attributes []repo.TAttribute) *Reward {
 	}
 }
 
-func NewRewards(rewards []repo.TReward, attributes []repo.TAttribute) []Reward {
+func NewRewards(rewards []repo.TReward, attributes []repo.TAttribute, count int64) *Rewards {
 	var result []Reward
 
 	for _, reward := range rewards {
 		result = append(result, *NewReward(&reward, attributes))
 	}
 
-	return result
+	return &Rewards{Rewards: result, TotalReward: count}
 }
 
 func NewAttribute(attribute *repo.TAttribute) *Attribute {
