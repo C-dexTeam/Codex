@@ -1849,7 +1849,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "fileExtention",
-                "imagePath",
                 "monacoEditor",
                 "name"
             ],
@@ -1860,10 +1859,6 @@ const docTemplate = `{
                 "fileExtention": {
                     "type": "string",
                     "maxLength": 30
-                },
-                "imagePath": {
-                    "type": "string",
-                    "maxLength": 60
                 },
                 "languageID": {
                     "type": "string"
@@ -1989,9 +1984,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "imagePath": {
                     "type": "string"
                 },
                 "languageID": {

@@ -45,9 +45,6 @@ definitions:
       fileExtention:
         maxLength: 30
         type: string
-      imagePath:
-        maxLength: 60
-        type: string
       languageID:
         type: string
       monacoEditor:
@@ -58,7 +55,6 @@ definitions:
         type: string
     required:
     - fileExtention
-    - imagePath
     - monacoEditor
     - name
     type: object
@@ -135,8 +131,6 @@ definitions:
       fileExtention:
         type: string
       id:
-        type: string
-      imagePath:
         type: string
       languageID:
         type: string

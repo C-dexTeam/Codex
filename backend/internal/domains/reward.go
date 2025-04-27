@@ -12,7 +12,7 @@ type Reward struct {
 	Description string
 	ImagePath   string
 	URI         string
-	Attributes  []Attribute
+	Attributes  *Attributes
 	SellerFee   int
 }
 
@@ -21,6 +21,11 @@ type Attribute struct {
 	RewardID  uuid.UUID
 	TraitType string
 	Value     string
+}
+
+type Attributes struct {
+	Attributes     []Attribute
+	TotalAttribute int64
 }
 
 func NewReward(reward *repo.TReward, attributes []repo.TAttribute) *Reward {
@@ -35,7 +40,7 @@ func NewReward(reward *repo.TReward, attributes []repo.TAttribute) *Reward {
 		Description: reward.Description,
 		ImagePath:   reward.ImagePath.String,
 		URI:         reward.Uri.String,
-		Attributes:  NewAttributes(attributes),
+		Attributes:  NewAttributes(attributes, 0),
 		SellerFee:   int(reward.SellerFee),
 	}
 }
@@ -63,12 +68,12 @@ func NewAttribute(attribute *repo.TAttribute) *Attribute {
 	}
 }
 
-func NewAttributes(attributes []repo.TAttribute) []Attribute {
+func NewAttributes(attributes []repo.TAttribute, count int64) *Attributes {
 	var result []Attribute
 
 	for _, attribute := range attributes {
 		result = append(result, *NewAttribute(&attribute))
 	}
 
-	return result
+	return &Attributes{Attributes: result, TotalAttribute: count}
 }

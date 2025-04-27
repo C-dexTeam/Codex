@@ -33,7 +33,7 @@ func NewAttributeService(
 func (s *attributeService) GetAttributes(
 	ctx context.Context,
 	id, rewardID, traitType, page, limit string,
-) ([]domains.Attribute, error) {
+) (*domains.Attributes, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || page == "" {
 		pageNum = 1
@@ -65,7 +65,17 @@ func (s *attributeService) GetAttributes(
 			err,
 		)
 	}
-	domainsAttr := domains.NewAttributes(attributes)
+
+	count, err := s.queries.AttributeCount(ctx)
+	if err != nil {
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(
+			serviceErrors.StatusInternalServerError,
+			serviceErrors.ErrFetchingCount,
+			err,
+		)
+	}
+
+	domainsAttr := domains.NewAttributes(attributes, count)
 
 	return domainsAttr, nil
 }

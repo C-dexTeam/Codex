@@ -124,6 +124,7 @@ const (
 	ErrErrorWhileHashing                       = "ERROR_WHILE_HASHING"
 	ErrTransactionError                        = "ERROR_WHILE_COMMITING"
 	ErrWalletVerificationError                 = "ERROR_WHILE_VERIFICATON_WALLET"
+	ErrFetchingCount                           = "ERROR_WHILE_FETCHING_COUNT"
 
 	ErrPublicKeyEmpty             = "PUBLIC_KEY_EMPTY"
 	ErrErrorWhileSettingPublicKey = "ERROR_WHILE_SETTING_PUBLIC_KEY"

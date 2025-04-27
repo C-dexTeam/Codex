@@ -12,6 +12,17 @@ import (
 	"github.com/google/uuid"
 )
 
+const attributeCount = `-- name: AttributeCount :one
+SELECT COUNT(*) FROM t_attributes
+`
+
+func (q *Queries) AttributeCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, attributeCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createAttribute = `-- name: CreateAttribute :one
 INSERT INTO 
     t_attributes (reward_id, trait_type, value)
