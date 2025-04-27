@@ -18,6 +18,7 @@ const (
 	ErrRoleNotFound                = "ROLE_NOT_FOUND"
 	ErrRewardNotFound              = "REWARD_NOT_FOUND"
 	ErrRewardAttributeNotFound     = "REWARD_ATTRIBUTE_NOT_FOUND"
+	ErrAttributeNotFound           = "ATTRIBUTE_NOT_FOUND"
 	ErrChapterNotFound             = "CHAPTER_NOT_FOUND"
 	ErrTestNotFound                = "TEST_NOT_FOUND"
 	ErrInputNotFound               = "INPUT_NOT_FOUND"

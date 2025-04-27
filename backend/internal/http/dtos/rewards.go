@@ -158,7 +158,7 @@ type AddAttributeDTO struct {
 
 type UpdateAttributeDTO struct {
 	ID        string `json:"id"`
-	RewardID  string `json:"rewardID" validate:"required"`
-	TraitType string `json:"traitType" validate:"max=30"`
-	Value     string `json:"value" validate:"max=30"`
+	RewardID  string `json:"rewardID"`
+	TraitType string `json:"traitType"`
+	Value     string `json:"value"`
 }

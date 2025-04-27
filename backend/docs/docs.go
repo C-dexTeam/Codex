@@ -81,9 +81,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/attributes/:id": {
+        "/admin/attributes/{id}": {
             "delete": {
-                "description": "Delete Attributes from DB.",
+                "description": "Delete an Attribute by ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -99,12 +99,25 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Attribute ID",
                         "name": "id",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/response.BaseResponse"
                         }
@@ -793,6 +806,37 @@ const docTemplate = `{
                         "description": "Limit",
                         "name": "limit",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/attributes/{id}": {
+            "get": {
+                "description": "Retrieves spesific Attribute based on the provided query parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attributes"
+                ],
+                "summary": "Get One Attribute",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attribute ID",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -1882,9 +1926,6 @@ const docTemplate = `{
         },
         "dto.UpdateAttributeDTO": {
             "type": "object",
-            "required": [
-                "rewardID"
-            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -1893,12 +1934,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "traitType": {
-                    "type": "string",
-                    "maxLength": 30
+                    "type": "string"
                 },
                 "value": {
-                    "type": "string",
-                    "maxLength": 30
+                    "type": "string"
                 }
             }
         },
