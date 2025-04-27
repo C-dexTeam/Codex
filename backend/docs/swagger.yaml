@@ -1193,6 +1193,27 @@ paths:
       summary: Get All tests
       tags:
       - Test
+  /private/tests/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific test based on the provided test ID.
+      parameters:
+      - description: Test ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get One test
+      tags:
+      - Test
   /private/user/connect:
     post:
       consumes:

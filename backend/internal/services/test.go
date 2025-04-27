@@ -69,6 +69,28 @@ func (s *testService) GetTests(
 	return domainTests, nil
 }
 
+func (s *testService) GetTestByID(
+	ctx context.Context,
+	id string,
+) (*domains.Test, error) {
+
+	idUUID, err := s.utilService.NParseUUID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	test, err := s.queries.GetTest(ctx, idUUID)
+	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, serviceErrors.NewServiceErrorWithMessage(serviceErrors.StatusBadRequest, serviceErrors.ErrTestNotFound)
+		}
+		return nil, serviceErrors.NewServiceErrorWithMessageAndError(serviceErrors.StatusInternalServerError, serviceErrors.ErrErrorWhileFilteringTests, err)
+	}
+	domainTest := domains.NewTest(&test)
+
+	return domainTest, nil
+}
+
 func (s *testService) AddTest(
 	ctx context.Context,
 	chapterID, inputValue, outputValue string,
