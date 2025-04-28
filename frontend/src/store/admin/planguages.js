@@ -150,6 +150,8 @@ const adminPlanguagesSlice = createSlice({
       })
       .addCase(updatePlanguages.fulfilled, (state, action) => {
         state.loading = false;
+        showToast("dismiss");
+        showToast("success", "Planguage updated successfully");
 
       })
       .addCase(updatePlanguages.rejected, (state, action) => {

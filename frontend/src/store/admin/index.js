@@ -6,6 +6,7 @@ import adminLanguagesReducer from './languages';
 import adminAttributesReducer from './attributes';
 import adminPlanguagesReducer from './planguages';
 import adminCompilerReducer from './compiler';
+import adminTestReducer from './test';
 
 const adminReducer = combineReducers({
     adminCourses: adminCoursesReducer,
@@ -14,7 +15,8 @@ const adminReducer = combineReducers({
     adminLanguages: adminLanguagesReducer,
     adminAttributes: adminAttributesReducer,
     adminPlanguages: adminPlanguagesReducer,
-    adminCompiler: adminCompilerReducer
+    adminCompiler: adminCompilerReducer,
+    adminTest : adminTestReducer,
 });
 
 export default adminReducer;

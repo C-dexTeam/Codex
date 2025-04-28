@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -10,20 +10,38 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { theme } from "@/configs/theme";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import { getTest } from "@/store/test/testSlice";
 
 const TestCases = () => {
-  const testCases = [
-    { id: 1, nums: "[2, 7, 11, 15]", target: "9" },
-    { id: 2, nums: "[3, 2, 4]", target: "6" },
-    { id: 3, nums: "[3, 3]", target: "6" },
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { id } = router.query;
+
+  const { test: testSlice } = useSelector((state) => state);
+
+  useEffect(() => {
+    if (router.isReady) {
+      dispatch(getTest({ id: router.query.code }));
+    }
+  }, [router.isReady, router.query.code]);
+
+  const fallbackCases = [
+    { id: 1, input: "I'm Sorry", output: "here is empty" },
   ];
+
+  const testCases =
+    testSlice?.data?.data && testSlice.data.data.length > 0
+      ? testSlice.data.data
+      : fallbackCases;
 
   return (
     <Box sx={{ height: "100%", overflow: "auto" }}>
       <Typography variant="h4" color={`${theme.palette.primary.main}`}>
         Expected Test Cases
       </Typography>
-      {testCases.map((testCase, index) => (
+      {testCases?.map((testCase, index) => (
         <Accordion
           key={testCase.id}
           sx={{
@@ -41,7 +59,6 @@ const TestCases = () => {
           <AccordionDetails>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                {/* input yazısı */}
                 <Typography
                   variant="body1"
                   color={`${theme.palette.secondary.main}`}
@@ -52,7 +69,7 @@ const TestCases = () => {
                 <TextField
                   fullWidth
                   variant="outlined"
-                  value={testCase.nums}
+                  value={testCase.input}
                   InputProps={{ readOnly: true }}
                   sx={{
                     backgroundColor: `${theme.palette.action.hover}`,
@@ -75,7 +92,7 @@ const TestCases = () => {
                 <TextField
                   fullWidth
                   variant="outlined"
-                  value={testCase.target}
+                  value={testCase.output}
                   InputProps={{ readOnly: true }}
                   sx={{
                     backgroundColor: `${theme.palette.action.hover}`,

@@ -8,8 +8,8 @@ const initialState = {
 };
 
 export const fethcCompiler = createAsyncThunk(
-  "compiler/fethcCompiler",
-  async (params = {}) => {
+  'admin/adminCompiler/fethcCompiler',
+  async (params = {}, { rejectWithValue }) => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/private/chapters/compilerNames`,
@@ -17,15 +17,15 @@ export const fethcCompiler = createAsyncThunk(
       );
       return response.data?.data;
     } catch (error) {
-      return error.response.data;
+      return rejectWithValue(error.response.data);
     }
   }
 );
 
 
 
-const compilerSlice = createSlice({
-  name: "compiler",
+export const adminCompilerSlice = createSlice({
+  name: 'admin/adminCompiler',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -43,8 +43,8 @@ const compilerSlice = createSlice({
   },
 });
 
-export const getLoading = (state) => state.admin.courses.loading;
-export const getCompiler = (state) => state.admin.compiler.data;
-export const getCompilerLoading = (state) => state.admin.compiler.loading;
+export const getCompiler = (state) => state.admin.adminCompiler.data;
+export const getCompilerLoading = (state) => state.admin.adminCompiler.loading;
+export const getCompilerErrors = (state) => state.admin.adminCompiler.errors;
 
-export default compilerSlice.reducer;
+export default adminCompilerSlice.reducer;

@@ -92,6 +92,7 @@ const PlanguageForm = ({
     const compiler = useSelector(getCompiler)
 
 
+
     const handleSubmit = () => {
         setIsSubmitted(true);
 
@@ -131,6 +132,7 @@ const PlanguageForm = ({
 
         return isSubmitted && localErrors?.[field] ? localErrors[field] : undefined;
     };
+
 
 
 
@@ -196,9 +198,9 @@ const PlanguageForm = ({
                     required
                     label="Language"
                     id='languageID'
-                    disabled ={isEdit}
                     firstSelect={"-- Select a language --"}
                     value={values?.languageID}
+                    disabled={isEdit}
                     onChange={e => setValues({ ...values, languageID: e.target.value })}
                     items={
                         defLanguages && defLanguages?.length > 0 &&

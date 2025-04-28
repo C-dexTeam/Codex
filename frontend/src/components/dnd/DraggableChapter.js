@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { Delete, DragIndicator, Edit } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { deleteChapter } from '@/store/admin/chapters';
+import PsychologyAltIcon from '@mui/icons-material/PsychologyAlt';
 
 const DragHandle = () => (
     <Box
@@ -59,6 +60,10 @@ const DraggableChapter = ({ id, chapter }) => {
         dispatch(deleteChapter(chapter.id));
     };
 
+    const handleTestClick = () => {
+        router.push(`/admin/chapter/${chapter.id}/test`);
+    };
+
     return (
         <>
             <Dialog
@@ -107,6 +112,13 @@ const DraggableChapter = ({ id, chapter }) => {
                 </CardContent>
 
                 <CardActions flat>
+                    <Button
+                        onClick={handleTestClick}
+                        variant='empty'
+                        color='secondary'
+                    >
+                        <PsychologyAltIcon sx={{ mr: 1 }} /> Test
+                    </Button>
                     <Button
                         onClick={handleDetailsClick}
                         variant='empty'

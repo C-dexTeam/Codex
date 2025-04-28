@@ -34,6 +34,12 @@ const navigation = [
     },
     { // single item
         type: "item",
+        title: 'Programming Languages',
+        path: '/admin/planguages',
+        permission: 'admin',
+    },
+    { // single item
+        type: "item",
         path: "/roadmap",
         title: "roadmap",
         permission: "admin",
