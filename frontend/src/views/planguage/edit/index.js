@@ -37,12 +37,11 @@ const PlanguageEdit = () => {
     }, [plangauge])
 
     const handleSubmit = (dataMain) => {
-        const data = {
-            ...dataMain,
-             courseId
-        }
+       
+
         dispatch(updatePlanguages({
-            data,
+            id: plangauge.id,
+            ...dataMain,
             callback: () => router.replace("/admin/plangauge")
         }))
     }

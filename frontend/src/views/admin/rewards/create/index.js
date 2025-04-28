@@ -17,7 +17,6 @@ const RewardCreate = () => {
 
     // ** Handlers
     const handleSubmit = (data) => {
-        console.log("qweqe", data);
 
         let formData = new FormData()
 

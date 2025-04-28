@@ -26,8 +26,8 @@ const CourseChaptersList = () => {
         const { active, over } = event;
 
         if (active?.data?.current?.sortable?.index !== over?.data?.current?.sortable?.index) {
-            const oldIndex = chapters.findIndex((item, index) => index === active?.data?.current?.sortable?.index);
-            const newIndex = chapters.findIndex((item, index) => index === over?.data?.current?.sortable?.index);
+            const oldIndex = chapters?.findIndex((item, index) => index === active?.data?.current?.sortable?.index);
+            const newIndex = chapters?.findIndex((item, index) => index === over?.data?.current?.sortable?.index);
             const newItems = arrayMove(chapters, oldIndex, newIndex);
 
             newItems?.forEach((item, index) => {
@@ -89,7 +89,7 @@ const CourseChaptersList = () => {
             </Box>
 
             <SortableList
-                chapters={chapters}
+                chapters={chapters || []}
                 onSortEnd={handleSortEnd}
             />
 
