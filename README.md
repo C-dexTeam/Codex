@@ -1,49 +1,64 @@
 # Codex
-This repository is a comprehensive learning platform designed for developers who want to build on the Solana Blockchain. It not only focuses on Solana but also provides resources to learn essential technologies like Rust, JavaScript, Go, and Ruby, which are crucial for creating Solana-based applications.
 
-## Lisanslama  
-This project is offered with two different license models: 
-1. **Open Source:** It is available for personal and educational use.  
-2. **Commercial License:** A special license is available for those who wish to use the software for commercial purposes. Contact [buildwithcodex@gmail.com](mailto:buildwithcodex@gmail.com) for more information.
+**Codex** is a comprehensive learning platform designed for developers who want to build applications on the **Solana Blockchain**.
+It not only focuses on Solana but also provides resources to learn essential technologies such as **Rust, JavaScript, Go, and Ruby**, which are crucial for building robust Solana-based applications.
 
+---
+
+## 📝 Licensing
+
+This project is offered under two different license models:
+
+1. **Open Source:** Available for personal and educational use.
+2. **Commercial License:** A special license is available for commercial use.
+   Please contact us for more details: [buildwithcodex@gmail.com](mailto:buildwithcodex@gmail.com)
+
+---
 
 ## 🚀 Quick Start
 
 ### 📥 Clone the Repository
 
 ```bash
-git clone --recurse-submodules https://github.com/C-dexTeam/Codex.git
+git clone https://github.com/C-dexTeam/Codex.git --recursive
 cd Codex
-
-Use --recurse-submodules to fetch all submodules (e.g. Codex-Web3, Codex-Compiler).
-
 ```
-⚙️ Requirements
-Docker
 
-Docker Compose
+> **Note:** Be sure to use the `--recursive` flag to fetch all submodules (e.g., `Codex-Web3`, `Codex-Compiler`).
 
-GNU Make (default in Linux/macOS/WSL)
+---
 
+### ⚙️ Requirements
 
+* [Docker](https://www.docker.com/)
+* [Docker Compose](https://docs.docker.com/compose/)
+* [GNU Make](https://www.gnu.org/software/make/) (comes pre-installed on most Linux/macOS/WSL systems)
 
-🧪 Run in Development Mode
-bash
+---
+
+### 🧪 Run in Development Mode
+
+```bash
 make dev
+```
 
-🛑 Stop and Remove Containers
-bash
-make down
+Alternatively, you can use Docker Compose directly:
 
-🛠️ Build Containers (Optional)
-bash
-make dev-build
+```bash
+docker-compose -f ./deployment/dev.docker-compose.yaml up --build
+```
+---
 
-❓ Show Available Commands
-bash
+### ❓ List All Available Make Commands
+
+```bash
 make help
+```
 
-📁 Project Structure
+---
+
+## 📁 Project Structure
+
 ```
 Codex/
 ├── backend/           # Backend services
